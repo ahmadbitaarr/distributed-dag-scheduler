@@ -2,7 +2,7 @@
 
 | ID | Category / gate | Observation | Required next action |
 |---|---|---|---|
-| S1-04 | **BLOCKER — integration** | Push to origin is refused: HTTP 403, Hasanlm23123 has no write access to ahmadbitaarr/distributed-dag-scheduler. Steps 1–9 exist only as local commits on stacked branches `ms2/step-01-build-foundation` … `ms2/step-09-video`. | The repo owner grants write access. Then push the branches and fast-forward `main` to the Step 9 commit, in order. Never force-push. |
+| S1-04 | Integration pending | Write access now works: branches `ms2/step-01-build-foundation` … `ms2/step-09-video` are pushed to origin (stacked, each containing the previous). `main` is still at 82ca8bc and can fast-forward to the Step 9 commit. | Integrate through the team's process: fast-forward `main` or open a PR from `ms2/step-09-video`. Never force-push. |
 | S0-02 | Historical provenance gap | Earlier build/native passes lack a Git SHA, a full tested-source manifest and run-time JAR fingerprints, so the exact tested revision is UNKNOWN. | Keep them historical only. Current evidence carries `source_revision` (Step 8 onward). |
 | S1-02a | Environment | `make` is not installed on the verifying Windows host, so each target's recipe was run directly (Compose `up`/`down`, `deploy/harness/run.sh`, `tests.harness.demo`). The Makefile itself has not been executed. | A teammate on Linux or macOS runs `make up demo down` and `make test` (Step 13). |
 | S1-03a | Toolchain | Maven is not vendored (there is no `mvnw`). The harness container pins Maven 3.9.9, so `make test` needs only Docker. | Optional: add a Maven wrapper for host builds. |

@@ -1,6 +1,6 @@
 # Step 09 — Concrete video-file demonstration
 
-Status: DONE on branch ms2/step-09-video (gate passed; not yet on main — push blocked, see S1-04).
+Status: DONE on branch ms2/step-09-video (gate passed; pushed to origin; not yet on main, see S1-04).
 Base commit: 4d2f8c9 (Step 8). Writer: Hasanlm23123.
 
 ## Added and changed

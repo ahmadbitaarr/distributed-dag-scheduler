@@ -1,12 +1,12 @@
 # MS2 sequential progress
 
 Current step: 9 — Concrete video demonstration
-Status: DONE on step branch (gate passed). Steps 1–9 await integration into main; the push is blocked (no write access, OPEN_ISSUES S1-04).
+Status: DONE on step branch (gate passed). Steps 1–9 are pushed to origin as step branches and await integration into main (OPEN_ISSUES S1-04).
 Current writer: Hasanlm23123
 Next teammate: not assigned
 Repository / remote: https://github.com/ahmadbitaarr/distributed-dag-scheduler
 Accepted branch: main (still at 82ca8bc)
-Local step branches (stacked, each containing the previous): ms2/step-01-build-foundation … ms2/step-09-video
+Pushed step branches (stacked, each containing the previous): ms2/step-01-build-foundation … ms2/step-09-video
 Last accepted shared GitHub commit: 82ca8bc (82ca8bcbac2b967493aacdb1865afdde7d24cded)
 
 Canonical architecture: docs/CS4094_MS2_Architecture.md
