@@ -2,7 +2,7 @@
 
 | ID | Category / gate | Observation | Required next action |
 |---|---|---|---|
-| S0-01 | BLOCKER — Step 0 GitHub | Connected profile Abu7arb111 is visible, but installations/accounts/repositories are empty; no shared repo, branch or pushed SHA exists. | User supplies/creates the team repository and enables connected GitHub repository access/write permission. Resume Step 0 commit/push gate. |
+| S0-01 | RESOLVED — Step 0 GitHub | Shared repository https://github.com/ahmadbitaarr/distributed-dag-scheduler exists; Step 0 accepted on `main` at 82ca8bc (82ca8bcbac2b967493aacdb1865afdde7d24cded). | None. Step 0 is DONE; Step 1 may proceed. |
 | S0-02 | Historical provenance gap | Earlier build/native passes lack Git SHA, full tested-source manifest and run-time JAR fingerprints. Exact tested revision UNKNOWN. | Keep them historical only. Record fresh base commit/source manifest with new Step 1 build; do not retroactively certify checkpoint. |
 | S1-01 | Environment — Step 1 | Latest recorded build stopped fetching Maven JUnit provider through unavailable private proxy; no JUnit tests ran. | Reproduce mvn -B verify in the normal build environment after Step 0 acceptance; exclude private proxy configuration. |
 | S1-02 | Missing — Step 1 and service gates | No Makefile, Dockerfiles or Compose service files; Python Compose harness is only a draft. Docker/Compose availability unverified. | Complete at the ordered roadmap gates, preserving existing code. |
