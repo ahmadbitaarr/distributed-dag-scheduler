@@ -12,7 +12,7 @@ The design is fixed by [docs/CS4094_MS2_Architecture.md](docs/CS4094_MS2_Archite
 |---|---|---|
 | Java | 21 **JDK** | You need the full JDK (e.g. `openjdk-21-jdk`), not only a JRE. With only a JRE, Maven fails with a misleading `release version 21 not supported`. |
 | Maven | 3.9.x | Verified with 3.9.9. |
-| Python | 3.12 | Used for pytest orchestration, the harness and benchmarks. |
+| Python | 3.12 | Used for pytest orchestration, the harness and benchmarks. Provided by the harness container. A host Python is needed only for `make demo` and the Compose backend (standard library plus pytest). |
 | pytest | pinned in `requirements.txt` | The only third-party Python dependency. |
 | FFmpeg / ffprobe | any recent | Only workers need these, for video operations. The worker image installs them. |
 | Docker + Docker Compose v2 | Engine 27.x, Compose 2.29 verified | Used for the containerized deployment. |
@@ -59,19 +59,43 @@ Ports bind to `127.0.0.1`: scheduler `${SCHEDULER_PORT:-8080}` and artifact stor
 
 Pinned images: `maven:3.9.9-eclipse-temurin-21` (build stage) and `eclipse-temurin:21.0.5_11-jre-jammy` (runtime). The worker runtime adds Ubuntu 22.04's `ffmpeg` package (4.4.2 when verified).
 
+## Evaluator commands
+
+| Command | What it does |
+|---|---|
+| `make build` | `mvn -B verify`: compile and run the JUnit tests. |
+| `make up` | Build the images and start the scheduler, the artifact store and `WORKERS` (default 3) workers via Compose. Waits for readiness. |
+| `make demo` | Against `make up`: upload the committed workloads and run the functional DAG and the video DAG. Checks the results and writes all outputs to `results/demo/<timestamp>/`. |
+| `make test` | In the Linux harness container: `mvn -B verify`, then the full pytest suite. Requires **exactly one** XFAIL, the intentional worker-crash oracle. Evidence goes to `results/latest-tests/`. |
+| `make down` | Stop the deployment. Artifact files and `results/` are kept. |
+
+`make fault-demo` and `make bench` are added at roadmap Steps 10 and 12. On Windows without `make`, run the recipe lines from `Makefile` directly, for example `sh deploy/harness/run.sh` from Git Bash.
+
 ## Tests
 
+The suite runs in a pinned Linux harness container, so the host needs only Docker:
+
 ```bash
-python3.12 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-mvn -B verify                         # JUnit
-pytest                                # integration + fault tests (native backend by default)
-MS2_BACKEND=compose pytest            # same tests against the Compose deployment
+sh deploy/harness/run.sh                              # = make test
+sh deploy/harness/run.sh pytest -q tests/integration/test_api.py   # any command, run in the harness
+MS2_BACKEND=compose pytest -q tests/integration/test_system.py     # host Python: drive real containers
 ```
 
-`pytest.ini` enables `xfail_strict`. The MS2 suite is expected to have exactly one strict, narrowly typed XFAIL: the worker-crash reassignment oracle in `tests/faults/`. Integration and fault tests are verified at later roadmap steps. See [docs/PROGRESS.md](docs/PROGRESS.md) for which ones currently have evidence.
+The harness image is `deploy/harness/Dockerfile`: Ubuntu 24.04, JDK 21, Maven 3.9.9, Python 3.12, pytest from `requirements.txt`, and FFmpeg. It works on a container-local copy of the checkout and copies evidence back.
 
-The top-level `make up | demo | test | fault-demo | bench | down` targets required by the architecture (§15) do not exist yet. They are added at later roadmap steps.
+| Suite | Location | Contents |
+|---|---|---|
+| JUnit | `*/src/test/java` | Wire contract and DAG validation, the scheduler state machine (including concurrency and the silent-owner gap), and the artifact store over real HTTP. |
+| Unit (pytest) | `tests/unit/` | The history checker falsifies each safety invariant on a real saved history. |
+| Integration | `tests/integration/` | API, worker and client lifecycle, the functional workload, replay and retry safety, and the video pipeline. |
+| Fault | `tests/faults/` | The worker-crash reassignment oracle: one strict XFAIL limited to `RecoveryNotObserved`. |
+
+`pytest.ini` enables `xfail_strict`, and `MS2_REQUIRE_XFAIL=1` fails the run unless exactly one XFAIL occurs. Every test exports its evidence. `python -m tests.harness.check_evidence <dir>` re-checks the safety invariants offline. See [docs/evidence.md](docs/evidence.md).
+
+## Workloads
+
+- [workloads/functional/](workloads/functional/): the five-task DAG (A=3 → B=7, C=15 → D=22 → `result=22`) with expected outputs.
+- [workloads/video/](workloads/video/): a synthetic, reproducible 10 s 1280×720 sample, fixture subtitles, checksums and provenance. The video DAG is inspect → 720p / 360p / thumbnail / subtitles → publish.
 
 ## Repository layout
 
@@ -84,7 +108,8 @@ The top-level `make up | demo | test | fault-demo | bench | down` targets requir
 | `client/` | CLI for upload, submit, status and fetch |
 | `tests/` | pytest harness, integration and fault tests |
 | `benchmarks/` | Benchmark driver |
-| `workloads/` | Video sample and fixture subtitles |
+| `workloads/` | Functional and video workloads with provenance |
 | `deploy/compose/` | Local Docker Compose deployment |
-| `docs/` | Architecture, roadmap, progress, handoffs, open issues |
+| `deploy/harness/` | Linux harness/client container for tests |
+| `docs/` | Architecture, roadmap, API contract (`api.md`), evidence and event schema (`evidence.md`), progress, handoffs, open issues |
 | `results/handoffs/` | Per-step verification evidence |

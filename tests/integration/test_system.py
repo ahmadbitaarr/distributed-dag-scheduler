@@ -211,25 +211,63 @@ def test_strict_json_types_and_unknown_fields(system):
     assert request(system.scheduler, "/v1/jobs", {"scheduler_run_id": system.api.run_id, "manifest": m})[0] == 400
 
 
+def ffprobe(path):
+    return json.loads(subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(path)]))
+
+
 def test_video_pipeline(system):
     workers = [system.start_worker() for _ in range(3)]
     directory = ROOT / "workloads/video"
+    expected_sums = dict(reversed(line.split()) for line in (directory / "SHA256SUMS").read_text().splitlines())
+    for name, digest in expected_sums.items():
+        assert hashlib.sha256((directory / name).read_bytes()).hexdigest() == digest, f"{name} differs from SHA256SUMS"
     video = system.api.put((directory / "sample.mp4").read_bytes(), f"inputs/{uid()}/sample.mp4", "video/mp4")
     subtitles = system.api.put((directory / "fixture.srt").read_bytes(), f"inputs/{uid()}/fixture.srt", "application/x-subrip")
     m = video_manifest(video, subtitles)
     snapshot = system.api.complete(system.api.submit(m), 90)
+    tasks = snapshot["tasks"]
+    evidence = {"inputs": {"video": video, "subtitles": subtitles}, "outputs": {}}
+
+    metadata = json.loads(system.api.get(tasks["inspect"]["outputs"]["metadata"]))
+    source = next(s for s in metadata["streams"] if s["codec_type"] == "video")
+    assert (source["width"], source["height"]) == (1280, 720)
+    assert abs(float(metadata["format"]["duration"]) - 10.0) < 0.1
+
     publication = json.loads(system.api.get(snapshot["outputs"]["result"]))
-    assert publication["fixture_subtitles"] is True
-    assert set(publication["artifacts"]) == {"video720", "video360", "image", "subtitles"}
+    assert publication["schema_version"] == 1 and publication["fixture_subtitles"] is True
+    accepted = {"video720": tasks["transcode720"]["outputs"]["video"], "video360": tasks["transcode360"]["outputs"]["video"],
+                "image": tasks["thumbnail"]["outputs"]["image"], "subtitles": tasks["subtitles"]["outputs"]["subtitles"]}
+    assert publication["artifacts"] == accepted, "publish must reference exactly the accepted branch outputs"
+
     for name, height in [("video720", 720), ("video360", 360)]:
-        output = publication["artifacts"][name]
-        accepted = snapshot["tasks"]["transcode" + str(height)]["outputs"]["video"]
-        assert output == accepted
         file = system.evidence / (name + ".mp4")
-        file.write_bytes(system.api.get(output))
-        info = json.loads(subprocess.check_output(["ffprobe", "-v", "error", "-show_streams", "-of", "json", str(file)]))
+        file.write_bytes(system.api.get(accepted[name]))
+        info = ffprobe(file)
         stream = next(s for s in info["streams"] if s["codec_type"] == "video")
+        assert stream["codec_name"] == "h264"
         assert (stream["width"], stream["height"]) == ((1280, 720) if height == 720 else (640, 360))
-    assert system.api.get(publication["artifacts"]["image"]).startswith(b"\x89PNG\r\n\x1a\n")
-    assert system.api.get(publication["artifacts"]["subtitles"]) == (directory / "fixture.srt").read_bytes()
-    check_history(m, snapshot, system.api.events(), [e for w in workers for e in system.worker_events(w)])
+        assert abs(float(info["format"]["duration"]) - 10.0) < 0.2
+        assert publication["metadata"][name]["streams"][0]["height"] == height
+        evidence["outputs"][name] = {"descriptor": accepted[name], "codec": stream["codec_name"], "width": stream["width"],
+                                     "height": stream["height"], "duration": info["format"]["duration"]}
+
+    png = system.api.get(accepted["image"])
+    assert png.startswith(bytes([0x89]) + b"PNG" + bytes([13, 10, 26, 10])) and png[12:16] == b"IHDR"
+    width, height = int.from_bytes(png[16:20], "big"), int.from_bytes(png[20:24], "big")
+    assert (width, height) == (1280, 720)
+    (system.evidence / "thumbnail.png").write_bytes(png)
+    evidence["outputs"]["image"] = {"descriptor": accepted["image"], "width": width, "height": height}
+
+    assert system.api.get(accepted["subtitles"]) == (directory / "fixture.srt").read_bytes()
+    evidence["outputs"]["subtitles"] = {"descriptor": accepted["subtitles"], "byte_identical_to_fixture": True}
+
+    events = system.api.events()
+    check_history(m, snapshot, events, [e for w in workers for e in system.worker_events(w)])
+    branches = ["transcode720", "transcode360", "thumbnail", "subtitles"]
+    sessions = {tasks[b]["attempts"][-1]["identity"]["worker_session_id"] for b in branches}
+    assert len(sessions) >= 2, "independent branches should spread across workers"
+    seq = {(e["event_type"], e.get("task_id")): e["scheduler_event_seq"] for e in events if e.get("job_id") == m["job_id"]}
+    assert all(seq["task_succeeded", b] < seq["task_assigned", "publish"] for b in branches)
+    assert all(seq["task_succeeded", "inspect"] < seq["task_assigned", b] for b in branches)
+    evidence.update({"publication": publication, "branch_sessions": sorted(sessions), "job_duration_ns": snapshot["duration_ns"]})
+    (system.evidence / "video-demo.json").write_text(json.dumps(evidence, indent=2))

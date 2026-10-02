@@ -9,7 +9,7 @@ rm -rf /tmp/src && mkdir -p /tmp/src
 cd /tmp/src
 export MS2_EVIDENCE_DIR=/tmp/src/results/latest-tests
 if [ "$#" -eq 0 ]; then
-  set -- sh -c 'mvn -B -q package -DskipTests && MS2_REQUIRE_XFAIL=1 pytest'
+  set -- sh -c 'mvn -B -q verify && MS2_REQUIRE_XFAIL=1 pytest'
 fi
 "$@"
 status=$?

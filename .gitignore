@@ -27,3 +27,4 @@ maven-settings.xml
 Thumbs.db
 # Evidence under results/handoffs is explicitly retained.
 results/latest-tests/
+results/demo/

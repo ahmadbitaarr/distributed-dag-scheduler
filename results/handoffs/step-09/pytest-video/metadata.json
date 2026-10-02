@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_video_pipeline",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "393a8d13-7669-48b0-8cc0-879fed42b532",
+  "source_revision": "4d2f8c9622f60d1f98164a9af8b2314c6bcbeab8+uncommitted",
+  "started_utc": "2026-10-02T10:53:07.608563+00:00",
+  "finished_utc": "2026-10-02T10:53:24.257820+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

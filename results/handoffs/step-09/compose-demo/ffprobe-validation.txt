@@ -1,0 +1,5 @@
+video720.mp4: h264|1280|720 10.000000 
+video360.mp4: h264|640|360 10.000000 
+thumbnail.png: png|1280|720 N/A 
+
+subtitles: byte-identical to fixture

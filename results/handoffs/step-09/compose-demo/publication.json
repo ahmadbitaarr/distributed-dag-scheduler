@@ -1,0 +1,180 @@
+{
+  "fixture_subtitles": true,
+  "metadata": {
+    "video360": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "width": 640,
+          "height": 360,
+          "coded_width": 640,
+          "coded_height": 360,
+          "closed_captions": 0,
+          "has_b_frames": 2,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "16:9",
+          "pix_fmt": "yuv420p",
+          "level": 22,
+          "chroma_location": "left",
+          "refs": 1,
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "r_frame_rate": "20/1",
+          "avg_frame_rate": "20/1",
+          "time_base": "1/10240",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 102400,
+          "duration": "10.000000",
+          "bit_rate": "173990",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "200",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "format": {
+        "filename": "/tmp/dag-attempt-15459818600093086873/input-video360",
+        "nb_streams": 1,
+        "nb_programs": 0,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "start_time": "0.000000",
+        "duration": "10.000000",
+        "size": "220298",
+        "bit_rate": "176238",
+        "probe_score": 100,
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf58.76.100"
+        }
+      }
+    },
+    "video720": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "width": 1280,
+          "height": 720,
+          "coded_width": 1280,
+          "coded_height": 720,
+          "closed_captions": 0,
+          "has_b_frames": 2,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "16:9",
+          "pix_fmt": "yuv420p",
+          "level": 31,
+          "chroma_location": "left",
+          "refs": 1,
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "r_frame_rate": "20/1",
+          "avg_frame_rate": "20/1",
+          "time_base": "1/10240",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 102400,
+          "duration": "10.000000",
+          "bit_rate": "1055174",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "200",
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "vendor_id": "[0][0][0][0]"
+          }
+        }
+      ],
+      "format": {
+        "filename": "/tmp/dag-attempt-15459818600093086873/input-video720",
+        "nb_streams": 1,
+        "nb_programs": 0,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "start_time": "0.000000",
+        "duration": "10.000000",
+        "size": "1321890",
+        "bit_rate": "1057512",
+        "probe_score": 100,
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf58.76.100"
+        }
+      }
+    }
+  },
+  "artifacts": {
+    "video720": {
+      "key": "runs/771f8002-ad23-427d-ad28-68d581344fa6/jobs/8a24aea9-a12d-40ec-a6fa-a40c6ee5dec0/tasks/transcode720/attempts/1/video",
+      "length": 1321890,
+      "sha256": "8fd0566f66ed504fbaa7a787cb74007bf48df542961c540736d0a4466db0781e",
+      "media_type": "video/mp4"
+    },
+    "subtitles": {
+      "key": "runs/771f8002-ad23-427d-ad28-68d581344fa6/jobs/8a24aea9-a12d-40ec-a6fa-a40c6ee5dec0/tasks/subtitles/attempts/1/subtitles",
+      "length": 156,
+      "sha256": "5baa53c70fc23b4c33aa464712a1061b0db659aef37e9d2b0ce0f47185c14b56",
+      "media_type": "application/x-subrip"
+    },
+    "image": {
+      "key": "runs/771f8002-ad23-427d-ad28-68d581344fa6/jobs/8a24aea9-a12d-40ec-a6fa-a40c6ee5dec0/tasks/thumbnail/attempts/1/image",
+      "length": 169597,
+      "sha256": "bbdb6ece54efe4a499eed753a59e56c18cb0eb31f1dbf6f5cbfae5b6b78494ce",
+      "media_type": "image/png"
+    },
+    "video360": {
+      "key": "runs/771f8002-ad23-427d-ad28-68d581344fa6/jobs/8a24aea9-a12d-40ec-a6fa-a40c6ee5dec0/tasks/transcode360/attempts/1/video",
+      "length": 220298,
+      "sha256": "54a633d18d7d4e30b6c462f7c7a62024626763c314926235991a749f7d0ad840",
+      "media_type": "video/mp4"
+    }
+  },
+  "schema_version": 1
+}

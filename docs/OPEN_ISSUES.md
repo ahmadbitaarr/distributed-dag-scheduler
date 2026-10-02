@@ -2,18 +2,26 @@
 
 | ID | Category / gate | Observation | Required next action |
 |---|---|---|---|
-| S0-01 | RESOLVED — Step 0 GitHub | Shared repository https://github.com/ahmadbitaarr/distributed-dag-scheduler exists; Step 0 accepted on `main` at 82ca8bc (82ca8bcbac2b967493aacdb1865afdde7d24cded). | None. Step 0 is DONE; Step 1 may proceed. |
-| S0-02 | Historical provenance gap | Earlier build/native passes lack Git SHA, full tested-source manifest and run-time JAR fingerprints. Exact tested revision UNKNOWN. | Keep them historical only. Record fresh base commit/source manifest with new Step 1 build; do not retroactively certify checkpoint. |
-| S1-01 | RESOLVED — Step 1 | `mvn -B verify` passes on a normal network (Maven 3.9.9, JDK 21.0.2): BUILD SUCCESS, 14 JUnit tests, 0 failures. Evidence: results/handoffs/step-01/. | None. |
-| S1-02 | PARTIAL — Step 1 and service gates | Dockerfiles and deploy/compose/compose.yaml exist. Images build and scheduler/artifact-store reach healthy; a worker container polls. Still missing: Makefile targets (§15), an end-to-end ComposeHarness run, and any job executed through containers. | Add make targets and run the harness with MS2_BACKEND=compose at the steps that need them (6, 7, 10, 12). |
-| S1-03 | Environment — toolchain | Python 3.12 is unverified (the verifying host had only 3.13.1). Maven is not vendored (no mvnw). The host had no ffmpeg, so native video operations need a host install. | A teammate with Python 3.12 confirms `pip install -r requirements.txt` and pytest. Decide whether to add a Maven wrapper. |
-| S1-04 | BLOCKER — integration | Push to origin is refused: HTTP 403, Hasanlm23123 has no write access to ahmadbitaarr/distributed-dag-scheduler. Steps 1–2 exist only as local commits. | The repo owner grants write access. Then push both step branches and merge them into main in order. |
-| S2-01 | Deferred to Steps 4–5 | Source-artifact existence at acceptance, the 1 MiB request limit, and the 503 path when storage is unavailable are documented in docs/api.md but have no HTTP-level test. | Cover them in the artifact/API steps. |
-| S3-S8 | Unverified existing code | Core/API/artifact/worker/client and histories are drafts. The 8 SchedulerCoreTest tests pass at build, but nobody has reviewed them against the contract (the protocol tests were reviewed and extended at Step 2). No integration case has current passing evidence. | Review/finish/verify at Steps 3–8. Source existence or a passing draft test is not DONE. |
-| S9-01 | Missing/unverified — Step 9 | Video fixtures/operations exist; no verified video DAG or complete provenance/functional manifest documentation. | Verify approved functional/video pipelines at their roadmap gates. |
-| S10-01 | Intentional defect / unexecuted oracle | Worker-crash reassignment is intentionally absent. Strict typed XFAIL draft has not run. | Keep recovery broken in MS2; demonstrate exactly as Step 10 specifies, not in Step 0. |
-| S11-01 | Missing/environment — Step 11 | Hokea adapter missing; runtime.py imports nonexistent hokea_adapter when selected; cluster access unverified. | Version-ground adapter and record cluster limitations at Step 11. |
-| S12-01 | Unverified/resource gap — Step 12 | Benchmark draft unexecuted; native harness does not enforce 512 MiB container memory limit. | Complete exact approved matrix/resource controls at Step 12. |
-| S13-S15 | Missing final gates | Independent clean reproduction, revised specification, progress report, final docs and submission audit incomplete. | Complete in order at Steps 13–15, using measured evidence. |
+| S1-04 | **BLOCKER — integration** | Push to origin is refused: HTTP 403, Hasanlm23123 has no write access to ahmadbitaarr/distributed-dag-scheduler. Steps 1–9 exist only as local commits on stacked branches `ms2/step-01-build-foundation` … `ms2/step-09-video`. | The repo owner grants write access. Then push the branches and fast-forward `main` to the Step 9 commit, in order. Never force-push. |
+| S0-02 | Historical provenance gap | Earlier build/native passes lack a Git SHA, a full tested-source manifest and run-time JAR fingerprints, so the exact tested revision is UNKNOWN. | Keep them historical only. Current evidence carries `source_revision` (Step 8 onward). |
+| S1-02a | Environment | `make` is not installed on the verifying Windows host, so each target's recipe was run directly (Compose `up`/`down`, `deploy/harness/run.sh`, `tests.harness.demo`). The Makefile itself has not been executed. | A teammate on Linux or macOS runs `make up demo down` and `make test` (Step 13). |
+| S1-03a | Toolchain | Maven is not vendored (there is no `mvnw`). The harness container pins Maven 3.9.9, so `make test` needs only Docker. | Optional: add a Maven wrapper for host builds. |
+| S6-01 | Environment note | Running the suite directly on a Windows/OneDrive bind mount made JVM start-up take about 12 s and caused readiness time-outs. `deploy/harness/in-container.sh` runs on a container-local copy, which avoids this. | None. Use `deploy/harness/run.sh`. |
+| S10-01 | Intentional defect; Step 10 | Worker-crash reassignment is intentionally absent. The strict typed XFAIL oracle runs in every full suite (1 xfailed). Step 10 still needs `make fault-demo` (`--runxfail`) and its saved failing evidence. Caveat: the crash test's gate sits inside the worker's 30 s `OPERATION_TIMEOUT_MS`. If killing worker A took longer than that, X would fail over explicitly and the oracle would XPASS, which the strict marker turns into a failure. | At Step 10, give gated worker A an operation timeout longer than the test window and document why. |
+| S11-01 | Missing/environment; Step 11 | The Hokea adapter is missing (`runtime.py` imports a nonexistent `hokea_adapter` when selected). Cluster access is unverified. | Write a version-grounded adapter and record cluster limitations at Step 11. |
+| S12-01 | Unverified; Step 12 | The benchmark driver (`benchmarks/run.py`) has not run. The native harness does not enforce the 512 MiB limit; Compose does (verified at Step 1). | Run the exact matrix under Compose resource caps at Step 12. |
+| S13-S15 | Final gates | Independent clean reproduction, revised specification, progress report, final docs and submission audit are not done. | Complete in order at Steps 13–15, using measured evidence. |
 
-No approved decision is changed to work around an issue. No leases, heartbeat expiry, scanner, automatic silent recovery, administrative requeue, scheduler replication/failover or durable scheduler recovery are introduced.
+## Resolved
+
+| ID | Resolution |
+|---|---|
+| S0-01 | Shared repository exists; Step 0 accepted at 82ca8bc. |
+| S1-01 | `mvn -B verify` passes (Step 1). |
+| S1-02 | Dockerfiles, Compose, and Make targets up/demo/test/down exist. ComposeHarness ran real-container tests (Step 6), and a live Compose demo ran (Step 9). |
+| S1-03 | Python 3.12.3 is verified in the harness container (Step 5). |
+| S2-01 | Source existence, the 1 MiB limit and the storage-unavailable 503 are covered by `test_api.py` (Step 5). |
+| S3-S8 | Core, API, artifact store, worker and client were reviewed and verified at Steps 3–8. Four defects were fixed, each confirmed by a mutation check: validator NPE → 503; lenient UUID keys; media-type replay; worker exiting on stale rejection. |
+| S9-01 | The video DAG is verified (Step 9). The sample is now byte-reproducible from `workloads/video/generate.sh`, with checksums and provenance. |
+
+No approved decision was changed to work around an issue. No leases, heartbeat expiry, scanner, automatic silent recovery, administrative requeue, scheduler replication/failover or durable scheduler recovery were introduced.
