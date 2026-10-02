@@ -1,0 +1,29 @@
+# Build products and dependency caches
+**/target/
+*.class
+*.jar
+dependency-reduced-pom.xml
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+# Local runtime data, downloads, and environment configuration
+.runtime/
+**/runtime/
+tmp/
+toolchain/
+.env
+.env.*
+!.env.example
+settings.xml
+maven-settings.xml
+*.pem
+*.key
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+# Evidence under results/handoffs is explicitly retained.
+results/latest-tests/

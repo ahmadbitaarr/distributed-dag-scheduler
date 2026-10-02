@@ -1,0 +1,12 @@
+{
+  "archive_name": "CS4094_MS2_Continuation_Pack.zip",
+  "sha256": "cb6e4a1ddecb45ac68430eabda2ade5c3ad5ab6aa99703fc4cc7e45091b7b77d",
+  "entries": 98,
+  "crc_errors": [],
+  "unsafe_paths": [],
+  "manifest_entries_verified": 97,
+  "checkpoint_files_byte_equal_before_step0": 37,
+  "canonical_architecture_sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1",
+  "approved_roadmap_sha256": "2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921",
+  "result": "PASS"
+}

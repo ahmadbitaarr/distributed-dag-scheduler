@@ -1,0 +1,39 @@
+{
+  "result": "PASS for local Step 0 checks; shared baseline BLOCKED",
+  "archive_entries": 98,
+  "archive_hash_entries_verified": 97,
+  "source_files_preserved": 37,
+  "canonical_architecture_sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1",
+  "approved_roadmap_sha256": "2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921",
+  "historical_evidence": "byte-identical to supplied pack; exact tested source revision unknown",
+  "repository_checks": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/workspace/scratch/565bb6dfb453/cs4094-ms2",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "exit_code": 128,
+      "stdout": "",
+      "stderr": "fatal: not a git repository (or any of the parent directories): .git\n"
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/workspace/scratch/565bb6dfb453/cs4094-ms2",
+        "remote",
+        "-v"
+      ],
+      "exit_code": 128,
+      "stdout": "",
+      "stderr": "fatal: not a git repository (or any of the parent directories): .git\n"
+    }
+  ],
+  "generated_builds_secrets_runtime_toolchains_proxy_files_promoted": false,
+  "architecture_changes": "none",
+  "build_or_product_test_commands_run": [],
+  "git_commit_push_commands_run": []
+}

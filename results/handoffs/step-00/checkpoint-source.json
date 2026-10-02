@@ -1,0 +1,8 @@
+{
+  "identifier": "sha256:dd038556cd4bcee32be2a91adfaab729be105adab10a7a230640c7b2cb62f35f",
+  "kind": "unversioned checkpoint content manifest",
+  "git_commit": null,
+  "source_files": 37,
+  "manifest": "checkpoint-source-SHA256SUMS.txt",
+  "note": "Identifies preserved source, not the earlier binaries tested."
+}

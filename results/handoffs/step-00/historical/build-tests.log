@@ -1,0 +1,62 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] dag-ms2                                                            [pom]
+[INFO] protocol                                                           [jar]
+[INFO] scheduler                                                          [jar]
+[INFO] artifact-store                                                     [jar]
+[INFO] worker                                                             [jar]
+[INFO] client                                                             [jar]
+[INFO] 
+[INFO] -------------------------< edu.vt.dag:dag-ms2 >-------------------------
+[INFO] Building dag-ms2 0.2.0                                             [1/6]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] ------------------------< edu.vt.dag:protocol >-------------------------
+[INFO] Building protocol 0.2.0                                            [2/6]
+[INFO]   from protocol/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ protocol ---
+[INFO] skip non existing resourceDirectory /workspace/scratch/565bb6dfb453/cs4094-ms2/protocol/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ protocol ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ protocol ---
+[INFO] skip non existing resourceDirectory /workspace/scratch/565bb6dfb453/cs4094-ms2/protocol/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ protocol ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ protocol ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for dag-ms2 0.2.0:
+[INFO] 
+[INFO] dag-ms2 ............................................ SUCCESS [  0.002 s]
+[INFO] protocol ........................................... FAILURE [  1.411 s]
+[INFO] scheduler .......................................... SKIPPED
+[INFO] artifact-store ..................................... SKIPPED
+[INFO] worker ............................................. SKIPPED
+[INFO] client ............................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.499 s
+[INFO] Finished at: 2026-10-01T23:24:05-05:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.2:test (default-test) on project protocol: Failed to collect dependencies at org.apache.maven.surefire:surefire-junit-platform:jar:3.5.2: Failed to read artifact descriptor for org.apache.maven.surefire:surefire-junit-platform:jar:3.5.2: The following artifacts could not be resolved: org.apache.maven.surefire:surefire-junit-platform:pom:3.5.2 (absent): Could not transfer artifact org.apache.maven.surefire:surefire-junit-platform:pom:3.5.2 from/to central (https://repo.maven.apache.org/maven2): Connect to 127.0.0.1:37807 [/127.0.0.1] failed: Connection refused -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :protocol

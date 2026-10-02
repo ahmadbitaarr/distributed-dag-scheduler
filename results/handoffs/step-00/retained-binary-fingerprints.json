@@ -1,0 +1,53 @@
+{
+  "captured_at_step": 0,
+  "binaries_excluded_from_candidate": true,
+  "historical_run_fingerprints_recorded_at_execution": false,
+  "note": "Fingerprints of currently retained outputs only. They do not prove which exact bytes an earlier run launched, or reconstruct its source revision.",
+  "files": [
+    {
+      "path": "artifact-store/target/artifact-store-0.2.0.jar",
+      "sha256": "1a4e3d414da369705ab9b37194f92d92d6cdaa673933a933c466dd21ea8efa07",
+      "bytes": 2369409
+    },
+    {
+      "path": "artifact-store/target/original-artifact-store-0.2.0.jar",
+      "sha256": "25ab2fe26e2ce95c4822c090f469406f99a359d8abb3b9e198d1aeff0bda04c9",
+      "bytes": 6976
+    },
+    {
+      "path": "client/target/client-0.2.0.jar",
+      "sha256": "1d45018354f0235149fa9d1181a434bcd9b64f2b4efbad5a7e356be031e9db91",
+      "bytes": 2366924
+    },
+    {
+      "path": "client/target/original-client-0.2.0.jar",
+      "sha256": "4d209c0b6f41da0e58b4a0e34b741aabb0ee31e7c12163498ccee57d3100bab8",
+      "bytes": 4510
+    },
+    {
+      "path": "protocol/target/protocol-0.2.0.jar",
+      "sha256": "78bdfa93531cbc55240a865d37dffc63a289729a609648e5f747d8255b8fe6d3",
+      "bytes": 36333
+    },
+    {
+      "path": "scheduler/target/original-scheduler-0.2.0.jar",
+      "sha256": "b05b80ff2e02beec341c3ee9b43534cc607704352491f8c5ac27a53d157d120d",
+      "bytes": 26641
+    },
+    {
+      "path": "scheduler/target/scheduler-0.2.0.jar",
+      "sha256": "781d6ad3308e349367669138f8186537d5d2063aa33af4f8d279210753596b01",
+      "bytes": 2389219
+    },
+    {
+      "path": "worker/target/original-worker-0.2.0.jar",
+      "sha256": "47f4aca04269e42623b042a72094cc1add8610d422e131c8127ca7ae886f9a71",
+      "bytes": 15495
+    },
+    {
+      "path": "worker/target/worker-0.2.0.jar",
+      "sha256": "4b9acd05b2d6bd1738d5915eec4c669e9eb8c71fd8e54cd36fdfef3e35d80723",
+      "bytes": 2377959
+    }
+  ]
+}

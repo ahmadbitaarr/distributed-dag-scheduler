@@ -1,0 +1,52 @@
+[
+  {
+    "original_attachment": "Pasted markdown(3).md",
+    "package_path": "sources/Pasted_Implementation_Agent_Prompt.md",
+    "sha256": "2262327050135ef006373b62a0cff190d41110d68a127e4ad2bb43b214a53c15"
+  },
+  {
+    "original_attachment": "cs4094_f26_project_guidelines_v20260824(1).pdf",
+    "package_path": "sources/cs4094_f26_project_guidelines_v20260824.pdf",
+    "sha256": "43d875112f9b835a43daf8f3abe03d029d4e3e4e8fdd7694005a5ee31f8f3400"
+  },
+  {
+    "original_attachment": "CS4069 (1)(1).pdf",
+    "package_path": "sources/CS4069_MS1_Specification.pdf",
+    "sha256": "3e2b3cb815dd0beafc4bb7d967f7829124ee9593e7c91d5d90562969d3016189"
+  },
+  {
+    "original_attachment": "CS4094_MS2_Architecture(2).md",
+    "package_path": "sources/CS4094_MS2_Architecture.md",
+    "sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1"
+  },
+  {
+    "original_attachment": "ms1_proposal_deck (1)(1).pptx",
+    "package_path": "sources/ms1_proposal_deck.pptx",
+    "sha256": "baa466683e2dbeb19671c47f2ab3981cf26bfb02d9952a697b79b464cd76b276"
+  },
+  {
+    "original_attachment": "CS4094 F26 L2_ System Models(1).pdf",
+    "package_path": "sources/CS4094_F26_L2_System_Models.pdf",
+    "sha256": "f0d4fbddc4ceb7514bc91fe8fa2897e155d47197ed48b84ac72fc49a3003347d"
+  },
+  {
+    "original_attachment": "CS4094 F26 L3_ Hokea Lab(1).pdf",
+    "package_path": "sources/CS4094_F26_L3_Hokea_Lab.pdf",
+    "sha256": "01bf38989a1ebe32629d95daac09d15a60b48cf350044e1b6b0b4224470ce4c4"
+  },
+  {
+    "original_attachment": "CS4094 F26 L4_ Time, Clocks, and Lies(1).pdf",
+    "package_path": "sources/CS4094_F26_L4_Time_Clocks_and_Lies.pdf",
+    "sha256": "a560063bff970b3f92e188587494d8f1ea052594b3045e71ad2a9bb043147777"
+  },
+  {
+    "original_attachment": "CS4094 F26 L5_ Replication(1).pdf",
+    "package_path": "sources/CS4094_F26_L5_Replication.pdf",
+    "sha256": "0de3bef4a80144671a30c8a67aa5ee657a4a0b4acf4b87ce02f3ef1cb5d6edb3"
+  },
+  {
+    "original_attachment": "CS4094 F26 L6_ Consensus(1).pdf",
+    "package_path": "sources/CS4094_F26_L6_Consensus.pdf",
+    "sha256": "f2f5aa474f6f30414e43b61d48a1a242ec5925ad25d0378535570de3037168fe"
+  }
+]
