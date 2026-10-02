@@ -82,6 +82,12 @@ class NativeHarness:
     def worker_running(self, name):
         return self.processes[name].poll() is None
 
+    def stop_artifacts(self):
+        """Fault hook for the storage-unavailable API test: stop the artifact service, keep the scheduler."""
+        process = self.processes["artifact-store"]
+        os.killpg(process.pid, signal.SIGTERM)
+        process.wait(timeout=10)
+
     def kill_worker(self, name):
         process = self.processes[name]
         os.killpg(process.pid, signal.SIGKILL)
@@ -150,6 +156,9 @@ class ComposeHarness(NativeHarness):
     def worker_running(self, name):
         result = subprocess.run(["docker", "inspect", "-f", "{{.State.Running}}", self.worker_containers[name]], check=True, capture_output=True, text=True)
         return result.stdout.strip() == "true"
+
+    def stop_artifacts(self):
+        self.compose("stop", "artifact-store")
 
     def kill_worker(self, name):
         subprocess.run(["docker", "kill", "--signal=KILL", self.worker_containers[name]], check=True, capture_output=True)

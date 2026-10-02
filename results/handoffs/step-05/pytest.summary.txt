@@ -1,0 +1,10 @@
+Harness: dag-ms2/harness:0.2.0 (Ubuntu 24.04.2, OpenJDK 21.0.7, Maven 3.9.9, Python 3.12.3, pytest 8.3.4, ffmpeg 6.1.1)
+Backend: native (NativeHarness inside the Linux container). Source: Step 4 commit 05a7928 + Step 5 test/harness files.
+
+$ pytest -q tests/integration/test_api.py
+8 passed in 93.24s
+
+Baseline full-suite run on the same source (first ever execution of the checkpoint pytest suite):
+$ mvn -B -q verify && MS2_REQUIRE_XFAIL=1 pytest -q
+21 passed, 1 xfailed in 376.31s
+(the XFAIL is tests/faults/test_worker_crash.py::test_worker_crash_reassignment, the intentional MS2 oracle)
