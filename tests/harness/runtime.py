@@ -82,6 +82,19 @@ class NativeHarness:
     def worker_running(self, name):
         return self.processes[name].poll() is None
 
+    def restart_scheduler(self):
+        """Start a new scheduler run on the same address; the old run's state is gone (architecture §8)."""
+        process = self.processes["scheduler"]
+        os.killpg(process.pid, signal.SIGTERM)
+        process.wait(timeout=10)
+        self.restarts = getattr(self, "restarts", 0) + 1
+        name = f"scheduler-run{self.restarts + 1}"
+        self.launch(name, "scheduler", {"PORT": self.scheduler.rsplit(":", 1)[1], "ARTIFACT_BASE_URL": self.artifacts})
+        self.processes["scheduler"] = self.processes.pop(name)
+        wait_for(lambda: ready(self.scheduler), description="restarted scheduler readiness")
+        self.api = Api(self.scheduler, self.artifacts)
+        return self.api.run_id
+
     def stop_artifacts(self):
         """Fault hook for the storage-unavailable API test: stop the artifact service, keep the scheduler."""
         process = self.processes["artifact-store"]

@@ -93,9 +93,12 @@ public final class WorkerMain {
                 var r=retry("/v1/work/claim",claim);
                 if(r.statusCode()==204){event("work_empty",null,"request_id",claim.claim_id());Thread.sleep(HttpSupport.envInt("POLL_INTERVAL_MS",100));continue;}
                 var a=Json.read(r.body(),Assignment.class);
-                if(a.disposition().equals("EXECUTE"))attempt(a);
+                if(a.disposition().equals("EXECUTE")) {
+                    // A stale/conflicting rejection ends this attempt only; the worker keeps its slot and claims again.
+                    try{attempt(a);}catch(ApiException e){event("attempt_rejected",a.identity(),"status",e.status,"code",e.code,"message",e.getMessage());}
+                }
             }catch(RunChanged e){event("scheduler_run_changed",null);run=null;session=UUID.randomUUID();}
-            catch(ApiException e){event("attempt_rejected",null,"status",e.status,"message",e.getMessage());throw e;}
+            catch(ApiException e){event("request_rejected",null,"status",e.status,"code",e.code,"message",e.getMessage());Thread.sleep(HttpSupport.envInt("POLL_INTERVAL_MS",100));}
         }
     }
     public static void main(String[] args)throws Exception {

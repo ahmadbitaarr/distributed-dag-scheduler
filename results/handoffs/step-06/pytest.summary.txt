@@ -1,0 +1,18 @@
+Source: Step 5 commit d72b887 + Step 6 changes (worker fix, tests, harness hooks).
+
+Native backend inside dag-ms2/harness (Ubuntu 24.04, Python 3.12.3), container-local copy:
+$ deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests; pytest -q tests/integration/test_worker_client.py'
+7 passed in 67.42s
+
+Mutation check (original WorkerMain from d72b887, same harness):
+$ pytest -q tests/integration/test_worker_client.py -k stale_report
+1 failed (job never completes: the worker process exits on the 409 stale-report rejection)
+
+Compose backend (real containers built by `docker compose -f deploy/compose/compose.yaml build`; Windows host, Python 3.13.1 venv driving ComposeHarness):
+$ MS2_BACKEND=compose pytest -q tests/integration/test_system.py -k "functional_multiple or real_worker_failure or join_and_independent or duplicate_conflicting"
+4 passed in 209.68s
+$ MS2_BACKEND=compose pytest -q tests/integration/test_worker_client.py -k "hooks_are_disabled or stale_report or timeout or lost_report or new_one"
+3 passed, 2 skipped (native-only: lost-ack proxy, scheduler restart) in 336.77s
+`docker ps` empty after both runs (harness teardown removed all containers).
+
+Note: the first Step 6 attempt ran the suite directly on the Windows bind mount (OneDrive). JVM start-up took ~12 s and readiness probes timed out (1 failed, 4 errors). Running on a container-local copy (deploy/harness/in-container.sh) removed this; it was an environment artifact, not a product defect.
