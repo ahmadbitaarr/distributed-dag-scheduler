@@ -11,10 +11,14 @@ import static edu.vt.dag.Model.*;
 public final class ArtifactMain {
     record Stored(Artifact descriptor,Path file) {}
     public static void main(String[] args) throws Exception {
-        Path data=Path.of(HttpSupport.env("DATA_DIR",".runtime/objects"));Files.createDirectories(data);
+        start(HttpSupport.envInt("PORT",8081),Path.of(HttpSupport.env("DATA_DIR",".runtime/objects")));
+    }
+    /** Starts the service; port 0 picks an ephemeral port (tests). */
+    public static com.sun.net.httpserver.HttpServer start(int port,Path data) throws IOException {
+        Files.createDirectories(data);
         var index=new ConcurrentHashMap<String,Stored>();
         Object[] locks=new Object[64];Arrays.setAll(locks,i->new Object());
-        HttpSupport.serve(HttpSupport.envInt("PORT",8081),ex->{
+        return HttpSupport.serve(port,ex->{
             String path=ex.getRequestURI().getPath(),method=ex.getRequestMethod();
             if(path.equals("/health")||path.equals("/v1/health")) {HttpSupport.method(ex,"GET");HttpSupport.send(ex,200,Map.of("ready",true));return;}
             if(!path.startsWith("/v1/objects/"))throw new ApiException(404,"NOT_FOUND","Unknown endpoint");
@@ -35,7 +39,7 @@ public final class ArtifactMain {
                     synchronized(locks[(key.hashCode()&0x7fffffff)%locks.length]) {
                         var old=index.get(key);
                         if(old!=null) {
-                            if(old.descriptor().length()!=length || !old.descriptor().sha256().equals(hash))throw ApiException.conflict("Immutable object key already has different bytes");
+                            if(!old.descriptor().equals(descriptor))throw ApiException.conflict("Immutable object key already has different bytes or media type");
                             status=200;response=old.descriptor();
                         } else {
                             Path complete=data.resolve("object-"+UUID.randomUUID());Files.move(temp,complete);
