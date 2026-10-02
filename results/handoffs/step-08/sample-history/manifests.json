@@ -1,0 +1,326 @@
+{
+  "b51c83de-81af-43fc-a95d-8654442cb288": {
+    "schema_version": 1,
+    "job_id": "b51c83de-81af-43fc-a95d-8654442cb288",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3,
+          "delay_ms": 100
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "B",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "C",
+        "operation": "fixture_multiply",
+        "parameters": {
+          "amount": 5,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "D",
+        "operation": "fixture_sum",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "B",
+          "C"
+        ],
+        "inputs": {
+          "left": {
+            "task_id": "B",
+            "output_name": "value"
+          },
+          "right": {
+            "task_id": "C",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "E",
+        "operation": "fixture_format",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "D"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "D",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "text"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "E",
+        "output_name": "text"
+      }
+    }
+  },
+  "10aa6b3f-70ed-49ee-beb2-0c98f946f9d0": {
+    "schema_version": 1,
+    "job_id": "10aa6b3f-70ed-49ee-beb2-0c98f946f9d0",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3,
+          "delay_ms": 100
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "B",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "C",
+        "operation": "fixture_multiply",
+        "parameters": {
+          "amount": 5,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "D",
+        "operation": "fixture_sum",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "B",
+          "C"
+        ],
+        "inputs": {
+          "left": {
+            "task_id": "B",
+            "output_name": "value"
+          },
+          "right": {
+            "task_id": "C",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "E",
+        "operation": "fixture_format",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "D"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "D",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "text"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "E",
+        "output_name": "text"
+      }
+    }
+  },
+  "8f09f9e1-3144-444b-aee6-c33942d3b093": {
+    "schema_version": 1,
+    "job_id": "8f09f9e1-3144-444b-aee6-c33942d3b093",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3,
+          "delay_ms": 100
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "B",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "C",
+        "operation": "fixture_multiply",
+        "parameters": {
+          "amount": 5,
+          "delay_ms": 100
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "A",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "D",
+        "operation": "fixture_sum",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "B",
+          "C"
+        ],
+        "inputs": {
+          "left": {
+            "task_id": "B",
+            "output_name": "value"
+          },
+          "right": {
+            "task_id": "C",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "E",
+        "operation": "fixture_format",
+        "parameters": {
+          "delay_ms": 100
+        },
+        "parents": [
+          "D"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "D",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "text"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "E",
+        "output_name": "text"
+      }
+    }
+  }
+}

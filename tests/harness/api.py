@@ -94,12 +94,14 @@ class Api:
         assert status == 200, data
         self.run_id = data["scheduler_run_id"]
         self.job_ids = []
+        self.manifests = {}
 
     def submit(self, value):
         status, data = request(self.scheduler, "/v1/jobs", {"scheduler_run_id": self.run_id, "manifest": value})
         assert status in (200, 201), (status, data)
         if value["job_id"] not in self.job_ids:
             self.job_ids.append(value["job_id"])
+        self.manifests[value["job_id"]] = value
         return value["job_id"]
 
     def status(self, job):
@@ -163,41 +165,66 @@ class Api:
         status, metrics = request(self.scheduler, "/v1/metrics")
         assert status == 200
         (directory / "metrics.json").write_text(json.dumps(metrics, indent=2))
+        (directory / "manifests.json").write_text(json.dumps(self.manifests, indent=2))
         (directory / "evidence-boundary.json").write_text(json.dumps({"scheduler_run_id": self.run_id, "last_exported_event_seq": len(events)}))
         return snapshots, events
 
 
+class HistoryViolation(AssertionError):
+    """A saved or live history falsifies a safety invariant (architecture §14)."""
+
+
 def check_history(manifest_value, snapshot, events, worker_events=()):
-    """Check decision order and worker start acknowledgments, never cross-node clocks."""
+    """Check decision order and worker start acknowledgments, never cross-node clocks.
+
+    Raises HistoryViolation for any broken invariant, including a missing event that an invariant needs."""
+    def require(condition, message):
+        if not condition:
+            raise HistoryViolation(message)
+
+    all_seqs = [e["scheduler_event_seq"] for e in events]
+    require(all_seqs == list(range(1, len(all_seqs) + 1)), "scheduler event sequence has a gap or reordering")
     events = [e for e in events if e.get("job_id") == manifest_value["job_id"]]
-    successes = {}
-    started = {}
-    assigned = {}
+    successes, started, assigned, owners = {}, {}, {}, {}
     definitions = {t["task_id"]: t for t in manifest_value["tasks"]}
-    owners = {}
+    completed = None
     for e in events:
         name, kind = e.get("task_id"), e["event_type"]
+        if kind in ("task_assigned", "task_started", "task_failed", "task_succeeded"):
+            require(name in definitions, f"{kind} for unknown task {name}")
+            require(completed is None, f"{kind} for {name} after job_completed")
         if kind == "task_assigned":
-            assert name not in owners, "Two active owners"
-            assert all(p in successes for p in definitions[name]["parents"]), "Dependency assigned too early"
+            require(name not in owners, f"two active owners for {name}")
+            require(name not in successes, f"{name} assigned after its logical success")
+            missing = [p for p in definitions[name]["parents"] if p not in successes]
+            require(not missing, f"{name} assigned before parents {missing} succeeded")
             owners[name] = (e["attempt_no"], e["worker_session_id"])
             assigned[(name, e["attempt_no"])] = e["scheduler_event_seq"]
-        if kind == "task_started":
-            assert owners[name] == (e["attempt_no"], e["worker_session_id"])
-            assert (name, e["attempt_no"]) in assigned
+        elif kind == "task_started":
+            require((name, e["attempt_no"]) in assigned, f"{name} attempt {e['attempt_no']} started without assignment")
+            require(owners.get(name) == (e["attempt_no"], e["worker_session_id"]), f"{name} started by a non-owner")
             started[e["scheduler_event_seq"]] = (name, e["attempt_no"], e["worker_session_id"])
-        if kind == "task_failed":
-            assert owners.pop(name) == (e["attempt_no"], e["worker_session_id"])
-        if kind == "task_succeeded":
-            assert name not in successes, "Duplicate logical completion"
-            assert owners.pop(name) == (e["attempt_no"], e["worker_session_id"])
-            report = e["report"]
-            assert report["outcome"] == "SUCCESS" and report["identity"]["attempt_no"] == e["attempt_no"]
-            assert (name, e["attempt_no"], e["worker_session_id"]) in started.values()
+        elif kind == "task_failed":
+            require(owners.pop(name, None) == (e["attempt_no"], e["worker_session_id"]), f"{name} failure from a non-owner")
+        elif kind == "task_succeeded":
+            require(name not in successes, f"duplicate logical completion of {name}")
+            require(owners.pop(name, None) == (e["attempt_no"], e["worker_session_id"]), f"{name} success from a non-owner")
+            report = e.get("report") or {}
+            require(report.get("outcome") == "SUCCESS" and (report.get("identity") or {}).get("attempt_no") == e["attempt_no"],
+                    f"{name} success without a matching SUCCESS report")
+            require((name, e["attempt_no"], e["worker_session_id"]) in started.values(), f"{name} succeeded without an accepted start")
             successes[name] = e["scheduler_event_seq"]
-        if kind == "job_completed":
-            assert set(successes) == set(definitions)
+        elif kind == "job_completed":
+            require(completed is None, "job completed twice")
+            require(set(successes) == set(definitions), f"job completed before {sorted(set(definitions) - set(successes))} succeeded")
+            completed = e["scheduler_event_seq"]
     for e in worker_events:
         if e.get("job_id") == manifest_value["job_id"] and e["event_type"] == "worker_operation_started":
-            assert started[e["ack_scheduler_event_seq"]] == (e["task_id"], e["attempt_no"], e["worker_session_id"])
-    assert sum(t["state"] == "SUCCEEDED" for t in snapshot["tasks"].values()) == len(successes)
+            ack = e["ack_scheduler_event_seq"]
+            require(ack in started, f"worker operation for {e['task_id']} has no acknowledged scheduler start (seq {ack})")
+            require(started[ack] == (e["task_id"], e["attempt_no"], e["worker_session_id"]),
+                    f"worker operation for {e['task_id']} joined to the wrong scheduler start")
+    states = {n: t["state"] for n, t in snapshot["tasks"].items()}
+    require(sum(v == "SUCCEEDED" for v in states.values()) == len(successes), "snapshot successes disagree with history")
+    require((snapshot["state"] == "SUCCEEDED") == (completed is not None), "snapshot job state disagrees with job_completed")
+    require(snapshot["snapshot_event_seq"] <= len(all_seqs), "snapshot is newer than the exported history")

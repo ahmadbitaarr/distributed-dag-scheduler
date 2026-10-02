@@ -50,12 +50,11 @@ def test_worker_has_one_slot_and_starts_only_after_ack(system):
     jobs = [functional(150) for _ in range(3)]
     for m in jobs:
         system.api.submit(m)
-    for m in jobs:
-        system.api.complete(m["job_id"])
-    events = system.api.events()
+    snapshots = {m["job_id"]: system.api.complete(m["job_id"]) for m in jobs}
+    events = system.api.events()                     # after the snapshots, so the history covers them
     worker_events = [e for w in workers for e in system.worker_events(w)]
     for m in jobs:
-        check_history(m, system.api.status(m["job_id"]), events, worker_events)
+        check_history(m, snapshots[m["job_id"]], events, worker_events)
     # Per session: after a task_assigned, the next claim comes only after that attempt is reported.
     active = {}
     for e in events:
