@@ -1,0 +1,63 @@
+# Local MS2 deployment. Service names and the SCHEDULER_PORT / ARTIFACT_PORT /
+# ARTIFACT_DATA_DIR variables are the contract used by tests/harness/runtime.py
+# (ComposeHarness); keep them in sync.
+#
+#   docker compose -f deploy/compose/compose.yaml up -d --wait scheduler artifact-store
+#   docker compose -f deploy/compose/compose.yaml run -d --no-deps worker
+#   docker compose -f deploy/compose/compose.yaml down
+name: dag-ms2
+
+services:
+  artifact-store:
+    build:
+      context: ../..
+      dockerfile: artifact-store/Dockerfile
+    image: dag-ms2/artifact-store:0.2.0
+    environment:
+      PORT: "8081"
+      DATA_DIR: /data
+    ports:
+      - "127.0.0.1:${ARTIFACT_PORT:-8081}:8081"
+    volumes:
+      # Host directory survives worker termination and `compose down`.
+      - "${ARTIFACT_DATA_DIR:-../../.runtime/objects}:/data"
+    cpus: 1.0
+    mem_limit: 512m
+    restart: "no"
+
+  scheduler:
+    build:
+      context: ../..
+      dockerfile: scheduler/Dockerfile
+    image: dag-ms2/scheduler:0.2.0
+    environment:
+      PORT: "8080"
+      ARTIFACT_BASE_URL: http://artifact-store:8081
+    ports:
+      - "127.0.0.1:${SCHEDULER_PORT:-8080}:8080"
+    depends_on:
+      artifact-store:
+        condition: service_healthy
+    cpus: 1.0
+    mem_limit: 512m
+    restart: "no"
+
+  # Workers: no published port and no fixed container name, so they can be
+  # scaled (`up --scale worker=N`) or launched individually with `run`.
+  # restart "no" keeps a killed worker dead for the crash-fault test.
+  worker:
+    build:
+      context: ../..
+      dockerfile: worker/Dockerfile
+    image: dag-ms2/worker:0.2.0
+    environment:
+      SCHEDULER_URL: http://scheduler:8080
+      ARTIFACT_BASE_URL: http://artifact-store:8081
+      POLL_INTERVAL_MS: "${POLL_INTERVAL_MS:-100}"
+      OPERATION_TIMEOUT_MS: "${OPERATION_TIMEOUT_MS:-30000}"
+    depends_on:
+      scheduler:
+        condition: service_healthy
+    cpus: 1.0
+    mem_limit: 512m
+    restart: "no"

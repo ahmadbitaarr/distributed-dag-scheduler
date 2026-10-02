@@ -1,0 +1,15 @@
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.318 s -- in edu.vt.dag.ManifestValidatorTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.408 s -- in edu.vt.dag.SchedulerCoreTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] No tests to run.
+[INFO] No tests to run.
+[INFO] No tests to run.
+[INFO] dag-ms2 ............................................ SUCCESS [  0.003 s]
+[INFO] protocol ........................................... SUCCESS [ 16.454 s]
+[INFO] scheduler .......................................... SUCCESS [  5.517 s]
+[INFO] artifact-store ..................................... SUCCESS [  0.886 s]
+[INFO] worker ............................................. SUCCESS [  1.496 s]
+[INFO] client ............................................. SUCCESS [  0.714 s]
+[INFO] BUILD SUCCESS
+[INFO] Total time:  25.246 s

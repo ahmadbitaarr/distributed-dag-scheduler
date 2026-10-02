@@ -1,0 +1,12 @@
+**/target/
+.git/
+.runtime/
+results/
+tests/
+benchmarks/
+workloads/
+docs/
+deploy/
+**/__pycache__/
+.venv/
+venv/

@@ -1,0 +1,8 @@
+# Keep LF in working copies on every OS: recorded SHA-256 checksums, Dockerfiles
+# and container shell commands all assume LF bytes.
+* text=auto eol=lf
+*.mp4 binary
+*.png binary
+*.jar binary
+*.zip binary
+*.pdf binary

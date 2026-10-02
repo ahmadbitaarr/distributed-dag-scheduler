@@ -1,7 +1,7 @@
 # MS2 sequential progress
 
 Current step: 1 — Build, repository, and deployment foundation
-Status: IN_PROGRESS
+Status: DONE on step branch (gate passed); awaiting integration into main
 Current writer: Hasanlm23123
 Next teammate: not assigned
 Repository / remote: https://github.com/ahmadbitaarr/distributed-dag-scheduler
@@ -18,7 +18,7 @@ SHA-256: 2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921
 | Step | Status | Notes |
 |---|---|---|
 | 0 — Shared baseline | DONE | Accepted at 82ca8bc on origin/main. Step 0 evidence: results/handoffs/step-00/. Existing implementation remains unreviewed. |
-| 1 — Build/deployment foundation | IN_PROGRESS | First verification command: `mvn -B verify`. |
+| 1 — Build/deployment foundation | DONE (pending merge) | `mvn -B verify` exit 0, 14 JUnit tests pass. Images build; scheduler and artifact-store are healthy under Compose. Evidence: results/handoffs/step-01/. Open: S1-02 (Makefile/harness run), S1-03 (Python 3.12 unverified). |
 | 2–15 | NOT_STARTED | Source files existing for later steps does not make them DONE. |
 
-Next gate: Step 1 exit gate — clean `mvn -B verify` from the shared checkout, documented toolchain, deployment structure established.
+Next gate: integrate ms2/step-01-build-foundation into main, then Step 2 — freeze wire contracts and validate DAGs. First command: `mvn -B verify -pl protocol`.
