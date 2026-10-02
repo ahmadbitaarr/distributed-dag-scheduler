@@ -1,0 +1,6 @@
+valid functional manifest: HTTP 201 {"scheduler_run_id":"8ac3e679-ca84-4711-a6e8-570b710acf01","job_id":"2ddf957a-3c49-41c8-9602-92658c566c55","state":"ACCEPTED","scheduler_event_seq":2}
+identical replay (tasks reversed): HTTP 200 {"scheduler_run_id":"8ac3e679-ca84-4711-a6e8-570b710acf01","job_id":"2ddf957a-3c49-41c8-9602-92658c566c55","state":"ACCEPTED","scheduler_event_seq":2}
+same job_id, amount 4->40: HTTP 409 {"error":{"message":"Job ID already has a different manifest","code":"CONFLICT"}}
+B binding missing output_name: HTTP 400 {"error":{"message":"Input binding needs a source or a parent output","code":"INVALID_INPUT"}}
+value as string "3": HTTP 400 {"error":{"message":"Malformed JSON or unsupported field/type: Cannot coerce String value (\"3\") to `java.lang.Long` value (but might if coercion using `CoercionConfig` was enabled)\n at [Source: RED
+missing scheduler_run_id: HTTP 400 {"error":{"message":"scheduler_run_id required","code":"INVALID_INPUT"}}

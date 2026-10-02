@@ -17,23 +17,26 @@ public final class ManifestValidator {
         require(a.sha256() != null && a.sha256().matches("[0-9a-f]{64}"), "Invalid SHA-256");
         require(a.media_type() != null && a.media_type().matches("[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+"), "Invalid media type");
     }
+    /** UUID.fromString is lenient ("1-1-1-1-1"); object keys require the canonical lowercase form. */
+    static boolean canonicalUuid(String s) {
+        try { return UUID.fromString(s).toString().equals(s); } catch (IllegalArgumentException e) { return false; }
+    }
     public static boolean validKey(String k) {
         if (k == null || k.length() > 512) return false;
         String[] p = k.split("/",-1);
-        try {
-            if (p.length == 3 && p[0].equals("inputs")) {
-                UUID.fromString(p[1]); return identifier(p[2]);
-            }
-            if (p.length == 10 && p[0].equals("runs") && p[2].equals("jobs") && p[4].equals("tasks") && p[6].equals("attempts")) {
-                // Reserved longer paths are never accepted.
-                return false;
-            }
-            if (p.length == 9 && p[0].equals("runs") && p[2].equals("jobs") && p[4].equals("tasks") && p[6].equals("attempts")) {
-                UUID.fromString(p[1]); UUID.fromString(p[3]);
-                return identifier(p[5]) && p[7].matches("[1-9][0-9]{0,8}") && identifier(p[8]);
-            }
-        } catch (IllegalArgumentException ignored) { return false; }
+        if (p.length == 3 && p[0].equals("inputs")) return canonicalUuid(p[1]) && identifier(p[2]);
+        if (p.length == 9 && p[0].equals("runs") && p[2].equals("jobs") && p[4].equals("tasks") && p[6].equals("attempts"))
+            return canonicalUuid(p[1]) && canonicalUuid(p[3]) && identifier(p[5]) && p[7].matches("[1-9][0-9]{0,8}") && identifier(p[8]);
         return false;
+    }
+    /** The ownership tuple carried by start and report requests. */
+    public static void identity(Identity id) {
+        require(id != null, "Identity required");
+        require(id.scheduler_run_id() != null && id.job_id() != null && id.worker_session_id() != null
+            && id.attempt_no() > 0 && identifier(id.task_id()), "Invalid identity");
+    }
+    public static void claim(Claim c) {
+        require(c != null && c.scheduler_run_id() != null && c.worker_session_id() != null && c.claim_id() != null, "Claim UUIDs required");
     }
     public static void validate(Manifest m) {
         require(m != null && m.schema_version() == 1 && m.job_id() != null, "Manifest version 1 and job UUID required");
@@ -66,6 +69,7 @@ public final class ManifestValidator {
                     require(b.task_id() == null && b.output_name() == null, "Mixed input binding");
                     artifact(b.source()); require(b.source().key().startsWith("inputs/"), "Source must use inputs namespace");
                 } else {
+                    require(b.task_id() != null && b.output_name() != null, "Input binding needs a source or a parent output");
                     require(t.parents().contains(b.task_id()), "Input must name declared parent");
                     require(tasks.get(b.task_id()).outputs().contains(b.output_name()), "Unknown parent output");
                 }
@@ -80,7 +84,7 @@ public final class ManifestValidator {
         }
         require(seen==tasks.size(), "Cycle in DAG");
         require(m.final_outputs()!=null && !m.final_outputs().isEmpty(), "Final output bindings required");
-        m.final_outputs().forEach((name,b) -> require(identifier(name) && b!=null && tasks.containsKey(b.task_id()) && tasks.get(b.task_id()).outputs().contains(b.output_name()), "Invalid final binding"));
+        m.final_outputs().forEach((name,b) -> require(identifier(name) && b!=null && b.task_id()!=null && b.output_name()!=null && tasks.containsKey(b.task_id()) && tasks.get(b.task_id()).outputs().contains(b.output_name()), "Invalid final binding"));
     }
     private static void validateOperation(TaskSpec t) {
         var p=t.parameters();

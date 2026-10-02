@@ -1,12 +1,12 @@
 # MS2 sequential progress
 
-Current step: 1 — Build, repository, and deployment foundation
-Status: DONE on step branch (gate passed); awaiting integration into main
+Current step: 2 — Freeze the wire contracts and validate DAGs
+Status: DONE on step branch (gate passed); Steps 1–2 awaiting integration into main (push blocked: no write access, see S1-04)
 Current writer: Hasanlm23123
 Next teammate: not assigned
 Repository / remote: https://github.com/ahmadbitaarr/distributed-dag-scheduler
 Accepted branch: main
-Active step branch: ms2/step-01-build-foundation
+Active step branch: ms2/step-02-protocol (stacked on ms2/step-01-build-foundation)
 Last accepted shared GitHub commit: 82ca8bc (82ca8bcbac2b967493aacdb1865afdde7d24cded) — "docs(ms2): establish canonical baseline and sequential roadmap"
 
 Canonical architecture: docs/CS4094_MS2_Architecture.md
@@ -19,6 +19,7 @@ SHA-256: 2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921
 |---|---|---|
 | 0 — Shared baseline | DONE | Accepted at 82ca8bc on origin/main. Step 0 evidence: results/handoffs/step-00/. Existing implementation remains unreviewed. |
 | 1 — Build/deployment foundation | DONE (pending merge) | `mvn -B verify` exit 0, 14 JUnit tests pass. Images build; scheduler and artifact-store are healthy under Compose. Evidence: results/handoffs/step-01/. Open: S1-02 (Makefile/harness run), S1-03 (Python 3.12 unverified). |
-| 2–15 | NOT_STARTED | Source files existing for later steps does not make them DONE. |
+| 2 — Wire contracts and DAG validation | DONE (pending merge) | docs/api.md; 41 JUnit tests pass (27 new WireContractTest). Fixed NPE→503 on incomplete bindings and lenient-UUID keys. Evidence: results/handoffs/step-02/. |
+| 3–15 | NOT_STARTED | Source files existing for later steps does not make them DONE. |
 
-Next gate: integrate ms2/step-01-build-foundation into main, then Step 2 — freeze wire contracts and validate DAGs. First command: `mvn -B verify -pl protocol`.
+Next gate: integrate Steps 1–2 into main, then Step 3 — scheduler domain state machine. First command: `mvn -B verify -pl protocol,scheduler`.

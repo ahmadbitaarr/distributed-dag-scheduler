@@ -20,7 +20,7 @@ public final class SchedulerCore {
         for(int i=0;i<pairs.length;i+=2) m.put((String)pairs[i],pairs[i+1]);
         return Collections.unmodifiableMap(m);
     }
-    private void run(SchedulerState s,UUID run) {if(!s.runId.equals(run)) throw new ApiException(409,"STALE_RUN","Scheduler run changed");}
+    private void run(SchedulerState s,UUID run) {ApiException.require(run!=null,"scheduler_run_id required");if(!s.runId.equals(run)) throw new ApiException(409,"STALE_RUN","Scheduler run changed");}
     private void count(SchedulerState s,String key) {s.counters.merge(key,1L,Long::sum);}
     private long event(SchedulerState s,String type,String request,Identity id,UUID job,String task,Object... detail) {
         long seq=s.events.size()+1L;
@@ -59,8 +59,7 @@ public final class SchedulerCore {
         });
     }
     private Task task(SchedulerState s,Identity id) {
-        ApiException.require(id!=null,"Identity required");run(s,id.scheduler_run_id());
-        ApiException.require(id.job_id()!=null && id.worker_session_id()!=null && id.attempt_no()>0 && ManifestValidator.identifier(id.task_id()),"Invalid identity");
+        ManifestValidator.identity(id);run(s,id.scheduler_run_id());
         var j=s.jobs.get(id.job_id());
         if(j==null || !j.tasks.containsKey(id.task_id()))throw ApiException.conflict("Unknown task in this run");
         return j.tasks.get(id.task_id());
@@ -83,7 +82,7 @@ public final class SchedulerCore {
     }
     public Assignment claim(Claim r) {
         return store.command(s->{
-            ApiException.require(r!=null && r.worker_session_id()!=null && r.claim_id()!=null,"Claim UUIDs required");run(s,r.scheduler_run_id());
+            ManifestValidator.claim(r);run(s,r.scheduler_run_id());
             var receipt=s.claims.get(r.claim_id());
             if(receipt!=null) {
                 if(!receipt.request().equals(r))throw ApiException.conflict("Claim ID reused with different identity");
