@@ -1,0 +1,23 @@
+{
+  "description": "Architecture \u00a712 functional workload. Outputs are canonical JSON integers except E (text/plain).",
+  "outputs": {
+    "A": {
+      "value": "3"
+    },
+    "B": {
+      "value": "7"
+    },
+    "C": {
+      "value": "15"
+    },
+    "D": {
+      "value": "22"
+    },
+    "E": {
+      "text": "result=22\n"
+    }
+  },
+  "final_outputs": {
+    "result": "result=22\n"
+  }
+}
