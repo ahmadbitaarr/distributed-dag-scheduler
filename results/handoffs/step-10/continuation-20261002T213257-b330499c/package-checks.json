@@ -1,0 +1,54 @@
+{
+  "status": "BLOCKED solely on Docker-capable execution of required gates",
+  "input_zip_sha256": "89238dfdbe287cc2624c5606aeaf708dc53ffbeb6bb0a4e7c20703c1cee7290c",
+  "input_files_retained": 255,
+  "input_files_byte_identical": 251,
+  "changed_input_files": [
+    "docs/HANDOFF.md",
+    "docs/OPEN_ISSUES.md",
+    "docs/PROGRESS.md",
+    "docs/handoffs/step-10.md"
+  ],
+  "implementation_changed": false,
+  "prior_evidence_changed": false,
+  "historical_steps_0_to_9_changed": false,
+  "preserved_native_original_evidence_changed": false,
+  "copied_new_raw_evidence_files_byte_identical": 363,
+  "source_manifest_sha256": "83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "architecture_sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1",
+  "roadmap_sha256": "2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921",
+  "excluded_directories": [
+    ".git",
+    ".m2",
+    ".pytest_cache",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "runtime",
+    "target",
+    "toolchain",
+    "toolchains",
+    "venv"
+  ],
+  "excluded_files": [
+    ".DS_Store",
+    ".env",
+    "Thumbs.db",
+    "credentials",
+    "credentials.json",
+    "id_ed25519",
+    "id_rsa",
+    "settings.xml"
+  ],
+  "excluded_other": [
+    "*.pyc",
+    "*.pyo",
+    "*.class",
+    "*.jar",
+    "symlinks",
+    "results outside results/handoffs"
+  ],
+  "secret_pattern_check": "No private keys, AWS access-key IDs, GitHub tokens or embedded URL credentials matched in packaged text; bounded pattern scan.",
+  "git_operations": false,
+  "step_11_started": false
+}

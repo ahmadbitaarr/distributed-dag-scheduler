@@ -1,0 +1,15 @@
+sh deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests && pytest -q --runxfail tests/faults/test_worker_crash.py'
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_worker_crash_reassignment ________________________
+
+system = <tests.harness.runtime.NativeHarness object at 0x7ac52b4847a0>
+
+>   ???
+E   test_worker_crash.RecoveryNotObserved: Expected X to be reassigned to healthy worker B with attempt_no > 1 within the controlled 10 s window; X remains RUNNING under killed worker A, Y BLOCKED, job RUNNING.
+
+/mnt/c/Users/Ahmad/OneDrive/Desktop/CS4906/distributed-dag-scheduler/tests/faults/test_worker_crash.py:201: RecoveryNotObserved
+=========================== short test summary info ============================
+FAILED tests/faults/test_worker_crash.py::test_worker_crash_reassignment - te...
+1 failed in 24.62s
+make: *** [Makefile:22: fault-demo] Error 1

@@ -1,0 +1,45 @@
+{
+  "8531f642-6e29-4b1a-a6e9-36b94269d37a": {
+    "scheduler_run_id": "1847a4ea-7579-4f10-89a7-dc0741f04c54",
+    "job_id": "8531f642-6e29-4b1a-a6e9-36b94269d37a",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 2160381193,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "A": {
+        "state": "ASSIGNED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 1,
+        "owner": "44558f7c-b6ed-4c90-a20d-78bee5a610ea",
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "1847a4ea-7579-4f10-89a7-dc0741f04c54",
+              "job_id": "8531f642-6e29-4b1a-a6e9-36b94269d37a",
+              "task_id": "A",
+              "attempt_no": 1,
+              "worker_session_id": "44558f7c-b6ed-4c90-a20d-78bee5a610ea"
+            },
+            "state": "ASSIGNED",
+            "ready_elapsed_ns": 2167822452,
+            "assigned_elapsed_ns": 2186653682,
+            "started_elapsed_ns": null,
+            "finished_elapsed_ns": null,
+            "start_receipt": null,
+            "report_receipt": null,
+            "report_ack": null
+          }
+        ],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "ASSIGNED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 5
+  }
+}

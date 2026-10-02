@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "pytest",
+    "--version"
+  ],
+  "shell_argv": [
+    "bash",
+    "-c",
+    "exec \"$@\"",
+    "check",
+    "python3",
+    "-m",
+    "pytest",
+    "--version"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 1,
+  "checked_utc": "2026-10-02T21:30:45.249203+00:00"
+}

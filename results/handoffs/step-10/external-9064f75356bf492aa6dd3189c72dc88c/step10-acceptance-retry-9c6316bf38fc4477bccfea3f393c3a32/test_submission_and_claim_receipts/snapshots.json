@@ -1,0 +1,133 @@
+{
+  "b10d0978-66e9-42ec-a57c-411febd876f0": {
+    "scheduler_run_id": "0e27e060-0293-4bfb-a7ce-33a520c345d5",
+    "job_id": "b10d0978-66e9-42ec-a57c-411febd876f0",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 2333606713,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "A": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 1,
+        "owner": null,
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "0e27e060-0293-4bfb-a7ce-33a520c345d5",
+              "job_id": "b10d0978-66e9-42ec-a57c-411febd876f0",
+              "task_id": "A",
+              "attempt_no": 1,
+              "worker_session_id": "8cf16304-8bc9-4b5f-a63c-02f81d39a375"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 2342144494,
+            "assigned_elapsed_ns": 2478355968,
+            "started_elapsed_ns": 2671535321,
+            "finished_elapsed_ns": 3053082648,
+            "start_receipt": {
+              "scheduler_run_id": "0e27e060-0293-4bfb-a7ce-33a520c345d5",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "0e27e060-0293-4bfb-a7ce-33a520c345d5",
+                "job_id": "b10d0978-66e9-42ec-a57c-411febd876f0",
+                "task_id": "A",
+                "attempt_no": 1,
+                "worker_session_id": "8cf16304-8bc9-4b5f-a63c-02f81d39a375"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/0e27e060-0293-4bfb-a7ce-33a520c345d5/jobs/b10d0978-66e9-42ec-a57c-411febd876f0/tasks/A/attempts/1/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "0e27e060-0293-4bfb-a7ce-33a520c345d5",
+              "scheduler_event_seq": 6,
+              "disposition": "ACCEPTED"
+            }
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/0e27e060-0293-4bfb-a7ce-33a520c345d5/jobs/b10d0978-66e9-42ec-a57c-411febd876f0/tasks/A/attempts/1/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "B": {
+        "state": "READY",
+        "parents": [
+          "A"
+        ],
+        "satisfied_parents": [
+          "A"
+        ],
+        "ready_seq": 2,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "C": {
+        "state": "READY",
+        "parents": [
+          "A"
+        ],
+        "satisfied_parents": [
+          "A"
+        ],
+        "ready_seq": 3,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "D": {
+        "state": "BLOCKED",
+        "parents": [
+          "B",
+          "C"
+        ],
+        "satisfied_parents": [],
+        "ready_seq": 0,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "E": {
+        "state": "BLOCKED",
+        "parents": [
+          "D"
+        ],
+        "satisfied_parents": [],
+        "ready_seq": 0,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "BLOCKED": 2,
+      "READY": 2,
+      "SUCCEEDED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 10
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "label": "continuation-20261002T213257-b330499c",
+  "evidence": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/handoffs/step-10/continuation-20261002T213257-b330499c",
+  "root": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "jar_provenance": "Existing local target JARs retained after the recorded prior java-acceptance mvn -B verify. Implementation manifest revalidated unchanged; JAR hashes captured for these continuation runs. No build products are included in the delivered ZIP."
+}

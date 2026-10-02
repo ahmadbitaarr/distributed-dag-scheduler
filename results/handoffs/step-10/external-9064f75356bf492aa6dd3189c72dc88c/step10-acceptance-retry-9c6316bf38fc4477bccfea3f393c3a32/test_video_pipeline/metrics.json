@@ -1,0 +1,31 @@
+{
+  "scheduler_run_id": "08b609d7-73c2-4e86-9981-a46b7c2dbbf6",
+  "scheduler_event_seq": 374,
+  "counters": {
+    "accepted_jobs": 1,
+    "accepted_logical_successes": 6,
+    "duplicate_reports": 0,
+    "explicit_failed_attempts": 0,
+    "rejected_reports": 0,
+    "retries_assigned": 0
+  },
+  "tasks_by_state": {
+    "ASSIGNED": 0,
+    "BLOCKED": 0,
+    "READY": 0,
+    "RUNNING": 0,
+    "SUCCEEDED": 6
+  },
+  "ready_queue_length": 0,
+  "active_attempts": 0,
+  "job_duration_ns": {
+    "count": 1,
+    "p50": 6538215662,
+    "p95": 6538215662
+  },
+  "scheduling_latency_ns": {
+    "count": 6,
+    "p50": 36280550,
+    "p95": 279413139
+  }
+}

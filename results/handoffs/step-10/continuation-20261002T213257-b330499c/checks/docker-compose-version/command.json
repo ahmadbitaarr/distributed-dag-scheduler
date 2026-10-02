@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "docker",
+    "compose",
+    "version"
+  ],
+  "shell_argv": [
+    "bash",
+    "-c",
+    "exec \"$@\"",
+    "check",
+    "docker",
+    "compose",
+    "version"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 127,
+  "checked_utc": "2026-10-02T21:30:45.223380+00:00"
+}

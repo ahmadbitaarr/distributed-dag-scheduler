@@ -66,10 +66,11 @@ Pinned images: `maven:3.9.9-eclipse-temurin-21` (build stage) and `eclipse-temur
 | `make build` | `mvn -B verify`: compile and run the JUnit tests. |
 | `make up` | Build the images and start the scheduler, the artifact store and `WORKERS` (default 3) workers via Compose. Waits for readiness. |
 | `make demo` | Against `make up`: upload the committed workloads and run the functional DAG and the video DAG. Checks the results and writes all outputs to `results/demo/<timestamp>/`. |
-| `make test` | In the Linux harness container: `mvn -B verify`, then the full pytest suite. Requires **exactly one** XFAIL, the intentional worker-crash oracle. Evidence goes to `results/latest-tests/`. |
+| `make test` | In the Linux harness container: `mvn -B verify`, then the full pytest suite. Requires **exactly one** XFAIL, the intentional worker-crash oracle. Evidence goes to `results/latest-tests/<unique-run>/<test>/`. |
+| `make fault-demo` | Build and run the same crash oracle with `--runxfail`. MS2 must return nonzero specifically from `RecoveryNotObserved`; evidence is retained. |
 | `make down` | Stop the deployment. Artifact files and `results/` are kept. |
 
-`make fault-demo` and `make bench` are added at roadmap Steps 10 and 12. On Windows without `make`, run the recipe lines from `Makefile` directly, for example `sh deploy/harness/run.sh` from Git Bash.
+`make bench` is added at roadmap Step 12. On Windows without `make`, run the recipe lines from `Makefile` directly, for example `sh deploy/harness/run.sh` from Git Bash.
 
 ## Tests
 
@@ -77,7 +78,7 @@ The suite runs in a pinned Linux harness container, so the host needs only Docke
 
 ```bash
 sh deploy/harness/run.sh                              # = make test
-sh deploy/harness/run.sh pytest -q tests/integration/test_api.py   # any command, run in the harness
+sh deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests && pytest -q tests/integration/test_api.py'
 MS2_BACKEND=compose pytest -q tests/integration/test_system.py     # host Python: drive real containers
 ```
 
@@ -113,3 +114,39 @@ The harness image is `deploy/harness/Dockerfile`: Ubuntu 24.04, JDK 21, Maven 3.
 | `deploy/harness/` | Linux harness/client container for tests |
 | `docs/` | Architecture, roadmap, API contract (`api.md`), evidence and event schema (`evidence.md`), progress, handoffs, open issues |
 | `results/handoffs/` | Per-step verification evidence |
+
+## Step 10 crash demonstration
+
+The worker-crash oracle demands recovery. Only its final `RecoveryNotObserved`
+is an expected strict XFAIL in normal acceptance. `make fault-demo` disables that
+marker with `--runxfail` and must fail visibly for the same oracle; infrastructure,
+probe, safety, export and cleanup errors are never expected failures.
+
+Only gated A gets `OPERATION_TIMEOUT_MS=120000`; the normal 30000 ms default is
+unchanged. The test proves the original attempt is still RUNNING immediately
+after SIGKILL, verifies B's independent probe and both histories, records a
+10-second harness-monotonic observation, and requires a new B claim after a
+scheduler-sequence boundary captured at least 8 seconds into that interval.
+The 10 seconds are an observation budget, not a universal recovery-time bound.
+Request delays and actual elapsed time are recorded.
+
+Each pytest invocation chooses a unique run directory. `MS2_RUN_LABEL` can set a
+readable unique name; the fixture refuses a populated test directory before startup.
+Always use a fresh label across container runs: their temporary source copies do
+not include earlier host results, so copy-back does not yet reject a reused label.
+`MS2_SOURCE_REV` can identify a source manifest when testing a ZIP without Git
+metadata. The Docker runner otherwise records local HEAD and a dirty marker.
+Native, Compose, acceptance and real-failure evidence must be retained separately.
+
+The Linux harness runs native services inside one container. For Compose use
+host Python (with requirements.txt installed), not Docker-in-Docker:
+
+```bash
+docker compose -f deploy/compose/compose.yaml build
+MS2_BACKEND=compose MS2_REQUIRE_XFAIL=1 MS2_RUN_LABEL=step10-compose-01 python3 -m pytest -q tests/faults/test_worker_crash.py
+```
+
+Set `MS2_SOURCE_REV` to the actual tested source before a host-Python run. See
+`docs/handoffs/step-10.md` for current results, remaining gates and exact evidence
+paths. Step 10 is a BLOCKED local checkpoint: native strict XFAIL is verified,
+but Compose, `make test`, and the real-failure demonstration remain unfinished.

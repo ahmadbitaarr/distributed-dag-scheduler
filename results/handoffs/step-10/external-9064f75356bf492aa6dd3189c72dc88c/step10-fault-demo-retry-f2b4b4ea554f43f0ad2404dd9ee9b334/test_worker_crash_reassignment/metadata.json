@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_worker_crash.py::test_worker_crash_reassignment",
+  "outcome": "failed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "8475dd39-47ec-4deb-8120-dfd826a418ec",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "run_label": "step10-fault-demo-retry-f2b4b4ea554f43f0ad2404dd9ee9b334",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-02T22:45:21.150663+00:00",
+  "finished_utc": "2026-10-02T22:45:45.678767+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

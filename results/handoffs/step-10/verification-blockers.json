@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED",
+  "reason": "Automatic approval review could not complete because the Work usage limit was reached.",
+  "attempted_action": "Escalated Compose prerequisite/fault check (compose-strict-docker-probe)",
+  "action_executed": false,
+  "exit_code": null,
+  "review_message": "Automatic approval review failed: You\u2019ve hit your usage limit. The action was not executed because automatic approval review could not be completed. This is a review failure, not a determination that the action is unsafe. Do not bypass the approval check; resolve the error or ask the user for guidance.",
+  "separate_environment_blockers": [
+    "No Docker executable, daemon executable, Podman executable, or Docker socket available",
+    "Sandboxed Compose pytest setup was denied socket creation before reaching Docker"
+  ],
+  "not_executed": [
+    "make test",
+    "full native pytest acceptance",
+    "make fault-demo",
+    "native --runxfail fault demonstration",
+    "escalated Compose retry"
+  ],
+  "checkpoint_decision": "User requested preserving a complete local checkpoint instead of starting verification that cannot be completed."
+}

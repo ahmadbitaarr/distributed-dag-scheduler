@@ -1,0 +1,28 @@
+{
+  "command": "mvn -B verify -pl protocol,scheduler",
+  "argv": [
+    "mvn",
+    "-B",
+    "verify",
+    "-pl",
+    "protocol,scheduler"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 0,
+  "started_utc": "2026-10-02T16:38:43.212167+00:00",
+  "duration_seconds": 19.149226619000274,
+  "accepted_base": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:51841e9f88177994d0fb0029d6c23db8be65eec507f2c775f751205812e25b46",
+  "source_manifest_sha256": "51841e9f88177994d0fb0029d6c23db8be65eec507f2c775f751205812e25b46",
+  "environment_overrides": {
+    "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+    "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+    "MAVEN_ARGS": "-ntp -s /tmp/cs4094-step10-maven-settings.xml -Dmaven.repo.local=/tmp/cs4094-step10-m2 -Dmaven.wagon.http.retryHandler.count=1",
+    "MAVEN_OPTS": "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts",
+    "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:51841e9f88177994d0fb0029d6c23db8be65eec507f2c775f751205812e25b46",
+    "MS2_RUN_LABEL": "focused-java",
+    "MS2_BACKEND": "native",
+    "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+  },
+  "required_xfail_count": null
+}

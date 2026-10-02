@@ -1,0 +1,27 @@
+{
+  "command": "python -m tests.harness.check_evidence results/latest-tests/native-strict/test_worker_crash_reassignment",
+  "argv": [
+    "python",
+    "-m",
+    "tests.harness.check_evidence",
+    "results/latest-tests/native-strict/test_worker_crash_reassignment"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 0,
+  "started_utc": "2026-10-02T16:43:28.477980+00:00",
+  "duration_seconds": 0.04332534700006363,
+  "accepted_base": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "source_manifest_sha256": "83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "environment_overrides": {
+    "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+    "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+    "MAVEN_ARGS": "-ntp -s /tmp/cs4094-step10-maven-settings.xml -Dmaven.repo.local=/tmp/cs4094-step10-m2 -Dmaven.wagon.http.retryHandler.count=1",
+    "MAVEN_OPTS": "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts",
+    "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "MS2_RUN_LABEL": "native-offline",
+    "MS2_BACKEND": "native",
+    "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+  },
+  "required_xfail_count": null
+}

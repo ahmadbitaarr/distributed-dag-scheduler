@@ -1,0 +1,153 @@
+{
+  "233158c9-99e1-4516-a93e-d8b745a75f3c": {
+    "schema_version": 1,
+    "job_id": "233158c9-99e1-4516-a93e-d8b745a75f3c",
+    "tasks": [
+      {
+        "task_id": "inspect",
+        "operation": "video_inspect",
+        "parameters": {},
+        "parents": [],
+        "inputs": {
+          "video": {
+            "source": {
+              "key": "inputs/2381ac08-1944-4115-9fb0-5272ff0ad14d/sample.mp4",
+              "length": 1554682,
+              "sha256": "d6dcfed93c1fb13967393dc755d235c5d96fbd3853a1b4895e31f6e3886308b3",
+              "media_type": "video/mp4"
+            }
+          }
+        },
+        "outputs": [
+          "metadata"
+        ]
+      },
+      {
+        "task_id": "transcode720",
+        "operation": "video_transcode",
+        "parameters": {
+          "height": 720
+        },
+        "parents": [
+          "inspect"
+        ],
+        "inputs": {
+          "video": {
+            "source": {
+              "key": "inputs/2381ac08-1944-4115-9fb0-5272ff0ad14d/sample.mp4",
+              "length": 1554682,
+              "sha256": "d6dcfed93c1fb13967393dc755d235c5d96fbd3853a1b4895e31f6e3886308b3",
+              "media_type": "video/mp4"
+            }
+          }
+        },
+        "outputs": [
+          "video"
+        ]
+      },
+      {
+        "task_id": "transcode360",
+        "operation": "video_transcode",
+        "parameters": {
+          "height": 360
+        },
+        "parents": [
+          "inspect"
+        ],
+        "inputs": {
+          "video": {
+            "source": {
+              "key": "inputs/2381ac08-1944-4115-9fb0-5272ff0ad14d/sample.mp4",
+              "length": 1554682,
+              "sha256": "d6dcfed93c1fb13967393dc755d235c5d96fbd3853a1b4895e31f6e3886308b3",
+              "media_type": "video/mp4"
+            }
+          }
+        },
+        "outputs": [
+          "video"
+        ]
+      },
+      {
+        "task_id": "thumbnail",
+        "operation": "video_thumbnail",
+        "parameters": {},
+        "parents": [
+          "inspect"
+        ],
+        "inputs": {
+          "video": {
+            "source": {
+              "key": "inputs/2381ac08-1944-4115-9fb0-5272ff0ad14d/sample.mp4",
+              "length": 1554682,
+              "sha256": "d6dcfed93c1fb13967393dc755d235c5d96fbd3853a1b4895e31f6e3886308b3",
+              "media_type": "video/mp4"
+            }
+          }
+        },
+        "outputs": [
+          "image"
+        ]
+      },
+      {
+        "task_id": "subtitles",
+        "operation": "fixture_subtitles",
+        "parameters": {},
+        "parents": [
+          "inspect"
+        ],
+        "inputs": {
+          "srt": {
+            "source": {
+              "key": "inputs/317c80ed-e0c0-4470-b488-4d53d3c4bc8d/fixture.srt",
+              "length": 156,
+              "sha256": "5baa53c70fc23b4c33aa464712a1061b0db659aef37e9d2b0ce0f47185c14b56",
+              "media_type": "application/x-subrip"
+            }
+          }
+        },
+        "outputs": [
+          "subtitles"
+        ]
+      },
+      {
+        "task_id": "publish",
+        "operation": "video_publish",
+        "parameters": {},
+        "parents": [
+          "transcode720",
+          "transcode360",
+          "thumbnail",
+          "subtitles"
+        ],
+        "inputs": {
+          "video720": {
+            "task_id": "transcode720",
+            "output_name": "video"
+          },
+          "video360": {
+            "task_id": "transcode360",
+            "output_name": "video"
+          },
+          "image": {
+            "task_id": "thumbnail",
+            "output_name": "image"
+          },
+          "subtitles": {
+            "task_id": "subtitles",
+            "output_name": "subtitles"
+          }
+        },
+        "outputs": [
+          "manifest"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "publish",
+        "output_name": "manifest"
+      }
+    }
+  }
+}

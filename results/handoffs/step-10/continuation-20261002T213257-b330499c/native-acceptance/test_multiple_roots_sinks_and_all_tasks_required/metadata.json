@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_multiple_roots_sinks_and_all_tasks_required",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "6ceddd82-7f70-40f9-905d-187f367b470d",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "run_label": "continuation-20261002T213257-b330499c-native-acceptance",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-02T21:34:25.807989+00:00",
+  "finished_utc": "2026-10-02T21:34:30.374267+00:00",
+  "python": "3.12.14",
+  "java": "openjdk version \"21.0.8\" 2025-07-15 LTS",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39"
+}

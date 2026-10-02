@@ -1,0 +1,3 @@
+sh deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests && pytest -q --runxfail tests/faults/test_worker_crash.py'
+deploy/harness/run.sh: 9: docker: not found
+make: *** [Makefile:22: fault-demo] Error 127

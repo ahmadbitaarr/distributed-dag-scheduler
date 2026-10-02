@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_worker_client.py::test_worker_abandons_old_run_and_joins_the_new_one",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "b4760a39-b5e2-4383-957d-5d36439a3f99",
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "run_label": "continuation-20261002T213257-b330499c-native-acceptance",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-02T21:36:51.572701+00:00",
+  "finished_utc": "2026-10-02T21:37:00.280280+00:00",
+  "python": "3.12.14",
+  "java": "openjdk version \"21.0.8\" 2025-07-15 LTS",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39"
+}

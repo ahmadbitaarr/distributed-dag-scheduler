@@ -1,0 +1,20 @@
+sh deploy/harness/run.sh
+{"message":"java.io.IOException: connection closed before all data received","event_type":"server_error"}
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.4, pluggy-1.6.0
+rootdir: /tmp/src
+configfile: pytest.ini
+testpaths: tests/unit, tests/integration, tests/faults
+collected 63 items
+
+tests/unit/test_fault_oracle.py .............                            [ 20%]
+tests/unit/test_history_checks.py ............                           [ 39%]
+tests/integration/test_api.py ........                                   [ 52%]
+tests/integration/test_functional_workload.py .                          [ 53%]
+tests/integration/test_system.py .....................                   [ 87%]
+tests/integration/test_worker_client.py .......                          [ 98%]
+tests/faults/test_worker_crash.py x                                      [100%]
+
+=========================== short test summary info ============================
+XFAIL tests/faults/test_worker_crash.py::test_worker_crash_reassignment - MS2 deliberately omits silent-worker ownership reclamation
+================== 62 passed, 1 xfailed in 366.13s (0:06:06) ===================

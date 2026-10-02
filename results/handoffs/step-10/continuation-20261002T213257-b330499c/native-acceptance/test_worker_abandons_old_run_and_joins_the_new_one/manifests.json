@@ -1,0 +1,27 @@
+{
+  "fa173860-7174-4bc3-ae82-5864b04b2b49": {
+    "schema_version": 1,
+    "job_id": "fa173860-7174-4bc3-ae82-5864b04b2b49",
+    "tasks": [
+      {
+        "task_id": "B",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 50,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "B",
+        "output_name": "value"
+      }
+    }
+  }
+}

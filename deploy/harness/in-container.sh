@@ -2,7 +2,7 @@
 # Runs inside dag-ms2/harness. Works on a container-local copy of the mounted
 # repository (/work): host bind mounts, especially on Windows/macOS, make JVM
 # start-up and log I/O slow enough to distort timing-sensitive tests.
-# Evidence is copied back to /work/results/latest-tests and the exit status is kept.
+# Each pytest invocation has a unique run directory. Copy failures remain ordinary errors.
 set -u
 rm -rf /tmp/src && mkdir -p /tmp/src
 (cd /work && tar --exclude=./.git --exclude=./results/latest-tests --exclude='./*/target' -cf - .) | tar -C /tmp/src -xf -
@@ -14,5 +14,10 @@ fi
 "$@"
 status=$?
 mkdir -p /work/results/latest-tests
-[ -d results/latest-tests ] && cp -r results/latest-tests/. /work/results/latest-tests/
+if [ -d results/latest-tests ]; then
+  if ! cp -r results/latest-tests/. /work/results/latest-tests/; then
+    echo "Evidence copy failed" >&2
+    exit 2
+  fi
+fi
 exit $status

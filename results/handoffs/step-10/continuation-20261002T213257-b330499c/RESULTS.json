@@ -1,0 +1,83 @@
+{
+  "status": "BLOCKED",
+  "implementation_changed": false,
+  "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "preserved_native_histories": 2,
+  "manifest_files_validated": 63,
+  "native_acceptance": {
+    "exit_code": 0,
+    "passed": 62,
+    "xfailed": 1,
+    "runtime_evidence_directories": 38,
+    "cleanup_succeeded_all": true,
+    "offline": {
+      "directories": 38,
+      "job_histories": 29,
+      "exit_code": 0
+    },
+    "fault": {
+      "scheduler_run_id": "1c5b4cc2-3d61-4bbd-9d01-308d1f390513",
+      "job_id": "3a6b5463-9d76-466e-b326-46b1d6594bec",
+      "task_id": "X",
+      "attempt_no": 1,
+      "worker_session_id": "5a1db8b4-8784-4acd-8378-b8524205507f",
+      "pid": 4934,
+      "signal": "SIGKILL",
+      "exit_code": -9
+    },
+    "observation": {
+      "worker_b_session_id": "d48e2e4b-9a95-4a35-9747-e3f672e0de34",
+      "actual_duration_ns": 10000123923,
+      "samples": 39,
+      "poll_pairs": 92,
+      "late_poll_pairs": 18,
+      "recovered_within_window": false
+    }
+  },
+  "native_runxfail": {
+    "exit_code": 1,
+    "failed": 1,
+    "reason": "RecoveryNotObserved",
+    "cleanup_succeeded": true,
+    "offline": {
+      "directories": 1,
+      "job_histories": 2,
+      "exit_code": 0
+    },
+    "fault": {
+      "scheduler_run_id": "2c5cd58a-9ff5-4455-a0cb-2ff958c1cfac",
+      "job_id": "4eb75563-a409-4c4e-a6bf-95e5bf8e608a",
+      "task_id": "X",
+      "attempt_no": 1,
+      "worker_session_id": "16232782-253f-4eba-ad79-b7528a381b43",
+      "pid": 5117,
+      "signal": "SIGKILL",
+      "exit_code": -9
+    },
+    "observation": {
+      "worker_b_session_id": "7356c34b-affd-4d28-8d1f-9ff12ea6227f",
+      "actual_duration_ns": 10000126193,
+      "samples": 39,
+      "poll_pairs": 92,
+      "late_poll_pairs": 17,
+      "recovered_within_window": false
+    }
+  },
+  "make_test": {
+    "exit_code": 2,
+    "reason": "docker: not found; recipe Error 127",
+    "tests_reached": false
+  },
+  "make_fault_demo": {
+    "exit_code": 2,
+    "reason": "docker: not found; recipe Error 127",
+    "tests_reached": false,
+    "satisfies_intended_demo_gate": false
+  },
+  "compose": {
+    "executed": false,
+    "reason": "No Docker executable or socket"
+  },
+  "remaining_environment_gate": "Docker-capable host execution of Compose strict XFAIL, actual make test, actual make fault-demo and retained evidence checks",
+  "architecture_deviations": []
+}

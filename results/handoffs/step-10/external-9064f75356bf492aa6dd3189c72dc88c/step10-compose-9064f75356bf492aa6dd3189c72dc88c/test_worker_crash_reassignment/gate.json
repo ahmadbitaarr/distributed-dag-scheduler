@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scheduler_run_id": "6bb4149e-6b28-4cea-bf80-f0680c99c26a",
+  "producer": "worker",
+  "producer_seq": 5,
+  "utc_timestamp": "2026-10-02T22:19:08.379909951Z",
+  "elapsed_ns": 1551176928,
+  "event_type": "worker_test_gate_entered",
+  "worker_session_id": "539e871d-0f8f-48e0-9f95-33654c436cdd",
+  "job_id": "3cdf9b9d-7415-4888-adb8-3dcd7f22a4e9",
+  "task_id": "X",
+  "attempt_no": 1,
+  "request_id": "Identity[scheduler_run_id=6bb4149e-6b28-4cea-bf80-f0680c99c26a, job_id=3cdf9b9d-7415-4888-adb8-3dcd7f22a4e9, task_id=X, attempt_no=1, worker_session_id=539e871d-0f8f-48e0-9f95-33654c436cdd]",
+  "ack_scheduler_event_seq": 9
+}

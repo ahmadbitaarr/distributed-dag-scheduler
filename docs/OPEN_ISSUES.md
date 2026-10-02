@@ -2,12 +2,12 @@
 
 | ID | Category / gate | Observation | Required next action |
 |---|---|---|---|
-| S1-04 | Integration pending | Write access now works: branches `ms2/step-01-build-foundation` … `ms2/step-09-video` are pushed to origin (stacked, each containing the previous). `main` is still at 82ca8bc and can fast-forward to the Step 9 commit. | Integrate through the team's process: fast-forward `main` or open a PR from `ms2/step-09-video`. Never force-push. |
 | S0-02 | Historical provenance gap | Earlier build/native passes lack a Git SHA, a full tested-source manifest and run-time JAR fingerprints, so the exact tested revision is UNKNOWN. | Keep them historical only. Current evidence carries `source_revision` (Step 8 onward). |
-| S1-02a | Environment | `make` is not installed on the verifying Windows host, so each target's recipe was run directly (Compose `up`/`down`, `deploy/harness/run.sh`, `tests.harness.demo`). The Makefile itself has not been executed. | A teammate on Linux or macOS runs `make up demo down` and `make test` (Step 13). |
+| S1-02a | Historical environment note | The prior Windows verifier lacked make and ran recipes directly. This continuation executed both Make test targets on Linux, but Docker was absent and neither reached tests. | Successful actual Make execution remains part of the Docker gate S10-01; historical Windows results retain their original scope. |
 | S1-03a | Toolchain | Maven is not vendored (there is no `mvnw`). The harness container pins Maven 3.9.9, so `make test` needs only Docker. | Optional: add a Maven wrapper for host builds. |
 | S6-01 | Environment note | Running the suite directly on a Windows/OneDrive bind mount made JVM start-up take about 12 s and caused readiness time-outs. `deploy/harness/in-container.sh` runs on a container-local copy, which avoids this. | None. Use `deploy/harness/run.sh`. |
-| S10-01 | Intentional defect; Step 10 | Worker-crash reassignment is intentionally absent. The strict typed XFAIL oracle runs in every full suite (1 xfailed). Step 10 still needs `make fault-demo` (`--runxfail`) and its saved failing evidence. Caveat: the crash test's gate sits inside the worker's 30 s `OPERATION_TIMEOUT_MS`. If killing worker A took longer than that, X would fail over explicitly and the oracle would XPASS, which the strict marker turns into a failure. | At Step 10, give gated worker A an operation timeout longer than the test window and document why. |
+| S10-01 | BLOCKER — Docker environment | Docker CLI/socket remain absent. Compose capability commands exit 127. Actual `make test` and `make fault-demo` each exit 2 before tests (recipe Error 127). Full native pytest passed 62 + 1 XFAIL and native --runxfail failed only on RecoveryNotObserved, but these do not replace the Docker/Make gates. | Run `results/handoffs/step-10/continuation-20261002T213257-b330499c/EXTERNAL-VERIFICATION.md` on a Docker-capable host. Keep Step 10 BLOCKED until all required gates are observed. |
+| S10-03 | Documented evidence-label limitation | Explicit reuse of a container run label can overwrite the host copy-back destination; the fixture guard applies only to an existing per-test directory. Every continuation run used a fresh unique label. | Continue using fresh labels. No source change is required for this milestone under the user's continuation instruction; do not claim universal overwrite prevention. |
 | S11-01 | Missing/environment; Step 11 | The Hokea adapter is missing (`runtime.py` imports a nonexistent `hokea_adapter` when selected). Cluster access is unverified. | Write a version-grounded adapter and record cluster limitations at Step 11. |
 | S12-01 | Unverified; Step 12 | The benchmark driver (`benchmarks/run.py`) has not run. The native harness does not enforce the 512 MiB limit; Compose does (verified at Step 1). | Run the exact matrix under Compose resource caps at Step 12. |
 | S13-S15 | Final gates | Independent clean reproduction, revised specification, progress report, final docs and submission audit are not done. | Complete in order at Steps 13–15, using measured evidence. |
@@ -17,6 +17,9 @@
 | ID | Resolution |
 |---|---|
 | S0-01 | Shared repository exists; Step 0 accepted at 82ca8bc. |
+| S1-04 | User confirmed Steps 0–9 integrated and accepted on main at 9bfd6d339d754475bcf218179f1cffdd4c07eeb3. Historical handoffs were not rewritten. |
+| S10-02 | Earlier Work approval-review usage interruption resolved for this continuation: temporary dependency restoration and local native service tests executed. Full native acceptance and native real failure are now verified. Docker absence remains S10-01. |
+| S10-TIMEOUT | Gated A alone uses OPERATION_TIMEOUT_MS=120000. Post-kill assertions require the original RUNNING attempt with no receipt or retry. Production timeout remains 30000. |
 | S1-01 | `mvn -B verify` passes (Step 1). |
 | S1-02 | Dockerfiles, Compose, and Make targets up/demo/test/down exist. ComposeHarness ran real-container tests (Step 6), and a live Compose demo ran (Step 9). |
 | S1-03 | Python 3.12.3 is verified in the harness container (Step 5). |

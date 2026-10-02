@@ -4,7 +4,7 @@ This file describes how MS2 records what happened and how anyone can falsify the
 
 ## What every test exports
 
-The pytest `system` fixture runs one isolated deployment per test. Before teardown, even when the test fails, it writes the following to `results/latest-tests/<test-name>/`:
+The pytest `system` fixture runs one isolated deployment per test. Before teardown, even when the test fails, it writes the following to `results/latest-tests/<unique-run>/<test-name>/`:
 
 | File | Contents |
 |---|---|
@@ -14,7 +14,7 @@ The pytest `system` fixture runs one isolated deployment per test. Before teardo
 | `metrics.json` | Counters, state gauges, and timing summaries from `GET /v1/metrics`. |
 | `evidence-boundary.json` | `scheduler_run_id` and `last_exported_event_seq`, which let a checker detect truncation. |
 | `worker-N.jsonl`, `scheduler.jsonl`, `artifact-store.jsonl` | Raw process stdout and stderr: JSON events plus any diagnostics. |
-| `metadata.json` | Test node ID, outcome (passed/failed/skipped), xfail flag, backend, scheduler run ID, source revision (`MS2_SOURCE_REV`, set by `deploy/harness/run.sh`, with `+uncommitted` for a dirty tree), UTC start and finish, and Python/Java/platform versions. |
+| `metadata.json` | Test node ID, outcome (passed/failed/skipped), xfail flag, backend, scheduler run ID, source revision (`MS2_SOURCE_REV`, set by `deploy/harness/run.sh`, with `+uncommitted` for a dirty tree), UTC start and finish, Python/Java/platform versions, the run label, and whether export/cleanup returned successfully. |
 | `compose.log` | Compose backend only: `docker compose logs` before `down`. |
 | Test-specific files | For example `fault.json`, `gate.json` and `oracle-traceback.txt` for the crash test. |
 
@@ -87,7 +87,7 @@ A missing event needed by an invariant (for example, a dropped `task_started`) p
 
 ```bash
 python -m tests.harness.check_evidence results/handoffs/step-08/sample-history
-python -m tests.harness.check_evidence results/latest-tests/*/      # every test from the last run
+python -m tests.harness.check_evidence results/latest-tests/<unique-run>/*/      # every test from the last run
 ```
 
 The command exits non-zero if any directory falsifies an invariant, is truncated relative to its boundary file, or mixes scheduler runs. Only the Python standard library is needed.
@@ -107,3 +107,36 @@ Backends implement one interface in `tests/harness/runtime.py`:
 | `__exit__` | Export evidence, then tear down. |
 
 `NativeHarness` (local processes) and `ComposeHarness` (containers) implement it. `restart_scheduler()` is native only. The Hokea adapter (Step 11) implements the same interface. Tests never use process IDs or paths directly.
+
+## Step 10 evidence
+
+A run label is generated once per pytest invocation (mode, backend, UTC label,
+random suffix), or supplied by `MS2_RUN_LABEL`. It is a simple directory name.
+The fixture refuses an existing per-test directory. Use a fresh label for every
+container invocation: the runner excludes host results from its temporary source
+copy, and copy-back does not yet reject an explicitly reused host label (S10-03).
+`metadata.json` records `run_label` and
+`cleanup_succeeded`; a failed teardown remains an ordinary pytest error.
+
+The crash test saves `gate.json`, `before-kill.json`, `fault.json`,
+`after-kill.json`, `probe.json`, `observation-window.json`,
+`surviving-worker-claims.json`, `after-window.json`,
+`services-after-window.json`, `safety-checks.json`, and `oracle-traceback.txt`,
+as well as the normal exports and raw worker logs. Claim evidence contains
+paired scheduler `work_claim`/`work_empty` records joined by request ID.
+
+Observation times come from the harness's monotonic clock relative to one test
+origin. After at least 8 seconds, the harness reads a scheduler-sequence
+boundary; a later B claim must exceed it. Worker/scheduler elapsed clocks and
+wall-clock timestamps are never subtracted across processes. The actual window
+and request overrun are recorded. Recovery observations after the deadline do
+not count as recovery within the budget.
+
+Both job histories are checked live and from exported files before the typed
+recovery failure. The normal stuck-state checks are experiment/safety
+preconditions, not a passing assertion of the required recovery property.
+Retain separate native-XFAIL, Compose-XFAIL, real-failure and acceptance run
+directories under `results/handoffs/step-10/`. Keep runtime/ and build outputs out
+of that retained evidence. Store full commands, exit codes and the tested source
+manifest alongside each run. A nonzero build or Docker startup is not the
+intentional demonstration.

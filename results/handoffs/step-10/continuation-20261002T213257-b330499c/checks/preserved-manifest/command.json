@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sha256sum",
+    "-c",
+    "results/handoffs/step-10/source-SHA256SUMS.txt"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 0,
+  "checked_utc": "2026-10-02T21:30:16.111593+00:00"
+}

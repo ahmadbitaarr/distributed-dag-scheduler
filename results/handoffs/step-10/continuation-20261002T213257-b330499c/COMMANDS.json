@@ -1,0 +1,264 @@
+{
+  "docker-compose-version": {
+    "argv": [
+      "docker",
+      "compose",
+      "version"
+    ],
+    "shell_argv": [
+      "bash",
+      "-c",
+      "exec \"$@\"",
+      "check",
+      "docker",
+      "compose",
+      "version"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "exit_code": 127,
+    "checked_utc": "2026-10-02T21:30:45.223380+00:00"
+  },
+  "docker-info": {
+    "argv": [
+      "docker",
+      "info"
+    ],
+    "shell_argv": [
+      "bash",
+      "-c",
+      "exec \"$@\"",
+      "check",
+      "docker",
+      "info"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "exit_code": 127,
+    "checked_utc": "2026-10-02T21:30:45.227167+00:00"
+  },
+  "make-fault-demo": {
+    "argv": [
+      "make",
+      "fault-demo"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "step10-resume-make-fault-demo-9e703cbcdd"
+    },
+    "exit_code": 2,
+    "checked_utc": "2026-10-02T21:31:32.667134+00:00"
+  },
+  "make-test": {
+    "argv": [
+      "make",
+      "test"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "step10-resume-make-test-0a20afe0bf"
+    },
+    "exit_code": 2,
+    "checked_utc": "2026-10-02T21:31:32.660936+00:00"
+  },
+  "native-acceptance": {
+    "command": "python3 -m pytest",
+    "argv": [
+      "python3",
+      "-m",
+      "pytest"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "started_utc": "2026-10-02T21:33:17.730189+00:00",
+    "duration_seconds": 241.20480878800004,
+    "exit_code": 0,
+    "environment_overrides": {
+      "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "continuation-20261002T213257-b330499c-native-acceptance",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+    },
+    "required_xfail_count": "1",
+    "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "build_manifest": "../../reused-build-SHA256SUMS.txt"
+  },
+  "native-acceptance-offline": {
+    "command": "python3 -m tests.harness.check_evidence results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_artifact_staging_atomic_publication_and_conflicts results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_cached_empty_claim_stays_empty results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_committed_functional_workload results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_counters_gauges_and_snapshot_sequence_are_consistent results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_duplicate_conflicting_stale_reports_and_retry results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_endpoint_errors_are_structured results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_functional_multiple_jobs_workers results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_health_and_run_header results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_hooks_are_disabled_by_default 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[bad_binding]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[cycle]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[duplicate]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[duplicate_parent]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[empty]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[operation]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[self]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[too_many]' 'results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[unknown_parent]' results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_java_client_upload_submit_status_fetch results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_join_and_independent_branch_concurrency results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_local_operation_timeout_is_an_explicit_bounded_failure results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_lost_report_ack_is_replayed_not_reexecuted results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_multiple_roots_sinks_and_all_tasks_required results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_real_worker_failure_attempt_two results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_rejected_commands_do_not_change_snapshots results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_request_body_limit_is_413 results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_simultaneous_claims_and_session_single_slot results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_source_descriptors_are_verified_before_acceptance results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_stale_report_rejection_does_not_kill_the_worker results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_stale_run_is_rejected_everywhere results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_storage_unavailable_is_transient_and_accepts_nothing results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_strict_json_types_and_unknown_fields results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_submission_and_claim_receipts results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_success_requires_published_correct_outputs results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_video_pipeline results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_abandons_old_run_and_joins_the_new_one results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_crash_reassignment results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_has_one_slot_and_starts_only_after_ack",
+    "argv": [
+      "python3",
+      "-m",
+      "tests.harness.check_evidence",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_artifact_staging_atomic_publication_and_conflicts",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_cached_empty_claim_stays_empty",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_committed_functional_workload",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_counters_gauges_and_snapshot_sequence_are_consistent",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_duplicate_conflicting_stale_reports_and_retry",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_endpoint_errors_are_structured",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_functional_multiple_jobs_workers",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_health_and_run_header",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_hooks_are_disabled_by_default",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[bad_binding]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[cycle]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[duplicate]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[duplicate_parent]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[empty]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[operation]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[self]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[too_many]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_invalid_dags_never_accepted[unknown_parent]",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_java_client_upload_submit_status_fetch",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_join_and_independent_branch_concurrency",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_local_operation_timeout_is_an_explicit_bounded_failure",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_lost_report_ack_is_replayed_not_reexecuted",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_multiple_roots_sinks_and_all_tasks_required",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_real_worker_failure_attempt_two",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_rejected_commands_do_not_change_snapshots",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_request_body_limit_is_413",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_simultaneous_claims_and_session_single_slot",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_source_descriptors_are_verified_before_acceptance",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_stale_report_rejection_does_not_kill_the_worker",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_stale_run_is_rejected_everywhere",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_storage_unavailable_is_transient_and_accepts_nothing",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_strict_json_types_and_unknown_fields",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_submission_and_claim_receipts",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_success_requires_published_correct_outputs",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_video_pipeline",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_abandons_old_run_and_joins_the_new_one",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_crash_reassignment",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-acceptance/test_worker_has_one_slot_and_starts_only_after_ack"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "started_utc": "2026-10-02T21:38:11.126829+00:00",
+    "duration_seconds": 0.08312883500002499,
+    "exit_code": 0,
+    "environment_overrides": {
+      "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "continuation-20261002T213257-b330499c-native-acceptance-offline",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+    },
+    "required_xfail_count": null,
+    "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "build_manifest": "../../reused-build-SHA256SUMS.txt"
+  },
+  "native-runxfail": {
+    "command": "python3 -m pytest -q --runxfail tests/faults/test_worker_crash.py",
+    "argv": [
+      "python3",
+      "-m",
+      "pytest",
+      "-q",
+      "--runxfail",
+      "tests/faults/test_worker_crash.py"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "started_utc": "2026-10-02T21:37:46.402667+00:00",
+    "duration_seconds": 18.81811266800014,
+    "exit_code": 1,
+    "environment_overrides": {
+      "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "continuation-20261002T213257-b330499c-native-runxfail",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+    },
+    "required_xfail_count": null,
+    "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "build_manifest": "../../reused-build-SHA256SUMS.txt"
+  },
+  "native-runxfail-offline": {
+    "command": "python3 -m tests.harness.check_evidence results/handoffs/step-10/continuation-20261002T213257-b330499c/native-runxfail/test_worker_crash_reassignment",
+    "argv": [
+      "python3",
+      "-m",
+      "tests.harness.check_evidence",
+      "results/handoffs/step-10/continuation-20261002T213257-b330499c/native-runxfail/test_worker_crash_reassignment"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "started_utc": "2026-10-02T21:39:14.231037+00:00",
+    "duration_seconds": 0.06062072300028376,
+    "exit_code": 0,
+    "environment_overrides": {
+      "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "continuation-20261002T213257-b330499c-native-runxfail-offline",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+    },
+    "required_xfail_count": null,
+    "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "build_manifest": "../../reused-build-SHA256SUMS.txt"
+  },
+  "pinned-pytest-version": {
+    "command": "python3 -m pytest --version",
+    "argv": [
+      "python3",
+      "-m",
+      "pytest",
+      "--version"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "started_utc": "2026-10-02T21:32:57.575948+00:00",
+    "duration_seconds": 0.1825254089999362,
+    "exit_code": 0,
+    "environment_overrides": {
+      "JAVA_HOME": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+      "MS2_RUN_LABEL": "continuation-20261002T213257-b330499c-pinned-pytest-version",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler/results/latest-tests"
+    },
+    "required_xfail_count": null,
+    "source_revision": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "build_manifest": "../../reused-build-SHA256SUMS.txt"
+  },
+  "preserved-manifest": {
+    "argv": [
+      "sha256sum",
+      "-c",
+      "results/handoffs/step-10/source-SHA256SUMS.txt"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "exit_code": 0,
+    "checked_utc": "2026-10-02T21:30:16.111593+00:00"
+  },
+  "preserved-native-offline": {
+    "argv": [
+      "python3",
+      "-m",
+      "tests.harness.check_evidence",
+      "results/handoffs/step-10/native-strict/test_worker_crash_reassignment"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "exit_code": 0,
+    "checked_utc": "2026-10-02T21:30:16.106017+00:00"
+  },
+  "pytest-version": {
+    "argv": [
+      "python3",
+      "-m",
+      "pytest",
+      "--version"
+    ],
+    "shell_argv": [
+      "bash",
+      "-c",
+      "exec \"$@\"",
+      "check",
+      "python3",
+      "-m",
+      "pytest",
+      "--version"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+    "exit_code": 1,
+    "checked_utc": "2026-10-02T21:30:45.249203+00:00"
+  }
+}

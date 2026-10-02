@@ -1,0 +1,54 @@
+E                                                                        [100%]!!!!!!!!!!!!!!!!! MS2 requires 1 intentional XFAIL; observed 0 !!!!!!!!!!!!!!!!!
+
+==================================== ERRORS ====================================
+_______________ ERROR at setup of test_worker_crash_reassignment _______________
+
+request = <SubRequest 'system' for <Function test_worker_crash_reassignment>>
+
+    @pytest.fixture
+    def system(request):
+        root = Path(os.environ.get("MS2_EVIDENCE_DIR", "results/latest-tests"))
+        directory = root / request.config._ms2_run_label / request.node.name
+        # Refuse to mix or replace evidence from a previous execution.
+        directory.mkdir(parents=True, exist_ok=False)
+        started = datetime.now(timezone.utc).isoformat()
+        instance = None
+        cleanup_succeeded = False
+        try:
+>           with harness(directory) as instance:
+
+tests/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/harness/runtime.py:196: in harness
+    return ComposeHarness(evidence)
+tests/harness/runtime.py:133: in __init__
+    super().__init__(evidence)
+tests/harness/runtime.py:35: in __init__
+    self.scheduler = f"http://127.0.0.1:{free_port()}"
+tests/harness/runtime.py:16: in free_port
+    with socket.socket() as sock:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py:233: PermissionError
+=========================== short test summary info ============================
+ERROR tests/faults/test_worker_crash.py::test_worker_crash_reassignment - Per...
+1 error in 0.06s

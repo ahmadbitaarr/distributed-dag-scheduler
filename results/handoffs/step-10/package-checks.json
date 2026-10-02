@@ -1,0 +1,60 @@
+{
+  "status": "BLOCKED checkpoint; packaging checks only, no additional runtime verification",
+  "input_archive_sha256": "10703f7828ba85a228ef69b4a4c637f68d99134b934540e3e97298907ec809b8",
+  "accepted_base_user_supplied": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3",
+  "original_files_preserved": 180,
+  "original_files_changed": [
+    "Makefile",
+    "README.md",
+    "deploy/harness/in-container.sh",
+    "deploy/harness/run.sh",
+    "docs/HANDOFF.md",
+    "docs/OPEN_ISSUES.md",
+    "docs/PROGRESS.md",
+    "docs/evidence.md",
+    "tests/conftest.py",
+    "tests/faults/test_worker_crash.py"
+  ],
+  "missing_original_files": [],
+  "protected_original_files_byte_identical": 140,
+  "architecture_sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1",
+  "roadmap_sha256": "2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921",
+  "tested_source_manifest_sha256": "83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+  "tested_source_files_verified": 63,
+  "retained_runtime_evidence_files_copied_byte_identically": 40,
+  "excluded_directory_names": [
+    ".git",
+    ".m2",
+    ".pytest_cache",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "runtime",
+    "target",
+    "toolchain",
+    "toolchains",
+    "venv"
+  ],
+  "excluded_filename_patterns": [
+    ".DS_Store",
+    ".env",
+    "Thumbs.db",
+    "credentials",
+    "credentials.json",
+    "id_ed25519",
+    "id_rsa",
+    "settings.xml"
+  ],
+  "excluded_other": [
+    "results outside results/handoffs",
+    "*.pyc",
+    "*.pyo",
+    "*.class",
+    "*.jar",
+    "symlinks"
+  ],
+  "secret_pattern_scan": "No private key, AWS access key, GitHub token or credential-in-URL pattern found in packaged text. This is a bounded pattern check.",
+  "production_and_historical_evidence_unchanged": true,
+  "no_git_operations": true,
+  "step_11_started": false
+}

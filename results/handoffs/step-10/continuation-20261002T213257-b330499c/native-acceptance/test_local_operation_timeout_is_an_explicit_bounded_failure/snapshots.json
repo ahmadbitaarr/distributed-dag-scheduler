@@ -1,0 +1,123 @@
+{
+  "8a8acaa7-e194-4695-ac4f-ca2e831da7a6": {
+    "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+    "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 2133932056,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "slow": {
+        "state": "ASSIGNED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 3,
+        "owner": "d9c9410c-e0ba-4217-94ce-0539042a667e",
+        "attempt_no": 3,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+              "task_id": "slow",
+              "attempt_no": 1,
+              "worker_session_id": "d9c9410c-e0ba-4217-94ce-0539042a667e"
+            },
+            "state": "FAILED",
+            "ready_elapsed_ns": 2137854566,
+            "assigned_elapsed_ns": 2212888074,
+            "started_elapsed_ns": 2364284785,
+            "finished_elapsed_ns": 2748744817,
+            "start_receipt": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "scheduler_event_seq": 7,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+                "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+                "task_id": "slow",
+                "attempt_no": 1,
+                "worker_session_id": "d9c9410c-e0ba-4217-94ce-0539042a667e"
+              },
+              "outcome": "FAILURE",
+              "outputs": {},
+              "error": {
+                "code": "OPERATION_TIMEOUT",
+                "message": "Local operation exceeded its timeout"
+              }
+            },
+            "report_ack": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "scheduler_event_seq": 8,
+              "disposition": "ACCEPTED"
+            }
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+              "task_id": "slow",
+              "attempt_no": 2,
+              "worker_session_id": "d9c9410c-e0ba-4217-94ce-0539042a667e"
+            },
+            "state": "FAILED",
+            "ready_elapsed_ns": 2748818277,
+            "assigned_elapsed_ns": 2760499400,
+            "started_elapsed_ns": 2806092568,
+            "finished_elapsed_ns": 3161637076,
+            "start_receipt": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "scheduler_event_seq": 13,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+                "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+                "task_id": "slow",
+                "attempt_no": 2,
+                "worker_session_id": "d9c9410c-e0ba-4217-94ce-0539042a667e"
+              },
+              "outcome": "FAILURE",
+              "outputs": {},
+              "error": {
+                "code": "OPERATION_TIMEOUT",
+                "message": "Local operation exceeded its timeout"
+              }
+            },
+            "report_ack": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "scheduler_event_seq": 14,
+              "disposition": "ACCEPTED"
+            }
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "3745af33-f953-41f7-8aa3-53a24d638230",
+              "job_id": "8a8acaa7-e194-4695-ac4f-ca2e831da7a6",
+              "task_id": "slow",
+              "attempt_no": 3,
+              "worker_session_id": "d9c9410c-e0ba-4217-94ce-0539042a667e"
+            },
+            "state": "ASSIGNED",
+            "ready_elapsed_ns": 3161736816,
+            "assigned_elapsed_ns": 3169726548,
+            "started_elapsed_ns": null,
+            "finished_elapsed_ns": null,
+            "start_receipt": null,
+            "report_receipt": null,
+            "report_ack": null
+          }
+        ],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "ASSIGNED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 18
+  }
+}

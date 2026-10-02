@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "tests.harness.check_evidence",
+    "results/handoffs/step-10/native-strict/test_worker_crash_reassignment"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "exit_code": 0,
+  "checked_utc": "2026-10-02T21:30:16.106017+00:00"
+}

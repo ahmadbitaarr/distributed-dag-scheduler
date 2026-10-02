@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "make",
+    "fault-demo"
+  ],
+  "cwd": "/workspace/scratch/565bb6dfb453/distributed-dag-scheduler",
+  "environment_overrides": {
+    "MS2_SOURCE_REV": "9bfd6d339d754475bcf218179f1cffdd4c07eeb3+local-step10:sha256:83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae",
+    "MS2_RUN_LABEL": "step10-resume-make-fault-demo-9e703cbcdd"
+  },
+  "exit_code": 2,
+  "checked_utc": "2026-10-02T21:31:32.667134+00:00"
+}

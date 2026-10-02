@@ -1,0 +1,64 @@
+{
+  "3cdf9b9d-7415-4888-adb8-3dcd7f22a4e9": {
+    "schema_version": 1,
+    "job_id": "3cdf9b9d-7415-4888-adb8-3dcd7f22a4e9",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "Y",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [
+          "X"
+        ],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "Y",
+        "output_name": "value"
+      }
+    }
+  },
+  "5e4cabdc-2d46-46d6-aa0a-a9e34b16e0ca": {
+    "schema_version": 1,
+    "job_id": "5e4cabdc-2d46-46d6-aa0a-a9e34b16e0ca",
+    "tasks": [
+      {
+        "task_id": "probe",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "probe",
+        "output_name": "value"
+      }
+    }
+  }
+}

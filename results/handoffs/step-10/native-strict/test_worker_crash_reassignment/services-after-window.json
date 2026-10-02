@@ -1,0 +1,9 @@
+{
+  "scheduler": {
+    "scheduler_run_id": "f45db35f-6a4b-4139-b38c-d2a1dc34de9c",
+    "ready": true
+  },
+  "artifact-store": {
+    "ready": true
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "98a5a799-959c-4bf2-87ee-7faa19eabb6c": {
+    "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+    "job_id": "98a5a799-959c-4bf2-87ee-7faa19eabb6c",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 1118949666,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "A": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 2,
+        "owner": null,
+        "attempt_no": 2,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+              "job_id": "98a5a799-959c-4bf2-87ee-7faa19eabb6c",
+              "task_id": "A",
+              "attempt_no": 1,
+              "worker_session_id": "13c9bb76-90d5-4e42-bdc9-246a50646513"
+            },
+            "state": "FAILED",
+            "ready_elapsed_ns": 1121093829,
+            "assigned_elapsed_ns": 1139124362,
+            "started_elapsed_ns": null,
+            "finished_elapsed_ns": 1251586382,
+            "start_receipt": null,
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+                "job_id": "98a5a799-959c-4bf2-87ee-7faa19eabb6c",
+                "task_id": "A",
+                "attempt_no": 1,
+                "worker_session_id": "13c9bb76-90d5-4e42-bdc9-246a50646513"
+              },
+              "outcome": "FAILURE",
+              "outputs": {},
+              "error": {
+                "code": "TEST_FAILURE",
+                "message": "Controlled failure"
+              }
+            },
+            "report_ack": {
+              "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            }
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+              "job_id": "98a5a799-959c-4bf2-87ee-7faa19eabb6c",
+              "task_id": "A",
+              "attempt_no": 2,
+              "worker_session_id": "0dddd322-4095-4402-8930-f0228603b581"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 1251707237,
+            "assigned_elapsed_ns": 1281200705,
+            "started_elapsed_ns": 1296988189,
+            "finished_elapsed_ns": 1526871332,
+            "start_receipt": {
+              "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+              "scheduler_event_seq": 12,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+                "job_id": "98a5a799-959c-4bf2-87ee-7faa19eabb6c",
+                "task_id": "A",
+                "attempt_no": 2,
+                "worker_session_id": "0dddd322-4095-4402-8930-f0228603b581"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/8d972aa5-ad92-4aca-a4b5-8629a35fe64f/jobs/98a5a799-959c-4bf2-87ee-7faa19eabb6c/tasks/A/attempts/2/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "8d972aa5-ad92-4aca-a4b5-8629a35fe64f",
+              "scheduler_event_seq": 13,
+              "disposition": "ACCEPTED"
+            }
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/8d972aa5-ad92-4aca-a4b5-8629a35fe64f/jobs/98a5a799-959c-4bf2-87ee-7faa19eabb6c/tasks/A/attempts/2/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "B": {
+        "state": "READY",
+        "parents": [
+          "A"
+        ],
+        "satisfied_parents": [
+          "A"
+        ],
+        "ready_seq": 3,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "READY": 1,
+      "SUCCEEDED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 15
+  }
+}

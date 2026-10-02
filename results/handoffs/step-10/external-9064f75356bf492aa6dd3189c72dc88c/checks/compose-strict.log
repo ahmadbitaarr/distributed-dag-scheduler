@@ -1,0 +1,4 @@
+x                                                                        [100%]
+=========================== short test summary info ============================
+XFAIL tests/faults/test_worker_crash.py::test_worker_crash_reassignment - MS2 deliberately omits silent-worker ownership reclamation
+1 xfailed in 47.05s
