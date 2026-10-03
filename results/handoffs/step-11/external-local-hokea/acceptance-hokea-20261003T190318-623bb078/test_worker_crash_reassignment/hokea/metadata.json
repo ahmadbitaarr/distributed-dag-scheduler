@@ -1,0 +1,120 @@
+{
+  "hokea_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "runtime": "docker",
+  "namespace": null,
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "images": {
+    "scheduler": "dag-ms2/scheduler:0.2.0",
+    "artifact-store": "dag-ms2/artifact-store:0.2.0",
+    "worker": "dag-ms2/worker:0.2.0"
+  },
+  "records": [
+    {
+      "role": "artifact-store",
+      "name": "artifact-store",
+      "node": "hokea-ms2-e016bcb4e8-artifact-store-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8081",
+        "DATA_DIR": "/data"
+      },
+      "observed": {
+        "instance_id": "2c8270b3d3b3fdef0eeac292c827d4f6bf873c20bfb2abcdae84d68d14b6ab97",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:5d62455888f7e8b25e0ae40f8a9874d12b4cbdb2b3591d7af9e980b70d8976ab"
+      }
+    },
+    {
+      "role": "scheduler",
+      "name": "scheduler",
+      "node": "hokea-ms2-e016bcb4e8-scheduler-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-e016bcb4e8-artifact-store-node1:8081"
+      },
+      "observed": {
+        "instance_id": "aec96ca220d7dec7f11dd9c508bcdecddb525af2490efe53bf5cf946c1f37cd9",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:dd234c0259a6c1217fdbf248822c84bc6d5afed1bd44c707d833bbfda62f3858"
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-1",
+      "node": "hokea-ms2-e016bcb4e8-worker-1-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://hokea-ms2-e016bcb4e8-scheduler-node1:8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-e016bcb4e8-artifact-store-node1:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "120000",
+        "ENABLE_TEST_HOOKS": "true",
+        "TEST_GATE_TASK": "X",
+        "TEST_FAIL_FIRST_TASK": ""
+      },
+      "observed": {
+        "instance_id": "ccc0d7d92296b75ea1b1ffa5c394e9d6cee4ff2308d996ee89bb32ac908f6846",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:31c0ef059a13606bbbbed29f380e4b5cde413822dd5c81c04d1691f95d3f7e83"
+      }
+    },
+    {
+      "hard_kill": {
+        "worker": "worker-1",
+        "hokea_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+        "runtime": "docker",
+        "node": "hokea-ms2-e016bcb4e8-worker-1-node1",
+        "node_index": 1,
+        "old_instance_id": "ccc0d7d92296b75ea1b1ffa5c394e9d6cee4ff2308d996ee89bb32ac908f6846",
+        "worker_session_id": "ac8fae44-175c-4885-8666-0eafd5185de9",
+        "hard_kill_requested": true,
+        "kill_completed": true,
+        "old_instance_running": false,
+        "automatic_restart_observed": false,
+        "mechanism": "docker_sigkill",
+        "death_observation": {
+          "instance_id": "ccc0d7d92296b75ea1b1ffa5c394e9d6cee4ff2308d996ee89bb32ac908f6846",
+          "running": false,
+          "exit_code": 137,
+          "restart_count": 0,
+          "restart_policy": "no",
+          "image_id": "sha256:31c0ef059a13606bbbbed29f380e4b5cde413822dd5c81c04d1691f95d3f7e83"
+        },
+        "signal": "SIGKILL",
+        "exit_code": 137
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-2",
+      "node": "hokea-ms2-e016bcb4e8-worker-2-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://hokea-ms2-e016bcb4e8-scheduler-node1:8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-e016bcb4e8-artifact-store-node1:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "2dba97c16a106f19dcc81a097b659b35adcb3a274897a373f5fa5f4146e6a520",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:d96b1e50f9b2224f7a2915d4ec513c887b6495f73d419c8fbe53fcf4e30bbfa8"
+      }
+    }
+  ],
+  "cleanup_succeeded": true
+}

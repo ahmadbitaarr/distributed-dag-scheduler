@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_join_and_independent_branch_concurrency",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "hokea",
+  "scheduler_run_id": "40bc8cc5-df92-497f-a918-fc6eb4e5e75d",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "acceptance-hokea-20261003T190455-0b61511b",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T19:04:56.274056+00:00",
+  "finished_utc": "2026-10-03T19:05:50.409249+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"11.0.32\" 2026-07-21",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

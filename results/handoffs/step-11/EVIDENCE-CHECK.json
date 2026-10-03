@@ -1,0 +1,439 @@
+[
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T174933-50c63001-smoke/test_service_exchange",
+    "job_count": 1,
+    "job_ids": [
+      "78d3890d-8af2-4374-b831-4b5ea3ccacd4"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "failed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_artifact_staging_atomic_publication_and_conflicts",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_cached_empty_claim_stays_empty",
+    "job_count": 1,
+    "job_ids": [
+      "70ddea5d-a026-43cb-b3e0-f2d1239659de"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_committed_functional_workload",
+    "job_count": 3,
+    "job_ids": [
+      "f81dffa7-6bf5-49a1-80ed-520c7e3b8df0",
+      "68caa6b4-8776-430a-b99b-374fd4094541",
+      "751dce5a-f125-433e-a9ca-6ecd6a246d10"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_counters_gauges_and_snapshot_sequence_are_consistent",
+    "job_count": 1,
+    "job_ids": [
+      "44d5b57d-6589-4cc7-8e06-9aec919b4dfe"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_duplicate_conflicting_stale_reports_and_retry",
+    "job_count": 1,
+    "job_ids": [
+      "ace34b30-6ca8-4b73-bc04-19ba81851aff"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_endpoint_errors_are_structured",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_functional_multiple_jobs_workers",
+    "job_count": 4,
+    "job_ids": [
+      "7e0e2719-8610-46d0-aa63-d970ffc15783",
+      "40d4e564-69fe-48ce-a051-38dd24517e47",
+      "5fea856c-3b6f-49e8-90c0-c37788bac997",
+      "ff19b8c6-3209-4e58-92c4-b62d1a580516"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_health_and_run_header",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_hooks_are_disabled_by_default",
+    "job_count": 1,
+    "job_ids": [
+      "1baa5cd2-7085-44cd-aa14-72fb70cdd010"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[bad_binding]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[cycle]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[duplicate]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[duplicate_parent]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[empty]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[operation]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[self]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[too_many]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[unknown_parent]",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_java_client_upload_submit_status_fetch",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_join_and_independent_branch_concurrency",
+    "job_count": 1,
+    "job_ids": [
+      "4b4554ac-d81e-41d8-9c4d-07e13f9baefb"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_local_operation_timeout_is_an_explicit_bounded_failure",
+    "job_count": 1,
+    "job_ids": [
+      "2ac366cf-a57a-4932-9c67-df62b332bca0"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_lost_report_ack_is_replayed_not_reexecuted",
+    "job_count": 1,
+    "job_ids": [
+      "b63d8ca5-40b1-4814-b689-a341a363c86f"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_multiple_roots_sinks_and_all_tasks_required",
+    "job_count": 1,
+    "job_ids": [
+      "4bc6ab62-ac33-4dec-92d6-d703849100fd"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_real_worker_failure_attempt_two",
+    "job_count": 1,
+    "job_ids": [
+      "f9127097-4d71-4d94-af0d-923889fc8e83"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_rejected_commands_do_not_change_snapshots",
+    "job_count": 1,
+    "job_ids": [
+      "5c842d08-9d90-4b47-8584-7da96d4dd560"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_request_body_limit_is_413",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_service_exchange",
+    "job_count": 1,
+    "job_ids": [
+      "e78c7ef5-694c-4201-a56d-c614966ee95a"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_simultaneous_claims_and_session_single_slot",
+    "job_count": 1,
+    "job_ids": [
+      "47cbecc1-ab76-4c99-8610-e28308249fd7"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_source_descriptors_are_verified_before_acceptance",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_stale_report_rejection_does_not_kill_the_worker",
+    "job_count": 1,
+    "job_ids": [
+      "75e5180c-7de0-4e8d-952f-047c4034e9ab"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_stale_run_is_rejected_everywhere",
+    "job_count": 1,
+    "job_ids": [
+      "bb355dcf-007c-43bf-a8a0-4fe38c958bfe"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_storage_unavailable_is_transient_and_accepts_nothing",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_strict_json_types_and_unknown_fields",
+    "job_count": 0,
+    "job_ids": [],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_submission_and_claim_receipts",
+    "job_count": 1,
+    "job_ids": [
+      "d92ec843-5b48-4269-a292-286134bf45ba"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_success_requires_published_correct_outputs",
+    "job_count": 1,
+    "job_ids": [
+      "81650797-975e-4153-baf3-a9a58b09a35f"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_video_pipeline",
+    "job_count": 1,
+    "job_ids": [
+      "8992122e-7f73-49ea-9276-98e54f8e78e4"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_abandons_old_run_and_joins_the_new_one",
+    "job_count": 1,
+    "job_ids": [
+      "6c45c242-9d42-45b1-a855-2ae9781bfdea"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_crash_reassignment",
+    "job_count": 2,
+    "job_ids": [
+      "ae64748d-5290-43b0-b03b-61b897f2f01c",
+      "26f4451e-3108-41d2-a8f0-69b6516a3275"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "skipped",
+    "xfail": true,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_has_one_slot_and_starts_only_after_ack",
+    "job_count": 3,
+    "job_ids": [
+      "a9faf087-363a-4153-8bde-59e4ff7d25d4",
+      "39ee088b-8b23-4a1c-9fae-a963cb42a5a7",
+      "e85c6018-2213-4a6c-b43f-60b5e3260b5e"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-fault-demo/test_worker_crash_reassignment",
+    "job_count": 2,
+    "job_ids": [
+      "d03cb6e9-cc26-4889-abb3-2e989b3caea3",
+      "8570e9c0-c94d-46b8-88c2-29a595cf3612"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "failed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  },
+  {
+    "directory": "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-smoke-retry/test_service_exchange",
+    "job_count": 1,
+    "job_ids": [
+      "d702b45b-11a9-457c-9933-96c1be2d0cb3"
+    ],
+    "cleanup_succeeded": true,
+    "outcome": "passed",
+    "xfail": false,
+    "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+  }
+]

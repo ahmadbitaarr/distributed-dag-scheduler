@@ -1,0 +1,26 @@
+{
+  "81650797-975e-4153-baf3-a9a58b09a35f": {
+    "schema_version": 1,
+    "job_id": "81650797-975e-4153-baf3-a9a58b09a35f",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "A",
+        "output_name": "value"
+      }
+    }
+  }
+}

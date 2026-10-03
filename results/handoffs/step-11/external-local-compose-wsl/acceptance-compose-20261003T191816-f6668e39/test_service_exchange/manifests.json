@@ -1,0 +1,35 @@
+{
+  "3d00332b-cced-4667-886b-fefd14ca21e9": {
+    "schema_version": 1,
+    "job_id": "3d00332b-cced-4667-886b-fefd14ca21e9",
+    "tasks": [
+      {
+        "task_id": "http-probe",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4
+        },
+        "parents": [],
+        "inputs": {
+          "value": {
+            "source": {
+              "key": "inputs/7615ac33-1ee0-4849-8445-b5c18ab946d3/input",
+              "length": 1,
+              "sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+              "media_type": "text/plain"
+            }
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "http-probe",
+        "output_name": "value"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+........................................................................ [ 84%]
+............x                                                            [100%]
+- generated xml file: /workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/native-acceptance.xml -
+=========================== short test summary info ============================
+XFAIL tests/faults/test_worker_crash.py::test_worker_crash_reassignment - MS2 deliberately omits silent-worker ownership reclamation
+84 passed, 1 xfailed in 216.71s (0:03:36)

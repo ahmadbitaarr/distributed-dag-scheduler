@@ -1,60 +1,65 @@
-# Current handoff — Step 10 Docker verification blocked
+# Current handoff — Step 11 local verification complete
 
-**Status: BLOCKED. Implementation source unchanged during this continuation.**
-Accepted baseline: `main @ 9bfd6d339d754475bcf218179f1cffdd4c07eeb3` (user supplied).
-Steps 0–9 accepted. This ZIP has no Git metadata; the user owns all Git operations.
-No commit, push, pull, fetch, authentication, external repository action or Step 11 work occurred.
+**Status: LOCAL IMPLEMENTATION/VERIFICATION COMPLETE. Course-cluster execution was attempted and blocked by an external course-runner Hokea package mismatch. Do not start Step 12.**
+Accepted `main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df`; Steps 0–10 accepted.
 
-The attached blocked Step 10 checkpoint was preserved and validated before editing:
-all 63 implementation manifest files matched; both original fault histories passed.
-The implementation remains the same local Step 10 snapshot, source manifest SHA-256
-`83c1d8789c58643c2ea74015008c38e4a058957e6b0a477f0bfe9b881e7c62ae`.
-Do not restore Step 9/Step 0 code or repeat the implementation.
+The canonical repository remains based on accepted
+`main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df`. Step 11 changes are currently
+uncommitted. The user performed the registry publishing and authorized
+course-cluster verification attempt.
 
-## Observed results
+The prior coordination files contained stale Step 10 blocked text. They are now
+updated to the user's explicit accepted baseline and the completed external
+Step 10 evidence. Historical handoffs/results were preserved. Do not redo those
+steps.
 
-- Full native pytest suite: **62 passed, 1 xfailed**, exit 0, 240.98 s.
-- Native same oracle with `--runxfail`: **1 failed**, exit 1, 18.59 s; sole failure
-  is final `RecoveryNotObserved`, with successful setup/probe/safety/export/cleanup.
-- Offline: 38 retained acceptance directories passed (29 exported histories);
-  both real-failure histories passed. All 39 new runtime directories report cleanup true.
-- Actual `make test`: exit **2**, Docker missing before build/tests.
-- Actual `make fault-demo`: exit **2**, same prerequisite failure; this is not the
-  required oracle demonstration through Make.
-- Compose: not run here; `docker compose version` and `docker info` each exit 127,
-  Docker socket absent. Prior 61 JUnit passes remain valid historical evidence;
-  Java tests were not rerun. Native verification used the prior packaged JARs,
-  now fingerprinted in the continuation evidence.
+New orchestration code: `tests/harness/hokea_adapter.py`; pinned Hokea package hashes,
+API verifier and flat runner generator under `deploy/hokea/`; 21 focused tests plus
+one service-exchange smoke check. No production Java, Native/Compose implementation,
+existing correctness test, architecture or roadmap changed. Runtime's Hokea dispatch
+was already present and is reused unchanged.
 
-Current evidence: `results/handoffs/step-10/continuation-20261002T213257-b330499c/`.
-Read its `RESULTS.md` and `COMMANDS.json` for actual outcomes and exact commands.
-Original Step 10 evidence and prior command records remain unchanged and historical.
+Observed: 21 focused PASS; full native **84 PASS + 1 RecoveryNotObserved XFAIL**,
+exit 0; same native `--runxfail` **1 final RecoveryNotObserved failure**, exit 1,
+with setup/probe/safety/export/cleanup all successful. Offline **42 directories /
+34 histories valid**; all cleanup true. New native HTTP-exchange smoke passes.
+First smoke's incorrect terminal-owner assertion was corrected; the original failed
+run and original source attribution are retained separately. Source manifests and
+accepted 63-file manifest pass. Production JARs were reused only after comparing
+all Java/module source and POM bytes to the accepted ZIP; hashes/provenance recorded.
 
-## Exact remaining work
+**External local Step 11 verification is complete.** Using the unchanged source
+from a WSL-native filesystem, the Compose regression completed with 2 passed and
+1 expected typed XFAIL. `make test` completed with 84 passed and 1 expected XFAIL.
+`make fault-demo` failed only with the intentional `RecoveryNotObserved` oracle.
+The earlier OneDrive `/mnt/c` Compose failure was an environment-path/cwd issue
+and is not acceptance evidence.
 
-Run the one sequence in `results/handoffs/step-10/continuation-20261002T213257-b330499c/EXTERNAL-VERIFICATION.md` on a Docker-capable host.
-It builds Compose images, requires one typed Compose XFAIL, runs actual `make test`,
-runs actual `make fault-demo`, checks the real failure reason/cleanup, validates
-histories and retains separate evidence. No implementation edit is currently needed.
+**Course-cluster execution was attempted.** Authorized access to `team-06` worked,
+and public immutable GHCR images were provided for all three services. Hokea
+created the runner Job, shipped the package, started pytest, and copied evidence
+back. All three tests then errored during fixture setup before any project service
+execution because the Hokea package installed in the course runner did not match
+the pinned revision `427b94634b1736ba8e59d4977836162aa58bd2cb`
+(`Hokea source mismatch at check.py`). Per the frozen Step 11 contract, this is
+an external course-runner environment mismatch; the project pin is not relaxed
+and the result is not classified as the intentional `RecoveryNotObserved` XFAIL.
+Evidence is preserved at
+`results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a`.
 
-First capability commands on that host:
+No local verification remains. If course staff provides the correctly pinned
+runner/environment, rerun the documented course sequence in
+`deploy/hokea/CLUSTER-HANDOFF.md` using the already-published immutable images.
+Until then, preserve the course-runner mismatch as the remaining external
+environment blocker.
 
-```bash
-docker compose version
-docker info
-python3 -m pytest --version
-```
+Read `docs/handoffs/step-11.md` and `results/handoffs/step-11/RESULTS.md` for source
+attribution, commands/exits and limitations. Architecture deviations: none.
+RUNNING ownership reclamation remains intentionally absent; add no recovery,
+leases, heartbeats, expiry/requeue, worker HTTP server or shared worker filesystem.
 
-Use fresh labels on every invocation. The explicit-label container copy-back
-limitation S10-03 remains documented; no universal overwrite-prevention claim is made.
-Do not weaken a gate or count the Docker-not-found exits as an intentional failure.
-
-Architecture deviations: none. MS2 still lacks RUNNING-owner reclamation after
-worker silence. No leases, heartbeats, expiry/scanning, automatic requeue/restart,
-scheduler replication/failover or durable recovery may be added.
-
-After the missing gates pass, update only observed outcomes, have the user inspect,
-and let the user commit/push. Recommended commit message:
-`test(faults): demonstrate intentional MS2 crash-reassignment violation`.
-Return the full accepted SHA, branch, clean/dirty status, push/acceptance confirmation
-and final evidence results. No Step 11 handoff until Step 10 is actually complete.
+Recommended eventual commit message:
+`deploy(hokea): adapt MS2 services and fault harness to course runtime`.
+After Planning accepts Step 11, the user can perform the normal personal
+commit/push flow and return the full SHA, branch, clean/dirty status and push
+confirmation. No Step 12 handoff yet.

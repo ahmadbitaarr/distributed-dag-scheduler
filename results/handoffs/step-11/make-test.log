@@ -1,0 +1,3 @@
+sh deploy/harness/run.sh
+deploy/harness/run.sh: 9: docker: not found
+make: *** [Makefile:19: test] Error 127

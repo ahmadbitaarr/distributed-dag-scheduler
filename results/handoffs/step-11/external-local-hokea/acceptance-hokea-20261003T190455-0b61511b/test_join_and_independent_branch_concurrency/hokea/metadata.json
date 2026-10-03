@@ -1,0 +1,92 @@
+{
+  "hokea_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "runtime": "docker",
+  "namespace": null,
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "images": {
+    "scheduler": "dag-ms2/scheduler:0.2.0",
+    "artifact-store": "dag-ms2/artifact-store:0.2.0",
+    "worker": "dag-ms2/worker:0.2.0"
+  },
+  "records": [
+    {
+      "role": "artifact-store",
+      "name": "artifact-store",
+      "node": "hokea-ms2-3d1eedad17-artifact-store-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8081",
+        "DATA_DIR": "/data"
+      },
+      "observed": {
+        "instance_id": "1e54ec0270b31830119fe8373a7ad2844dd3d9cc5d2709959868f322bfd3363f",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:2aabf457dc7428b5c094066ac11c32f0e8a5cd08da31640faec2347e06f00583"
+      }
+    },
+    {
+      "role": "scheduler",
+      "name": "scheduler",
+      "node": "hokea-ms2-3d1eedad17-scheduler-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-3d1eedad17-artifact-store-node1:8081"
+      },
+      "observed": {
+        "instance_id": "5e939e7a7bb72f7a51ff1d2a189dd1ccbc6e17790d5051f41cef2536af245663",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:963d1d3ac226f276db07e3284c75e984c9f69cb7fa297c6e45e46e74519fffc9"
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-1",
+      "node": "hokea-ms2-3d1eedad17-worker-1-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://hokea-ms2-3d1eedad17-scheduler-node1:8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-3d1eedad17-artifact-store-node1:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "6c5ae574a9bab589f2ebca60bfa535006065e81c741ab38ccb514b7952a8cc2a",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:4f0bb71dc05a2dea96aaaba7cdf9a6cd1370728b44b792032d4b4de934afacc9"
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-2",
+      "node": "hokea-ms2-3d1eedad17-worker-2-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://hokea-ms2-3d1eedad17-scheduler-node1:8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-3d1eedad17-artifact-store-node1:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "4aa5a6bf849eb993a36c2c27915801f1bcb73cb6d4c609b7bb55b692b4615475",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:6c8f269510d24313236f023bbe46b4d15ec6390b50c3e727fd894a093681d903"
+      }
+    }
+  ],
+  "cleanup_succeeded": true
+}

@@ -1,0 +1,71 @@
+{
+  "hokea_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "runtime": "docker",
+  "namespace": null,
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "images": {
+    "scheduler": "dag-ms2/scheduler:0.2.0",
+    "artifact-store": "dag-ms2/artifact-store:0.2.0",
+    "worker": "dag-ms2/worker:0.2.0"
+  },
+  "records": [
+    {
+      "role": "artifact-store",
+      "name": "artifact-store",
+      "node": "hokea-ms2-b814363a78-artifact-store-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8081",
+        "DATA_DIR": "/data"
+      },
+      "observed": {
+        "instance_id": "613426bc3bacef3e733e5cda67bf21a5bdae3ace7d0904a14708c10a317a61d5",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:f226838ede0487e7cf3860acf5e6a028e7a9435776a8a02936ed50ff3f8561ca"
+      }
+    },
+    {
+      "role": "scheduler",
+      "name": "scheduler",
+      "node": "hokea-ms2-b814363a78-scheduler-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-b814363a78-artifact-store-node1:8081"
+      },
+      "observed": {
+        "instance_id": "e85660968cf8960deecf44c721fd71cb845eecc87c649f10eaa24712457e1f2e",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:a61cc33ff17009fc6b36c5a45100c94f5a1d0721bf01214319515b73cff8d7ce"
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-1",
+      "node": "hokea-ms2-b814363a78-worker-1-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://hokea-ms2-b814363a78-scheduler-node1:8080",
+        "ARTIFACT_BASE_URL": "http://hokea-ms2-b814363a78-artifact-store-node1:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "5f8b66f18cc00ef0bc1448441af715159c189c20553426146e95875581bb30e2",
+        "running": true,
+        "exit_code": 0,
+        "restart_count": 0,
+        "restart_policy": "no",
+        "image_id": "sha256:367da7f0fbed99f7718c035747f9e22401fe026e162c3a02051d8f649f13653f"
+      }
+    }
+  ],
+  "cleanup_succeeded": true
+}

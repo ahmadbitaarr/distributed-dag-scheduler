@@ -1,0 +1,28 @@
+{
+  "health": {
+    "scheduler": {
+      "ready": true,
+      "scheduler_run_id": "a4363e27-cbdc-4c28-94bd-ca2e3bedd4d7"
+    },
+    "artifact-store": {
+      "ready": true
+    }
+  },
+  "input": {
+    "key": "inputs/f23a5dc6-8f0b-449d-bfcd-bd404d407c0d/input",
+    "length": 1,
+    "sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+    "media_type": "text/plain"
+  },
+  "worker_session_id": "e75d9dc2-3652-48ed-b0b7-7f416eb5d1f2",
+  "job_id": "e78c7ef5-694c-4201-a56d-c614966ee95a",
+  "output": {
+    "key": "runs/a4363e27-cbdc-4c28-94bd-ca2e3bedd4d7/jobs/e78c7ef5-694c-4201-a56d-c614966ee95a/tasks/http-probe/attempts/1/value",
+    "length": 2,
+    "sha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+    "media_type": "application/json"
+  },
+  "input_bytes": "7",
+  "output_bytes": "11",
+  "history_check": "PASS"
+}

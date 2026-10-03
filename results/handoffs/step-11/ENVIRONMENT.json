@@ -1,0 +1,8 @@
+{
+  "docker_cli": null,
+  "dockerd": null,
+  "docker_socket_exists": false,
+  "kubectl": null,
+  "hokea_actual_docker_execution": "NOT RUN \u2014 Docker CLI/socket absent",
+  "course_cluster_execution": "NOT VERIFIED \u2014 user-controlled external action; no credentials accessed"
+}
