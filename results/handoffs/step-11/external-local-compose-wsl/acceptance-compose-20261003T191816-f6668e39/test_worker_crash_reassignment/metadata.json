@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_worker_crash.py::test_worker_crash_reassignment",
+  "outcome": "skipped",
+  "xfail": true,
+  "backend": "compose",
+  "scheduler_run_id": "929bc4aa-f025-4d1e-8338-91cb1033fb9e",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "acceptance-compose-20261003T191816-f6668e39",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T19:19:51.329929+00:00",
+  "finished_utc": "2026-10-03T19:20:46.861220+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"11.0.32\" 2026-07-21",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

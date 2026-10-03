@@ -1,0 +1,64 @@
+{
+  "45c90472-c247-4bcf-83e0-a4ccac5f29d7": {
+    "schema_version": 1,
+    "job_id": "45c90472-c247-4bcf-83e0-a4ccac5f29d7",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "Y",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [
+          "X"
+        ],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "Y",
+        "output_name": "value"
+      }
+    }
+  },
+  "1ad46bd2-1d9e-4565-a939-8055cadc2d20": {
+    "schema_version": 1,
+    "job_id": "1ad46bd2-1d9e-4565-a939-8055cadc2d20",
+    "tasks": [
+      {
+        "task_id": "probe",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "probe",
+        "output_name": "value"
+      }
+    }
+  }
+}

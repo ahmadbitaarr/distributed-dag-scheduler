@@ -1,0 +1,5 @@
+test_entry.py::test_service_exchange
+test_entry.py::test_committed_functional_workload
+test_entry.py::test_worker_crash_reassignment
+
+3 tests collected in 0.02s

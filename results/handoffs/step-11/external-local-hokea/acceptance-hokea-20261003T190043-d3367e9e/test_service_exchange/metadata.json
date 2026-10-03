@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_hokea_smoke.py::test_service_exchange",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "hokea",
+  "scheduler_run_id": "5405bd99-157e-4775-aff2-07818e1efeb1",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "acceptance-hokea-20261003T190043-d3367e9e",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T19:00:43.951145+00:00",
+  "finished_utc": "2026-10-03T19:01:27.300101+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"11.0.32\" 2026-07-21",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

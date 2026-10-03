@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_hokea_smoke.py::test_service_exchange",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "compose",
+  "scheduler_run_id": "32e759d8-a4a7-466f-99b1-6f744afcccfe",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "acceptance-compose-20261003T191109-e62aae9e",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T19:11:10.846474+00:00",
+  "finished_utc": "2026-10-03T19:11:49.079157+00:00",
+  "python": "3.12.3",
+  "java": "Error occurred during initialization of VM",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

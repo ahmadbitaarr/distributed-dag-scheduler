@@ -1,0 +1,27 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________________ test_service_exchange _____________________________
+
+system = <tests.harness.runtime.NativeHarness object at 0x7fa5048c7050>
+
+    def test_service_exchange(system):
+        health = {}
+        for name, url in [("scheduler", system.scheduler), ("artifact-store", system.artifacts)]:
+            status, health[name] = request(url, "/v1/health")
+            assert status == 200 and health[name]["ready"] is True
+        source = system.api.put(b"7", media="text/plain")
+        assert request(system.artifacts, "/v1/objects/" + source["key"], method="HEAD")[0] == 200
+        assert system.api.get(source) == b"7"
+        worker = system.start_worker()
+        session = next(e["worker_session_id"] for e in system.worker_events(worker)
+                       if e["event_type"] == "worker_session_started")
+        m = manifest([task("http-probe", "fixture_add", inputs={"value": {"source": source}}, amount=4)])
+        result = system.api.complete(system.api.submit(m))
+        assert system.api.get(result["outputs"]["result"]) == b"11"
+>       assert result["tasks"]["http-probe"]["owner"] == session
+E       AssertionError: assert None == 'd26d7f1e-23df-420c-a289-d07f527e1e80'
+
+tests/integration/test_hokea_smoke.py:21: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_hokea_smoke.py::test_service_exchange - Asserti...
+1 failed in 5.60s

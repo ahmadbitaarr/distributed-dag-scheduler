@@ -1,0 +1,23 @@
+{
+  "changed_baseline_files": [
+    "docs/HANDOFF.md",
+    "docs/OPEN_ISSUES.md",
+    "docs/PROGRESS.md"
+  ],
+  "new_non_evidence_files": [
+    "deploy/hokea/API.md",
+    "deploy/hokea/CLUSTER-HANDOFF.md",
+    "deploy/hokea/HOKEA_API_SHA256.json",
+    "deploy/hokea/README.md",
+    "deploy/hokea/package_runner.py",
+    "deploy/hokea/verify_api.py",
+    "docs/handoffs/step-11.md",
+    "tests/harness/hokea_adapter.py",
+    "tests/integration/test_hokea_smoke.py",
+    "tests/unit/test_hokea_adapter.py",
+    "tests/unit/test_hokea_packaging.py"
+  ],
+  "historical_handoff_evidence_files_byte_identical": 982,
+  "architecture_sha256": "7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1",
+  "roadmap_sha256": "2ac8ef1944d425a7416eb8bff8ee143d856030b59832a7f08cbd450459c5b921"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_functional_workload.py::test_committed_functional_workload",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "hokea",
+  "scheduler_run_id": "2857f340-9928-4649-848f-f50e42ab9097",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "acceptance-hokea-20261003T190148-160a3f25",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T19:01:48.940934+00:00",
+  "finished_utc": "2026-10-03T19:02:54.360358+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"11.0.32\" 2026-07-21",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

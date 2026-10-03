@@ -1,0 +1,11 @@
+{
+  "bytes": 85703,
+  "budget": 900000,
+  "files": [
+    "conftest.py",
+    "payload.json",
+    "pytest.ini",
+    "test_entry.py"
+  ],
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+}

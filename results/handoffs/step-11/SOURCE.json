@@ -1,0 +1,10 @@
+{
+  "accepted_branch": "main",
+  "accepted_baseline": "bf0a7974dd63cc8cd1d9240177156d0a00bd26df",
+  "baseline_provenance": "user supplied; ZIP contains no Git metadata",
+  "input_zip_sha256": "1be69fc358ab867b3757145ec7a721bb41cec77b64fae8d84772c4131754c5ca",
+  "source_identifier": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "manifest_files": 70,
+  "hokea_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "run_prefix": "step11-20261003T175026-5dbfb7d8"
+}

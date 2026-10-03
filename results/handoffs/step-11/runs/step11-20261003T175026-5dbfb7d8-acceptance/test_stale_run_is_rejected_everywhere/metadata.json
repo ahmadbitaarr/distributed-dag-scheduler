@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_api.py::test_stale_run_is_rejected_everywhere",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "c2458281-4e1f-48d5-8651-1fd346323593",
+  "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+  "run_label": "step11-20261003T175026-5dbfb7d8-acceptance",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-03T17:50:54.773716+00:00",
+  "finished_utc": "2026-10-03T17:50:58.563468+00:00",
+  "python": "3.12.14",
+  "java": "openjdk version \"21.0.8\" 2025-07-15 LTS",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39"
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "module": "protocol",
+    "jar": "protocol/target/protocol-0.2.0.jar",
+    "sha256": "fb54ed342e380b07a5255a9f8a4808930518deb91c567f0b6726adf9d678dec2",
+    "source_match": "all module src and pom.xml bytes identical to accepted ZIP",
+    "provenance": "existing Step 10 packaged binaries; not rebuilt in Step 11"
+  },
+  {
+    "module": "scheduler",
+    "jar": "scheduler/target/scheduler-0.2.0.jar",
+    "sha256": "e08d4c9139946fab740fcbcdd8a6ed79c94c09df7f841435c1ac86421f3cc09b",
+    "source_match": "all module src and pom.xml bytes identical to accepted ZIP",
+    "provenance": "existing Step 10 packaged binaries; not rebuilt in Step 11"
+  },
+  {
+    "module": "artifact-store",
+    "jar": "artifact-store/target/artifact-store-0.2.0.jar",
+    "sha256": "c41e75a929f2a0fa537cf3a61c96a70a58e57f202372f2b44178eba842484fa3",
+    "source_match": "all module src and pom.xml bytes identical to accepted ZIP",
+    "provenance": "existing Step 10 packaged binaries; not rebuilt in Step 11"
+  },
+  {
+    "module": "worker",
+    "jar": "worker/target/worker-0.2.0.jar",
+    "sha256": "a37baa2164265d45ce245d8c83dceefa3c34784b60c42f7cda6bc83d3e005532",
+    "source_match": "all module src and pom.xml bytes identical to accepted ZIP",
+    "provenance": "existing Step 10 packaged binaries; not rebuilt in Step 11"
+  },
+  {
+    "module": "client",
+    "jar": "client/target/client-0.2.0.jar",
+    "sha256": "7fcb1e0647ea203eb60640fb344faeda6e3c351464e9141f8f3611c7b7c6ba1c",
+    "source_match": "all module src and pom.xml bytes identical to accepted ZIP",
+    "provenance": "existing Step 10 packaged binaries; not rebuilt in Step 11"
+  }
+]

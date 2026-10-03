@@ -1,0 +1,394 @@
+[
+  {
+    "name": "pin-check",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "deploy/hokea/verify_api.py",
+      "--package",
+      "/workspace/scratch/565bb6dfb453/tmp/hokea/src/hokea"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:35.815103+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:49:35.860900+00:00",
+    "raw_output": "results/handoffs/step-11/pin-check.log"
+  },
+  {
+    "name": "adapter-unit",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/unit/test_hokea_adapter.py",
+      "tests/unit/test_hokea_packaging.py",
+      "--junitxml=/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/adapter-unit.xml"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:35.861361+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:49:36.313665+00:00",
+    "raw_output": "results/handoffs/step-11/adapter-unit.log"
+  },
+  {
+    "name": "docker-compose-version",
+    "argv": [
+      "docker",
+      "compose",
+      "version"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:36.314158+00:00",
+    "exit_status": 127,
+    "finished_utc": "2026-10-03T17:49:36.315164+00:00",
+    "raw_output": "results/handoffs/step-11/docker-compose-version.log"
+  },
+  {
+    "name": "docker-info",
+    "argv": [
+      "docker",
+      "info"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:36.315466+00:00",
+    "exit_status": 127,
+    "finished_utc": "2026-10-03T17:49:36.316059+00:00",
+    "raw_output": "results/handoffs/step-11/docker-info.log"
+  },
+  {
+    "name": "pytest-version",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "--version"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:36.316338+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:49:36.452097+00:00",
+    "raw_output": "results/handoffs/step-11/pytest-version.log"
+  },
+  {
+    "name": "make-test",
+    "argv": [
+      "make",
+      "test"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:36.452634+00:00",
+    "exit_status": 2,
+    "finished_utc": "2026-10-03T17:49:36.459396+00:00",
+    "raw_output": "results/handoffs/step-11/make-test.log"
+  },
+  {
+    "name": "make-fault-demo",
+    "argv": [
+      "make",
+      "fault-demo"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334"
+    },
+    "started_utc": "2026-10-03T17:49:36.459708+00:00",
+    "exit_status": 2,
+    "finished_utc": "2026-10-03T17:49:36.465180+00:00",
+    "raw_output": "results/handoffs/step-11/make-fault-demo.log"
+  },
+  {
+    "name": "native-smoke",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/integration/test_hokea_smoke.py"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:c457006d4edbf66b6eaca9f19380565e632b2d5dbbfd7630d45c0ba2e926e334",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_RUN_LABEL": "step11-20261003T174933-50c63001-smoke",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/raw-runs"
+    },
+    "started_utc": "2026-10-03T17:49:36.465665+00:00",
+    "exit_status": 1,
+    "finished_utc": "2026-10-03T17:49:42.220991+00:00",
+    "raw_output": "results/handoffs/step-11/native-smoke.log"
+  },
+  {
+    "name": "adapter-unit-final",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/unit/test_hokea_adapter.py",
+      "tests/unit/test_hokea_packaging.py",
+      "--junitxml=/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/adapter-unit-final.xml"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:50:26.624946+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:50:27.048883+00:00",
+    "raw_output": "results/handoffs/step-11/adapter-unit-final.log"
+  },
+  {
+    "name": "native-smoke-retry",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/integration/test_hokea_smoke.py"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_RUN_LABEL": "step11-20261003T175026-5dbfb7d8-smoke-retry",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/raw-runs"
+    },
+    "started_utc": "2026-10-03T17:50:27.050145+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:50:32.710633+00:00",
+    "raw_output": "results/handoffs/step-11/native-smoke-retry.log"
+  },
+  {
+    "name": "native-acceptance",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--junitxml=/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/native-acceptance.xml"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_REQUIRE_XFAIL": "1",
+      "MS2_RUN_LABEL": "step11-20261003T175026-5dbfb7d8-acceptance",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/raw-runs"
+    },
+    "started_utc": "2026-10-03T17:50:43.017664+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:54:19.900852+00:00",
+    "raw_output": "results/handoffs/step-11/native-acceptance.log"
+  },
+  {
+    "name": "native-fault-demo",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--runxfail",
+      "tests/faults/test_worker_crash.py",
+      "--junitxml=/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/native-fault-demo.xml"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+      "JAVA": "/workspace/scratch/565bb6dfb453/tmp/toolchain/jdk-21.0.8+9/bin/java",
+      "MS2_BACKEND": "native",
+      "MS2_RUN_LABEL": "step11-20261003T175026-5dbfb7d8-fault-demo",
+      "MS2_EVIDENCE_DIR": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/raw-runs"
+    },
+    "started_utc": "2026-10-03T17:55:31.049968+00:00",
+    "exit_status": 1,
+    "finished_utc": "2026-10-03T17:55:48.223906+00:00",
+    "raw_output": "results/handoffs/step-11/native-fault-demo.log"
+  },
+  {
+    "name": "source-check",
+    "argv": [
+      "sha256sum",
+      "-c",
+      "results/handoffs/step-11/source-SHA256SUMS.txt"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.654474+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.661951+00:00",
+    "raw_output": "results/handoffs/step-11/source-check.log"
+  },
+  {
+    "name": "accepted-source-check",
+    "argv": [
+      "sha256sum",
+      "-c",
+      "results/handoffs/step-10/source-SHA256SUMS.txt"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.662479+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.666943+00:00",
+    "raw_output": "results/handoffs/step-11/accepted-source-check.log"
+  },
+  {
+    "name": "hokea-head",
+    "argv": [
+      "git",
+      "-C",
+      "/workspace/scratch/565bb6dfb453/tmp/hokea",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.667403+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.669448+00:00",
+    "raw_output": "results/handoffs/step-11/hokea-head.log"
+  },
+  {
+    "name": "hokea-clean",
+    "argv": [
+      "git",
+      "-C",
+      "/workspace/scratch/565bb6dfb453/tmp/hokea",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.669869+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.672112+00:00",
+    "raw_output": "results/handoffs/step-11/hokea-clean.log"
+  },
+  {
+    "name": "retained-offline",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "tests.harness.check_evidence",
+      "results/handoffs/step-11/runs/step11-20261003T174933-50c63001-smoke/test_service_exchange",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_artifact_staging_atomic_publication_and_conflicts",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_cached_empty_claim_stays_empty",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_committed_functional_workload",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_counters_gauges_and_snapshot_sequence_are_consistent",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_duplicate_conflicting_stale_reports_and_retry",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_endpoint_errors_are_structured",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_functional_multiple_jobs_workers",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_health_and_run_header",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_hooks_are_disabled_by_default",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[bad_binding]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[cycle]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[duplicate]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[duplicate_parent]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[empty]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[operation]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[self]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[too_many]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_invalid_dags_never_accepted[unknown_parent]",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_java_client_upload_submit_status_fetch",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_join_and_independent_branch_concurrency",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_local_operation_timeout_is_an_explicit_bounded_failure",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_lost_report_ack_is_replayed_not_reexecuted",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_multiple_roots_sinks_and_all_tasks_required",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_real_worker_failure_attempt_two",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_rejected_commands_do_not_change_snapshots",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_request_body_limit_is_413",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_service_exchange",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_simultaneous_claims_and_session_single_slot",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_source_descriptors_are_verified_before_acceptance",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_stale_report_rejection_does_not_kill_the_worker",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_stale_run_is_rejected_everywhere",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_storage_unavailable_is_transient_and_accepts_nothing",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_strict_json_types_and_unknown_fields",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_submission_and_claim_receipts",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_success_requires_published_correct_outputs",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_video_pipeline",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_abandons_old_run_and_joins_the_new_one",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_crash_reassignment",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-acceptance/test_worker_has_one_slot_and_starts_only_after_ack",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-fault-demo/test_worker_crash_reassignment",
+      "results/handoffs/step-11/runs/step11-20261003T175026-5dbfb7d8-smoke-retry/test_service_exchange"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.675724+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.733718+00:00",
+    "raw_output": "results/handoffs/step-11/retained-offline.log"
+  },
+  {
+    "name": "runner-package",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "deploy/hokea/package_runner.py",
+      "--out",
+      "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/runner-package",
+      "--source-revision",
+      "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+      "--scheduler-image",
+      "registry.example/scheduler@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "--artifact-store-image",
+      "registry.example/artifact-store@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "--worker-image",
+      "registry.example/worker@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler",
+    "environment_overrides": {
+      "MS2_SOURCE_REV": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee"
+    },
+    "started_utc": "2026-10-03T17:59:47.734420+00:00",
+    "exit_status": 0,
+    "finished_utc": "2026-10-03T17:59:47.765488+00:00",
+    "raw_output": "results/handoffs/step-11/runner-package.log"
+  },
+  {
+    "name": "runner-collection",
+    "argv": [
+      "/workspace/scratch/565bb6dfb453/tmp/step10-continuation-venv/bin/python",
+      "-m",
+      "pytest",
+      "--collect-only",
+      "-q"
+    ],
+    "cwd": "/workspace/scratch/565bb6dfb453/step11-work/distributed-dag-scheduler/results/handoffs/step-11/runner-package",
+    "environment_overrides": {},
+    "source_revision": "step11-sha256:a9aab6b8f97e9734799689d82502ec2cb0da57886b49d8e87326f11aafd73fee",
+    "exit_status": 0,
+    "raw_output": "results/handoffs/step-11/runner-collection.log"
+  }
+]
