@@ -1,0 +1,67 @@
+{
+  "started_utc": "2026-10-03T20:47:42.139536+00:00",
+  "command": [
+    "C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\benchmarks\\run.py",
+    "--backend",
+    "compose",
+    "--out",
+    "results/benchmark/smoke-1",
+    "--configs",
+    "c1-w1,c16-w4",
+    "--repetitions",
+    "1"
+  ],
+  "source_revision": "bf0a7974dd63cc8cd1d9240177156d0a00bd26df",
+  "source_dirty": true,
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "host_cpu_count": 12,
+  "backend": "compose",
+  "docker": "client 27.1.1 server \nrequest returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.46/version, check if the server supports the requested API version",
+  "docker_host": "; 0 CPUs; 0 bytes\nrequest returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.46/info, check if the server supports the requested API version",
+  "images": {
+    "scheduler": "request returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.46/images/dag-ms2/scheduler:0.2.0/json, check if the server supports the requested API version",
+    "artifact-store": "request returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.46/images/dag-ms2/artifact-store:0.2.0/json, check if the server supports the requested API version",
+    "worker": "request returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.46/images/dag-ms2/worker:0.2.0/json, check if the server supports the requested API version"
+  },
+  "resources": {
+    "jvm_heap": "-Xmx128m (all services)",
+    "handler_threads": 16,
+    "service_cpu": "Docker cpus: 1.0 per service",
+    "service_memory": "Docker mem_limit: 512m per service",
+    "worker_slots": 1,
+    "poll_interval_ms": 100
+  },
+  "contract": {
+    "concurrency": [
+      1,
+      4,
+      16
+    ],
+    "workers": [
+      1,
+      2,
+      4
+    ],
+    "warmup_jobs": 4,
+    "measured_jobs": 24,
+    "tasks_per_job": 6,
+    "fixture_delay_ms": 100,
+    "repetitions": 5,
+    "measured_timeout_seconds": 120
+  },
+  "percentiles": "nearest-rank; per-configuration p50/p95 pool the samples of complete runs; job_p95_ms_run_median is the median of per-run p95s",
+  "limitations": [
+    "Shared execution host: all services, the driver and the Docker VM share one machine",
+    "Synthetic waiting workload (100 ms sleeps); characterizes coordination, not codec or CPU scaling",
+    "Polling latency (100 ms worker poll interval) is part of measured scheduling latency",
+    "Recovery time is unmeasured in MS2; no faults are injected"
+  ],
+  "subset": {
+    "configs": [
+      "c1-w1",
+      "c16-w4"
+    ],
+    "repetitions": 1
+  }
+}

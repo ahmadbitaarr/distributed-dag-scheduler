@@ -1,0 +1,3 @@
+concurrency,workers,repetitions,complete_runs,censored_runs,error_runs,jobs_pooled,job_p50_ms,job_p95_ms,job_p95_ms_run_median,tasks_pooled,scheduling_p50_ms,scheduling_p95_ms,throughput_mean,throughput_stdev,throughput_min,throughput_max,incomplete_jobs
+1,1,1,1,0,0,24,3509.682628,4879.060743,4879.060743,144,12.830898,1202.12012,1.5941755393970782,,1.5941755393970782,1.5941755393970782,0
+16,4,1,1,0,0,24,19026.154156,21989.14687,21989.14687,144,3226.959451,12569.859141,3.9510170880743303,,3.9510170880743303,3.9510170880743303,0

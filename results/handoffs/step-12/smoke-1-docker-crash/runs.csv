@@ -1,0 +1,2 @@
+configuration,concurrency,workers,repetition,scheduler_run_id,status,error,completed_jobs,incomplete_jobs,logical_successes,max_in_flight,correct_outputs,batch_interval_ns,tasks_per_second,job_p50_ms,job_p95_ms,scheduling_p50_ms,scheduling_p95_ms,wall_seconds
+c1-w1-r1,1,1,1,,error,"CalledProcessError: Command '['docker', 'compose', '-f', 'C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\deploy\\compose\\compose.yaml', '-p', 'ms2-0eda1cb3e3', 'down', '--remove-orphans']' returned non-zero exit status 1.",0,24,,,,,,,,,,25.8
