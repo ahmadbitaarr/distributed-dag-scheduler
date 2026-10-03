@@ -2,8 +2,8 @@
 
 > **Status: DRAFT for Step 14.**
 >
-> - Sections marked *[PENDING Step 10/11/13]* depend on gates other teammates are completing.
-> - Benchmark numbers come from the Step 12 run in `results/handoffs/step-12/`.
+> - The Step 10, 11 and 12 evidence is incorporated.
+> - The document becomes final after Step 13 (independent verification) confirms or corrects it.
 > - Every "Current MS2 status" entry links to the test or evidence that supports it.
 
 This document revises the approved MS1 specification (CS4069 MS1 Specification, p. 1). The approved **intended semester claims are kept unchanged**. Each claim gains an explicit *current MS2 status*, so readers can distinguish what the prototype guarantees today from what later milestones will add. Design detail lives in [CS4094_MS2_Architecture.md](CS4094_MS2_Architecture.md). The wire contract is in [api.md](api.md), and the evidence format in [evidence.md](evidence.md).
@@ -58,7 +58,7 @@ Assumption: workers are honest. The scheduler checks identity, state, attempt an
 | Claim | Current MS2 status | Explanation | Evidence |
 |---|---|---|---|
 | L1. Ready tasks are eventually assigned, and complete or are retried after failure | **Partially satisfied** | The ready FIFO is fair: requeued tasks go to the tail. An explicit failure from ASSIGNED or RUNNING returns the task to READY, and it is reassigned with a higher attempt number. There is no retry cap and no terminal FAILED job. This holds while workers stay available and do not crash while holding a task; a crash after assignment can block completion (see L2). | `test_real_worker_failure_attempt_two`, `test_local_operation_timeout_is_an_explicit_bounded_failure`, `repeatedFailuresKeepIncreasingAttemptNumbersWithoutRetryCap` |
-| L2. A failed worker's unfinished task eventually becomes available for reassignment | **Intentionally not satisfied in MS2** | MS2 has no lease, heartbeat, expiry scan or silent-owner release. An attempt owned by a crashed worker can leave RUNNING only through a report from that worker, which will never come. This is MS2's **single demonstrated correctness violation**. | `tests/faults/test_worker_crash.py::test_worker_crash_reassignment`: strict XFAIL limited to `RecoveryNotObserved`; `make fault-demo` shows the real failure *[PENDING Step 10 Docker gates]*. Unit-level pin: `silentOwnerKeepsTaskForeverEvenAsTimePasses`. |
+| L2. A failed worker's unfinished task eventually becomes available for reassignment | **Intentionally not satisfied in MS2** | MS2 has no lease, heartbeat, expiry scan or silent-owner release. An attempt owned by a crashed worker can leave RUNNING only through a report from that worker, which will never come. This is MS2's **single demonstrated correctness violation**. | `tests/faults/test_worker_crash.py::test_worker_crash_reassignment`: strict XFAIL limited to `RecoveryNotObserved`; `make fault-demo` shows the real failure: exit 2, the single failure `RecoveryNotObserved` (Step 10, `results/handoffs/step-10/`). Unit-level pin: `silentOwnerKeepsTaskForeverEvenAsTimePasses`. |
 
 L1 and L2 are overlapping consequences of the same missing mechanism. Progress is not promised during a permanent partition, while all workers are unavailable, or under unbounded overload.
 
@@ -70,7 +70,7 @@ L1 and L2 are overlapping consequences of the same missing mechanism. Progress i
 |---|---|---|
 | Lost, delayed or duplicated messages | **Handled for safety and progress.** Stable IDs plus cached receipts make retries idempotent. A lost report acknowledgment causes a replayed report, never a second execution. | `test_lost_report_ack_is_replayed_not_reexecuted` (a fault-injecting proxy drops an accepted reply), `test_submission_and_claim_receipts` |
 | Worker restart | **Safe.** A restarted worker gets a new session and cannot report for its old attempt. Recovering the old attempt is **not** implemented (L2). | `sessionHoldsOneActiveAttemptAndGetsItBackOnNewClaims`, crash oracle |
-| Worker crash while holding a task | **Safe but not live.** The task stays RUNNING under the dead owner and dependents stay BLOCKED. This is the intentional MS2 defect. | `test_worker_crash_reassignment` *[PENDING Step 10 Docker gates]* |
+| Worker crash while holding a task | **Safe but not live.** The task stays RUNNING under the dead owner and dependents stay BLOCKED. This is the intentional MS2 defect. | `test_worker_crash_reassignment`: strict XFAIL in `make test` (62 passed + 1 xfailed, exit 0) and a real failure in `make fault-demo` (Step 10) |
 | Stale or conflicting reports | **Rejected without a state change.** The worker abandons that attempt and keeps working. | `test_stale_report_rejection_does_not_kill_the_worker`, `rejectedCommandsLeaveStateAndEventsUnchanged` |
 | Scheduler restart | **New empty run.** Old-run messages get `409 STALE_RUN`. Workers detect the change and join the new run. | `test_worker_abandons_old_run_and_joins_the_new_one` |
 | Artifact store unavailable | **Transient 503**: no job is accepted and no state changes. | `test_storage_unavailable_is_transient_and_accepts_nothing` |
@@ -92,7 +92,13 @@ Planned for later milestones (MS3): communication-fault campaigns, pause/restart
 | Resources | Each service capped at 1 CPU and 512 MiB (Docker), with a 128 MiB JVM heap and 16 handler threads. |
 | Metrics | Job completion time = scheduler acceptance → `job_completed`. Scheduling latency = READY → ASSIGNED. Throughput = measured logical successes ÷ (last measured completion − first measured acceptance). All are measured on the scheduler's monotonic clock. |
 
-Results and limitations are in the MS2 progress report, §E. No numeric performance target is claimed.
+**Measured (Step 12):** all 45 runs completed (1,080 jobs, 6,480 tasks).
+
+- Throughput is bounded by worker capacity, about 4.2 tasks/s per one-slot worker, and scales near-linearly in W when C ≥ 4: 16.7 tasks/s at C=16, W=4.
+- At C=1, the DAG's 3-wide middle limits parallelism.
+- With an idle worker, median READY→ASSIGNED latency is 4–6 ms. Larger latencies are queueing for busy workers.
+
+Full tables, method and limitations: the MS2 progress report, §E, and `results/handoffs/step-12/`. No numeric performance target is claimed.
 
 ## 7. Scope
 
@@ -104,7 +110,7 @@ Results and limitations are in the MS2 progress report, §E. No numeric performa
 | Immutable artifact store with attempt-isolated output namespaces | Exactly-once external effects, paid transcription APIs |
 | Event histories, metrics, snapshots, offline invariant checker | Authentication, UI, cancellation, priorities, retry caps or terminal job failure |
 | Functional and video workloads; Compose deployment; benchmark | Performance targets; finite recovery-time measurement |
-| Hokea adapter *[PENDING Step 11]* | Cluster verification is recorded honestly if access is unavailable *[PENDING Step 11]* |
+| Hokea adapter at the pinned course revision; local Hokea/Compose/Make verification (Step 11) | Course-cluster execution: attempted in `team-06` and **externally blocked** before any project service ran, because the course runner's Hokea package does not match the pinned revision. Not a project defect; retry when a correctly pinned runner is available. |
 
 ## 8. MS3 extension path (not implemented)
 
