@@ -122,3 +122,29 @@ def test_offline_checker_detects_truncated_export(tmp_path):
     (target / "events.jsonl").write_text("\n".join(lines[:-3]) + "\n")
     assert main([str(SAMPLE)]) == 0
     assert main([str(target)]) == 1
+
+
+def older_snapshot(history, before_task):
+    """The job's snapshot as it was just before `before_task` succeeded (a still-running job)."""
+    cut = history["events"][find(history, "task_succeeded", before_task)]["scheduler_event_seq"] - 1
+    later = {e["task_id"] for e in history["events"] if e.get("job_id") == history["job"]
+             and e["event_type"] == "task_succeeded" and e["scheduler_event_seq"] > cut}
+    snapshot = copy.deepcopy(history["snapshot"])
+    snapshot.update({"state": "RUNNING", "snapshot_event_seq": cut})
+    for name in later:
+        snapshot["tasks"][name]["state"] = "RUNNING"
+    return snapshot
+
+
+def test_snapshot_older_than_history_is_consistent(history):
+    # Step 12 regression: a censored benchmark run snapshotted a running job, then read history that
+    # already contained a later success. That is consistent and must not be reported as a violation.
+    history["snapshot"] = older_snapshot(history, "E")
+    check(history)
+
+
+def test_older_snapshot_still_detects_a_missing_covered_success(history):
+    snapshot = older_snapshot(history, "E")
+    snapshot["tasks"]["D"]["state"] = "RUNNING"          # D's success is inside the covered prefix
+    history["snapshot"] = snapshot
+    violated(history, "snapshot successes disagree")

@@ -224,7 +224,12 @@ def check_history(manifest_value, snapshot, events, worker_events=()):
             require(ack in started, f"worker operation for {e['task_id']} has no acknowledged scheduler start (seq {ack})")
             require(started[ack] == (e["task_id"], e["attempt_no"], e["worker_session_id"]),
                     f"worker operation for {e['task_id']} joined to the wrong scheduler start")
+    # A snapshot is atomic at snapshot_event_seq; compare it with the history prefix it covers.
+    # (A history exported after the snapshot may legitimately contain later successes of a running job.)
+    covered = snapshot["snapshot_event_seq"]
+    require(covered <= len(all_seqs), "snapshot is newer than the exported history")
     states = {n: t["state"] for n, t in snapshot["tasks"].items()}
-    require(sum(v == "SUCCEEDED" for v in states.values()) == len(successes), "snapshot successes disagree with history")
-    require((snapshot["state"] == "SUCCEEDED") == (completed is not None), "snapshot job state disagrees with job_completed")
-    require(snapshot["snapshot_event_seq"] <= len(all_seqs), "snapshot is newer than the exported history")
+    require(sum(v == "SUCCEEDED" for v in states.values()) == sum(seq <= covered for seq in successes.values()),
+            "snapshot successes disagree with history")
+    require((snapshot["state"] == "SUCCEEDED") == (completed is not None and completed <= covered),
+            "snapshot job state disagrees with job_completed")

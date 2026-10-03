@@ -1,0 +1,56 @@
+{
+  "started_utc": "2026-10-03T21:26:23.153148+00:00",
+  "command": [
+    "C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\benchmarks\\run.py",
+    "--backend",
+    "compose",
+    "--out",
+    "results/benchmark/full-20261003b"
+  ],
+  "source_revision": "9f53ada5163b6cbd5a693f70795338a3dcae5f7d",
+  "source_dirty": false,
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "host_cpu_count": 12,
+  "backend": "compose",
+  "docker": "client 27.1.1 server 27.1.1",
+  "docker_host": "Docker Desktop (containerized); 12 CPUs; 8165769216 bytes",
+  "images": {
+    "scheduler": "sha256:335645cc7bb33776b1cde80e92fef95cb2823ed5b8b9e90044af4ab98c906461 created 2026-10-03T20:51:28.409748015Z",
+    "artifact-store": "sha256:be8c931a677f062eca75a0dedacd494b86d270cd27bab8e6aa34244333781dab created 2026-10-03T20:50:52.550727252Z",
+    "worker": "sha256:8cb3f0e4f867f3e9bc5d9bc16a42fe2d5ddf10e187135e7916bb21abfc3de621 created 2026-10-03T20:52:03.531165979Z"
+  },
+  "resources": {
+    "jvm_heap": "-Xmx128m (all services)",
+    "handler_threads": 16,
+    "service_cpu": "Docker cpus: 1.0 per service",
+    "service_memory": "Docker mem_limit: 512m per service",
+    "worker_slots": 1,
+    "poll_interval_ms": 100
+  },
+  "contract": {
+    "concurrency": [
+      1,
+      4,
+      16
+    ],
+    "workers": [
+      1,
+      2,
+      4
+    ],
+    "warmup_jobs": 4,
+    "measured_jobs": 24,
+    "tasks_per_job": 6,
+    "fixture_delay_ms": 100,
+    "repetitions": 5,
+    "measured_timeout_seconds": 120
+  },
+  "percentiles": "nearest-rank; per-configuration p50/p95 pool the samples of complete runs; job_p95_ms_run_median is the median of per-run p95s",
+  "limitations": [
+    "Shared execution host: all services, the driver and the Docker VM share one machine",
+    "Synthetic waiting workload (100 ms sleeps); characterizes coordination, not codec or CPU scaling",
+    "Polling latency (100 ms worker poll interval) is part of measured scheduling latency",
+    "Recovery time is unmeasured in MS2; no faults are injected"
+  ]
+}

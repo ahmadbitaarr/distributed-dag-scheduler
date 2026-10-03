@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\benchmarks\run.py", line 143, in run_one
+    check_history(manifests[snapshot["job_id"]], snapshot, events)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\api.py", line 228, in check_history
+    require(sum(v == "SUCCEEDED" for v in states.values()) == len(successes), "snapshot successes disagree with history")
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\api.py", line 183, in require
+    raise HistoryViolation(message)
+tests.harness.api.HistoryViolation: snapshot successes disagree with history

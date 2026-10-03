@@ -1,0 +1,3 @@
+Gate after checker fix (harness container, source = this commit's tree):
+mvn -B -q verify -> MVN_EXIT=0
+MS2_REQUIRE_XFAIL=1 pytest -> 86 passed, 1 xfailed in 335.77s, exit 0

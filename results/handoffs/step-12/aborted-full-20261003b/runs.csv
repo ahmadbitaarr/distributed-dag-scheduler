@@ -1,0 +1,4 @@
+configuration,concurrency,workers,repetition,scheduler_run_id,status,error,completed_jobs,incomplete_jobs,logical_successes,max_in_flight,correct_outputs,batch_interval_ns,tasks_per_second,job_p50_ms,job_p95_ms,scheduling_p50_ms,scheduling_p95_ms,wall_seconds
+c1-w1-r1,1,1,1,4b5b3b9b-4f1d-4055-85a9-62b3cea31314,complete,,24,0,144,1,24,88615958331,1.6249894794584117,1933.444606,14099.353258,11.254859,1198.493692,163.5
+c1-w1-r2,1,1,2,729b09e9-6c5c-49d2-9fe5-8e55d862055e,error,HistoryViolation: snapshot successes disagree with history,0,24,,,,,,,,,,199.1
+c1-w1-r3,1,1,3,d44a410e-7473-4c57-9fc5-b508aa61feeb,censored,,22,3,132,1,22,123208218622,,2707.945639,15350.541407,10.20346,3508.811113,202.7
