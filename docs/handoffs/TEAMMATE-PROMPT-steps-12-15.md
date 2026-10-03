@@ -4,7 +4,7 @@ Paste everything below the line into your AI coding assistant (Claude Code, Code
 
 ---
 
-You are finishing the Virginia Tech CS4094 distributed DAG task scheduler, Milestone 2 (MS2). Complete roadmap **Steps 12, 13, 14 and 15**, in that order, one at a time.
+You are finishing the Virginia Tech CS4094 distributed DAG task scheduler, Milestone 2 (MS2). Step 12 is already done. Complete roadmap **Steps 13, 14 and 15**, in that order, one at a time.
 
 ## Repository and starting point
 
@@ -45,6 +45,16 @@ Source priority: course guidelines > approved MS1 spec > architecture/IMPLEMENTA
 - **At least 8 GB of free RAM while the benchmark runs.** Close browsers and chat apps, and don't use the machine during the run. On the original Windows host, under 1 GB of free memory caused system-wide stalls and Docker engine crashes (see `results/handoffs/step-12/aborted-*`).
 - Docker Engine with Compose v2, Python 3.10+ (standard library only, for the benchmark and demo), and `make`. Java/Maven/pytest are **not** needed on the host: `make test` runs in the pinned harness container.
 
+## Step 12: ALREADY DONE (skip it)
+
+Step 12 was completed on 2026-10-03 on branch `ms2/step-12-benchmark` (commit `7c14d01`):
+
+- **45/45 runs complete:** 1,080 jobs and 6,480 tasks, with outputs and the in-flight bound verified.
+- **Record and results:** `docs/handoffs/step-12.md` and `results/handoffs/step-12/full-20261003c/RESULTS.md`.
+- **Your job:** review it as part of Step 13 and run only the short benchmark reproduction listed there. **Start at Step 13.**
+
+<details><summary>Original Step 12 instructions (for reference only)</summary>
+
 ## Step 12: run the exact benchmark and keep raw measurements
 
 The driver `benchmarks/run.py` is finished and smoke-tested. Its target is `make bench`: it builds the images, then runs the full matrix on capped Compose services.
@@ -75,6 +85,8 @@ The driver `benchmarks/run.py` is finished and smoke-tested. Its target is `make
    - limitations: shared host, synthetic 100 ms waits, polling latency included, recovery time unmeasured;
    - observed bottlenecks. Smoke data suggests most task time is worker-side HTTP artifact I/O and output verification, not scheduling. Confirm or refute this from the "where task time goes" table.
 8. Commit with `perf(ms2): record the approved initial benchmark matrix`.
+
+</details>
 
 ## Step 13: independent clean-environment verification
 
