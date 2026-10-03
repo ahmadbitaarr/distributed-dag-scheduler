@@ -1,122 +1,80 @@
-# CS4094 MS2 Progress Report — Distributed DAG Task Scheduler
+# CS4094 MS2 Progress Report: Distributed DAG Task Scheduler
 
-> **Status: DRAFT (Step 14), not final.**
->
-> - Steps 10, 11 and 12 results are filled in.
-> - The only remaining marker is *[PENDING Step 13]*, the independent clean-checkout verification.
-> - Do not submit until it is resolved.
-> - Every number in this report comes from committed evidence under `results/handoffs/`.
+> **Draft.** Two items wait on the Step 13 independent verification: this note and the last limitation in Section G. *[PENDING Step 13]*
 
-Revised specification: [specification.md](specification.md). Architecture: [CS4094_MS2_Architecture.md](CS4094_MS2_Architecture.md). Roadmap and step records: [implementation-roadmap.md](implementation-roadmap.md), `docs/handoffs/`.
+Revised specification: [specification.md](specification.md). Every number below comes from evidence committed under `results/handoffs/`, and the per-step records are in `docs/handoffs/`.
 
-## A. Implemented capabilities
+## A. What works
 
 All planned MS2 functionality works on the happy path.
 
-| Capability | Where |
-|---|---|
-| Versioned JSON/HTTP API (§6) with strict typed parsing, structured errors and limits | `protocol/`, `scheduler/`, [api.md](api.md) |
-| DAG validation: cycles, unknown or self/duplicate parents, bindings, operation allowlist; 128 tasks / 512 edges / 1 MiB / 32 MiB | `ManifestValidator` |
-| Atomic scheduler state machine under one mutex: ready FIFO, ownership, attempts, receipts, joins, all-tasks job completion | `SchedulerCore`, `MemoryStateStore` |
-| Explicit-failure retry with increasing attempt numbers; idempotent replay of submissions, claims, starts and reports; stale/conflicting rejection | same |
-| Immutable HTTP artifact store: staged, length- and hash-verified, never partially visible, conflict on different bytes | `artifact-store/` |
-| One-slot polling worker: start acknowledged before execution, bounded allowlisted operations (fixtures, ffprobe, FFmpeg 720p/360p, thumbnail), timeouts, survives rejections, follows scheduler-run changes | `worker/` |
-| Java client: upload, submit, status, fetch | `client/` |
-| Functional workload (A=3 → 7 / 15 → 22 → `result=22`) and the concrete video pipeline on a byte-reproducible synthetic clip | `workloads/` |
-| Event histories, metrics, atomic snapshots, per-test metadata, offline safety-invariant checker | `tests/harness/`, [evidence.md](evidence.md) |
-| Docker images, Compose deployment (1 CPU / 512 MiB caps, `restart: no`), Linux harness container, `make build / up / demo / test / fault-demo / bench / down` | `deploy/`, `Makefile` |
+**Submission.** A client submits a DAG as a versioned JSON manifest. The scheduler rejects cycles, unknown or duplicate parents, bad input bindings, unsupported operations, and jobs over the limits (128 tasks, 512 edges, 1 MiB manifest, 32 MiB per file).
 
-## B. Repository structure
+**Scheduling.** Accepted jobs run under a single scheduler mutex. Ready tasks are handed out in FIFO order, independent branches run in parallel on different workers, joins wait for every parent, and a job succeeds only when all of its tasks have.
+
+**Workers.** Workers poll for work, must be acknowledged before starting, run one task at a time from a fixed list of operations, and exchange files only through the immutable artifact store. A reported failure is retried with a higher attempt number. Replayed messages are answered from cached receipts, and stale or conflicting reports are rejected.
+
+**Workloads.** The five-task functional DAG produces `result=22`. The video DAG turns a committed 10-second synthetic clip into 720p and 360p MP4s, a PNG thumbnail, fixture subtitles and a publish manifest.
+
+**Tooling.** Every test exports its event history, metrics and snapshots, and an offline checker re-verifies the safety properties from those files. Everything runs under Docker Compose with 1 CPU / 512 MiB per service. `make build / up / demo / test / fault-demo / bench / down` drive the whole artifact, with tests running in a pinned Linux container so the host needs only Docker.
+
+## B. Repository layout
 
 | Path | Contents |
 |---|---|
-| `protocol/`, `scheduler/`, `artifact-store/`, `worker/`, `client/` | Java 21 Maven modules; each service produces `<module>/target/<module>-0.2.0.jar` |
-| `tests/unit`, `tests/integration`, `tests/faults`, `tests/harness` | pytest suites, the harness adapters (native, Compose), the history checker and the demo driver |
-| `benchmarks/run.py` | The approved C × W × 5 benchmark driver |
-| `deploy/compose`, `deploy/harness`, `*/Dockerfile` | Deployment and the test container |
-| `workloads/functional`, `workloads/video` | Committed workloads with expected outputs, checksums and provenance |
-| `docs/` | Architecture, roadmap, specification, API, evidence schema, this report, progress, handoffs, open issues |
-| `results/handoffs/step-XX/` | Committed verification evidence for each roadmap step |
+| `protocol/`, `scheduler/`, `artifact-store/`, `worker/`, `client/` | Java 21 Maven modules |
+| `tests/unit`, `tests/integration`, `tests/faults`, `tests/harness` | pytest suites, deployment adapters (native, Compose, Hokea), history checker, demo driver |
+| `benchmarks/` | Benchmark driver and report generator |
+| `deploy/` | Compose, the test container, the Hokea adapter |
+| `workloads/` | Functional and video workloads with expected outputs and checksums |
+| `docs/` | Architecture, roadmap, specification, API, evidence format, this report, step handoffs |
+| `results/handoffs/step-XX/` | Committed evidence for each roadmap step |
 
 ## C. Tests and results
 
-| Suite | Count | Latest result | Evidence |
-|---|---|---|---|
-| JUnit: wire contract, state machine, artifact store over real HTTP | 61 | 61 passed (`mvn -B verify`, exit 0) | `results/handoffs/step-09/make-test-gate.txt` |
-| pytest unit: history checker falsification | 12 | passed | same |
-| pytest integration: API, worker/client, functional, replay/retry, video | 37 at Step 9 | passed | same |
-| Fault oracle: worker-crash reassignment | 1 | **xfailed**, as required (strict, limited to `RecoveryNotObserved`) | same |
-| Whole suite with `MS2_REQUIRE_XFAIL=1` | — | 49 passed + 1 xfailed (Step 9). `make test`: 62 passed + 1 xfailed (Step 10, Docker host). 84 passed + 1 xfailed (Step 11). **86 passed + 1 xfailed** (Step 12, after the checker fix). All exit 0. | step-09, step-10, step-11, step-12 |
-| Offline invariant re-check of all exported histories | 38 test directories | all OK | `results/handoffs/step-08/` |
+The current suite has 61 JUnit tests (wire contract, scheduler state machine, artifact store over real HTTP) and 87 pytest tests (unit, integration, Hokea, and the crash oracle).
 
-Defects found and fixed during verification. A mutation check confirmed each new test fails on the old code.
+The latest full run gave `mvn -B verify` exit 0, then **86 passed and 1 expected failure** (exit 0), with the run configured to fail unless exactly one test xfails (Step 12, `results/handoffs/step-12/`). On a separate Docker host, Step 10 gave `make test` 62 passed + 1 xfailed (exit 0) and `make fault-demo` exit 2 with the single intended failure. Re-checking all exported histories offline found no violations.
 
-1. An incomplete manifest binding caused a `NullPointerException`, returned as **503** instead of 400.
-2. Artifact keys accepted non-canonical UUIDs.
-3. An artifact replay with a different media type was silently accepted.
-4. **A worker process exited** whenever any request was rejected, for example a stale report.
-5. *(Step 12)* The history checker reported a **false violation** when it compared a still-running job's snapshot with a later, longer event history. It now compares a snapshot only with the history prefix it covers (`snapshot_event_seq`). Regression tests were added.
-6. *(Step 12)* A Hokea unit test wrote its fixture with text-mode line endings and failed on Windows only. It now writes bytes.
+We found and fixed six defects during verification. Each has a test that fails on the old code.
 
-Docker-host gates (Step 10, external evidence `results/handoffs/step-10/external-9064f75356bf492aa6dd3189c72dc88c/checks/`):
+1. An incomplete input binding crashed manifest validation, and the server returned 503 instead of 400.
+2. Artifact keys accepted non-canonical UUIDs such as `1-1-1-1-1`.
+3. Re-uploading identical bytes with a different media type was silently accepted.
+4. A worker process exited whenever the scheduler rejected one of its requests, for example a stale report.
+5. The history checker flagged a false violation when a running job's snapshot was compared with a later, longer history. It now compares only against the history up to the snapshot.
+6. One Hokea unit test failed on Windows only, because it wrote its fixture with Windows line endings.
 
-| Gate | Result |
-|---|---|
-| `make test` | 62 passed + 1 xfailed, exit 0 |
-| Compose backend, strict oracle | 1 xfailed, exit 0 |
-| `make fault-demo` | 1 failed with `RecoveryNotObserved`, exit 2: the intended nonzero result |
+## D. The intentional failure
 
-## D. Intentional correctness violation
+The property we leave broken is MS1's second liveness claim: *a failed worker's unfinished task eventually becomes available for reassignment.* Fixing it means telling a slow worker from a dead one and expiring ownership safely, which is the core of MS3. Leaving it broken costs no safety.
 
-**Property:** an unfinished task owned by a failed worker eventually becomes available for reassignment (MS1 liveness, claim L2).
+`tests/faults/test_worker_crash.py::test_worker_crash_reassignment` works like this:
 
-**Why this one:** it postpones the substantial MS3 problem of telling silence apart from failure and expiring ownership safely, while leaving all three safety claims intact.
+1. Worker A takes task X of job X→Y and pauses inside the operation, after the scheduler has acknowledged its start but before it writes any output.
+2. The test kills A with SIGKILL.
+3. A healthy worker B starts. It completes an unrelated probe job, which shows the system is otherwise live, and keeps asking for work.
+4. The test waits 10 seconds for X to be reassigned to B.
 
-**Test:** `tests/faults/test_worker_crash.py::test_worker_crash_reassignment`.
+In MS2 that never happens: X stays RUNNING under the dead worker, Y stays BLOCKED, and the job stays RUNNING. The cause is structural. The only ways out of a RUNNING attempt are reports from its owner, and the owner is dead. The test also checks that safety holds throughout: X is never falsely completed, Y never starts early, and X never succeeds twice.
 
-1. Start the scheduler, the store and worker A, then submit job X → Y.
-2. Wait for A's structured test gate inside X. This happens after the scheduler-acknowledged start and before any output exists.
-3. Hard-kill A (SIGKILL) and confirm it exited.
-4. Start healthy worker B. It completes an independent probe job and keeps polling, which shows workers are available and the system is live.
-5. Observe for 10 s.
-6. The oracle requires X to be reassigned to B with a higher attempt number. In MS2, X stays RUNNING under dead A, Y stays BLOCKED, and the job stays RUNNING.
+`make test` runs this as one strict expected failure that accepts only the `RecoveryNotObserved` exception. Any other error, or an unexpected pass, fails the build. `make fault-demo` runs it normally and exits nonzero with the real traceback (Step 10: exit 2, message *"Expected X to be reassigned to healthy worker B with attempt_no > 1 within the controlled 10 s window; X remains RUNNING under killed worker A, Y BLOCKED…"*). The 10 seconds is a test limit, not a bound on recovery time.
 
-Safety is asserted alongside: no false success, Y never starts early, and X has at most one success.
+## E. Performance (Step 12)
 
-**Structural cause:** the only transitions out of an owned ASSIGNED or RUNNING attempt need a report from its owner. MS2 has no lease, expiry or silent-owner release, so B's claims cannot free A's task.
+We ran every combination of C = 1, 4, 16 concurrent jobs and W = 1, 2, 4 one-task-at-a-time workers, with five fresh deployments each: 45 runs in total.
 
-**How it is reported:**
+Each run used a new Compose deployment capped at 1 CPU / 512 MiB per service. It ran 4 warmup jobs, which we discarded, then 24 measured six-task jobs, where each task is a 100 ms fixture operation. A closed loop kept at most C jobs in flight.
 
-- `make test` runs the oracle as one strict XFAIL that accepts only `RecoveryNotObserved`. Setup, process-control, probe or safety failures fail normally, and an XPASS fails the run.
-- `make fault-demo` runs it with `--runxfail` and exits nonzero with the real assertion traceback.
+All three metrics come from the scheduler's own monotonic clock:
 
-The 10 s window is a controlled test budget, not a liveness bound or a recovery-time measurement.
+- **Job time:** acceptance to completion.
+- **Scheduling latency:** ready to assigned.
+- **Throughput:** completed tasks per second over the measured interval.
 
-**Results (Step 10, Docker host):**
+**All 45 runs completed** (1,080 jobs and 6,480 tasks). Every output was correct, and in-flight jobs never exceeded C. Percentiles use the nearest-rank method, pooled over the five runs. Throughput is the mean (standard deviation) of the five per-run values.
 
-- `make test`: 62 passed + 1 xfailed, exit 0.
-- Compose backend: the strict oracle xfailed, exit 0.
-- `make fault-demo`: exit 2, with exactly one failure: `RecoveryNotObserved: Expected X to be reassigned to healthy worker B with attempt_no > 1 within the controlled 10 s window; X remains RUNNING under killed worker A, Y BLOCKED…`.
-
-In every crash run, the history checks pass (no false success, no early start, at most one success). Evidence: `results/handoffs/step-10/`.
-
-## E. Performance characterization (Step 12)
-
-All **45/45 runs completed**: C ∈ {1, 4, 16} in-flight jobs × W ∈ {1, 2, 4} one-slot workers × 5 fresh repetitions. There were no censored or error runs.
-
-That covers 1,080 measured jobs and 6,480 measured logical tasks. Every run produced 24/24 correct outputs, and its peak in-flight count equalled C.
-
-Each repetition used a fresh Compose deployment with every service capped at 1 CPU / 512 MiB and a 128 MiB heap. It ran 4 excluded warmup jobs, then 24 measured six-task jobs (100 ms fixture operations), with a 120 s measured-phase timeout.
-
-All metrics use the scheduler's monotonic clock:
-
-- **Job time:** acceptance → `job_completed`.
-- **Scheduling latency:** READY → ASSIGNED.
-- **Throughput:** logical successes ÷ the measured batch interval.
-
-Percentiles are nearest-rank, pooled over complete runs. Throughput is reported as the mean (sample sd) of the 5 run-level values. Full method, environment and raw data: [handoffs/step-12.md](handoffs/step-12.md) and `results/handoffs/step-12/full-20261003c/` (`RESULTS.md` is regenerated from the raw CSVs).
-
-| C | W | job p50 / p95 ms | scheduling p50 / p95 ms | throughput tasks/s, mean (sd) |
+| C | W | Job time p50 / p95 (ms) | Scheduling p50 / p95 (ms) | Throughput (tasks/s) |
 |---|---|---|---|---|
 | 1 | 1 | 1,398 / 1,454 | 5.7 / 450 | 4.20 (0.02) |
 | 1 | 2 | 1,149 / 1,202 | 4.4 / 228 | 5.09 (0.06) |
@@ -128,62 +86,59 @@ Percentiles are nearest-rank, pooled over complete runs. Throughput is reported 
 | 16 | 2 | 9,951 / 11,122 | 1,881 / 4,785 | 8.56 (0.03) |
 | 16 | 4 | 5,151 / 5,718 | 834 / 2,329 | 16.69 (0.28) |
 
-**Observed bottlenecks.**
+**Workers are the bottleneck.** Each one-slot worker completes about 4.2 tasks per second, so once there is enough work (C ≥ 4), throughput roughly doubles with each doubling of workers. At C = 1 a single job only ever has three tasks that can run at once, so extra workers help less: 5.1 and 6.0 tasks/s instead of 8 and 16.
 
-1. **Throughput is bounded by worker capacity**, about 4.2 tasks/s per one-slot worker. With C ≥ 4 it scales near-linearly in W: 4.3 → 8.3–8.6 → 15.4–16.7.
-2. **At C=1, the DAG's width (3 parallel branches) limits parallelism**, so W=2 and W=4 give only 5.1 and 6.0 tasks/s.
-3. **The scheduler is not the bottleneck at this scale.**
-   - With an idle worker, median READY→ASSIGNED is 4–6 ms.
-   - Larger scheduling latencies are queueing for busy workers, growing with C/W.
-   - Median execution time (RUNNING→SUCCEEDED) stays at 172–188 ms from C=1 to C=16.
-4. **Per task, a worker spends** about 100 ms on the operation, 75–90 ms on HTTP artifact transfer and verification, and about 45 ms on the start-acknowledgment round trip.
+**The scheduler keeps up.** When a worker is idle, it gets a ready task in about 5 ms. The large scheduling latencies in the table are tasks waiting for a busy worker, and they grow with C/W as queueing predicts. Task execution time stayed at 172–188 ms from C = 1 to C = 16.
 
-No performance target was promised, and none is claimed.
+**Where a task's time goes.** Each task takes roughly 240 ms on a worker:
 
-**Environment and validity.**
+- 100 ms for the operation itself;
+- 75–90 ms moving and verifying files over HTTP;
+- about 45 ms for the start acknowledgment.
 
-- One Windows 11 host (12 CPUs, 16 GB), running Docker Desktop 27.1.1 with its WSL2 VM capped at 3 GB.
-- Host free memory stayed at 1.9 GB or more throughout.
-- Two earlier full attempts on this host *without* the VM cap ran with 0.4–1 GB free and suffered system-wide stalls. One run was censored, and the Docker engine crashed. Both attempts are kept unmodified as aborted records under `results/handoffs/step-12/aborted-*` and are not used.
+Repetitions were very consistent: the throughput standard deviation was at most 0.28 tasks/s.
 
-**Recovery time is not measured in MS2**, because crashed-worker recovery does not exist yet.
+**Test environment.** All runs were on one Windows 11 machine with 12 CPUs and 16 GB of RAM, using Docker Desktop 27.1.1. We capped its Linux VM at 3 GB, and host free memory stayed above 1.9 GB throughout.
+
+Two earlier attempts without that cap starved the host: free memory fell to 0.4–1 GB, services stalled together, and Docker crashed. We kept those runs as aborted records and did not use them.
+
+Raw data, the full method and the generated tables are in `results/handoffs/step-12/full-20261003c/` and `docs/handoffs/step-12.md`. We promised no performance target and claim none. Recovery time is not measured, because MS2 cannot recover crashed workers' tasks.
 
 ## F. Deployment
 
-- **Local deployment:** `make up` runs Compose with one scheduler (port 8080), one artifact store (port 8081) and `WORKERS` one-slot workers. Each service is capped at 1 CPU / 512 MiB with a 128 MiB heap and `restart: "no"`. `make demo` and `make down` were verified at Step 9, with a live demo on 3 worker containers.
-- **Tests:** they run in a pinned Linux harness container, so the host needs only Docker.
-- **Course cluster (Hokea), Step 11:**
-  - **The adapter** is version-grounded at pinned Hokea revision `427b94634b1736ba8e59d4977836162aa58bd2cb`, with the package-source hashes verified.
-  - **Local verification passed:** Hokea/Compose/Make, with `make test` at 84 passed + 1 xfailed and `make fault-demo` failing only with `RecoveryNotObserved`.
-  - **The course-cluster run was attempted and externally blocked.** It ran in namespace `team-06` with public immutable GHCR images. Hokea accepted the request, created the runner Job and pod, started pytest, and copied evidence back. All three tests then stopped during fixture setup, **before any project service ran**, because the Hokea package installed in the course runner does not match the pinned revision (`Hokea source mismatch at check.py`).
-  - **This is an external course-runner environment issue, not a project defect and not the intentional failure.** The pin was deliberately not relaxed.
-  - Evidence: `results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a/`.
-  - It can be retried unchanged if course staff provide a correctly pinned runner.
+**Local.** `make up` starts one scheduler (port 8080), one artifact store (port 8081) and `WORKERS` workers under Docker Compose. Containers never restart automatically, so a killed worker stays dead for the crash test. `make demo` and `make down` were verified with three worker containers.
+
+**Course cluster.** The Hokea adapter (Step 11) is pinned to Hokea revision `427b94634b1736ba8e59d4977836162aa58bd2cb` and passed local Hokea, Compose and Make verification: `make test` 84 passed + 1 xfailed, and `make fault-demo` with only the intended failure.
+
+We also attempted a run on the course cluster (namespace `team-06`, public GHCR images). Hokea started the runner and pytest, but all three tests stopped during setup, before any of our services ran, because the Hokea package installed in the course runner is not the pinned revision. We did not loosen the pin to work around this. The run can be repeated unchanged once course staff provide a matching runner. Evidence: `results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a/`.
 
 ## G. Limitations
 
-- The worker-crash recovery gap (D) is intentional for MS2.
-- Scheduler state is in memory. A scheduler restart starts a new empty run; no scheduler crash tolerance is claimed.
-- The artifact store's index lives only as long as its process. Files remain on disk, but the store does not rebuild its index after a restart.
-- Workers are assumed honest; results are not recomputed.
-- Benchmarks ran on one shared Windows host (Docker WSL2 VM capped at 3 GB) with a synthetic waiting workload, and polling latency is included. Absolute numbers are host-specific, and results are sensitive to host memory pressure (see E). Recovery time is unmeasured.
-- The course-cluster execution is externally blocked (F). Cluster behavior is unverified until a correctly pinned course runner is available.
-- Explicit failures retry forever (no retry cap, no terminal FAILED job), so an operation that always fails keeps its job RUNNING.
-- *[PENDING Step 13: any findings from independent verification.]*
+- Crashed workers' tasks are never recovered (Section D). This is intentional for MS2.
+- Scheduler state lives in memory. A scheduler restart begins a new, empty run.
+- The artifact store's index lives only as long as its process. The files stay on disk, but a restarted store does not rebuild its index from them.
+- Workers are trusted; their results are not recomputed.
+- Failed operations are retried forever, so an operation that always fails leaves its job running.
+- Benchmark numbers come from one shared Windows host with a synthetic workload. They include polling delay, depend on the host's memory, and do not cover recovery time.
+- Cluster behavior is unverified until a correctly pinned course runner is available.
+- *[PENDING Step 13: findings from the independent clean-checkout verification.]*
 
-## H. Deviations from the architecture and the plan
+## H. Deviations
 
-- **Architecture deviations: none.** Every behavior change was a bug fix that brought the code into line with the contract: the four defects in C, plus missing `scheduler_run_id` now returning 400 instead of 409.
-- **Additions not named in the architecture**, all within its §15 harness-container role:
-  - the harness container runs the suite on a container-local copy, because a Windows bind mount made the JVM too slow (environment, not product);
-  - the synthetic video sample was regenerated by a byte-reproducible committed script, so its provenance is exact;
-  - `.gitattributes` keeps checksummed and byte-compared files LF.
-- **Process:** Step 12 began on its own branch while Step 11 was being finished, by agreement, and merged accepted `main` (`bf4f784`) before measuring. The measured service code is byte-identical to the Step 9 gate.
-- **Benchmark environment:** the Docker WSL2 VM was capped at 3 GB through the user's `.wslconfig` to keep the host stable. This is recorded in the Step 12 evidence; it is not a product change.
+There are no architecture deviations. Every behavior change was a bug fix toward the contract: the six defects in Section C, plus a missing run ID now returning 400 instead of 409.
 
-## I. MS3 handoff (extension points only; nothing implemented)
+Within the architecture's test-container role, we made three additions. The container runs tests on its own copy of the code, because a Windows/OneDrive mount made the JVM too slow. The video sample is regenerated by a committed, byte-reproducible script, so its provenance is exact. And `.gitattributes` keeps checksummed files byte-identical across operating systems.
 
-- **Scheduler leases:** add lease deadlines on the injected monotonic clock (`SchedulerCore(StateStore, LongSupplier)`) and an atomic expiry command: attempt → EXPIRED, task → READY at the FIFO tail.
-- **What already exists:** owner and attempt checks reject late results, attempt-numbered output namespaces prevent overwrites, and the event schema and history checker carry over.
-- **Then:** remove the XFAIL marker so the same oracle becomes a passing regression. Add tests for pause, restart and report loss at every attempt boundary, plus communication-fault campaigns.
-- **Separate scope decisions:** scheduler durability or replication, and exactly-once external effects.
+Step 12 was developed on a separate branch while Step 11 was being finished. It merged the accepted `main` before measuring, and the measured service code is identical to what passed at Step 9.
+
+## I. MS3 handoff
+
+MS3 adds scheduler-side leases on the existing injected monotonic clock. When a lease expires, the attempt is marked expired and the task goes back to the end of the ready queue.
+
+Most of the groundwork already exists:
+
+- owner and attempt-number checks already reject late results;
+- per-attempt output paths already prevent overwrites;
+- the event schema and history checker carry over unchanged.
+
+With leases in place, we remove the expected-failure marker so the crash test must pass, and add tests for crashes, pauses and lost reports at each stage of an attempt. Scheduler durability, replication and exactly-once external effects remain separate decisions.
