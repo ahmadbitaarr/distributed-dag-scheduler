@@ -9,14 +9,13 @@ You are finishing the Virginia Tech CS4094 distributed DAG task scheduler, Miles
 ## Repository and starting point
 
 - Repo: https://github.com/ahmadbitaarr/distributed-dag-scheduler
-- Start from branch **`ms2/step-12-benchmark`** at or after commit **`ad17ed3`**. This branch contains `main` at `bf4f784` (Steps 0–11, accepted) plus the Step 12 work done so far.
+- Work on **`main`**. It already contains Steps 0–11 (accepted) plus Step 12 (complete) and the Step 14 drafts. Commit each step to `main` and push with `git pull --ff-only` followed by `git push`. Never force-push.
 - **Windows only:** run `git config --global core.longpaths true` *before* cloning or pulling. Some evidence paths exceed 260 characters, and checkout fails partway without this.
 
 ```bash
 git clone https://github.com/ahmadbitaarr/distributed-dag-scheduler.git
 cd distributed-dag-scheduler
-git switch ms2/step-12-benchmark
-git log --oneline -1          # expect ad17ed3 or a later commit on this branch
+git log --oneline -1          # you are on main
 ```
 
 ## Read first (in this order)
@@ -47,7 +46,7 @@ Source priority: course guidelines > approved MS1 spec > architecture/IMPLEMENTA
 
 ## Step 12: ALREADY DONE (skip it)
 
-Step 12 was completed on 2026-10-03 on branch `ms2/step-12-benchmark` (commit `7c14d01`):
+Step 12 was completed on 2026-10-03 (commit `7c14d01`, now on `main`):
 
 - **45/45 runs complete:** 1,080 jobs and 6,480 tasks, with outputs and the in-flight bound verified.
 - **Record and results:** `docs/handoffs/step-12.md` and `results/handoffs/step-12/full-20261003c/RESULTS.md`.
@@ -118,7 +117,7 @@ Also review the safety, state, retry, publication and fault assertions against t
 
 ## Step 15: audit and package
 
-1. Merge `ms2/step-12-benchmark` into `main` with a fast-forward or a PR. Never force-push.
+1. Make sure every Step 13–14 commit is pushed to `main`. Never force-push.
 2. From a clean checkout of the final `main`, re-run `make test` and confirm `make fault-demo` still fails as intended.
 3. Build one archive from the exact commit (tracked files only, so no caches or build outputs):
    ```bash

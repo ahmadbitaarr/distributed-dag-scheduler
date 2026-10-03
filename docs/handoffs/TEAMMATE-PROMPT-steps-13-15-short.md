@@ -10,7 +10,7 @@ The full benchmark (Step 12) is already done; do NOT re-run the full matrix.
 Setup (on Windows, first run: git config --global core.longpaths true):
   git clone https://github.com/ahmadbitaarr/distributed-dag-scheduler.git
   cd distributed-dag-scheduler
-  git switch ms2/step-12-benchmark      # expect commit 57b9417 or later
+  git log --oneline -1                  # you are on main; Steps 0-12 are already merged here
 Read: docs/implementation-roadmap.md (Steps 13-15), README.md, docs/handoffs/step-12.md,
 docs/OPEN_ISSUES.md, docs/ms2-progress-report.md, docs/specification.md.
 Needs Docker, Python 3 and make. Keep at least 4 GB of RAM free.
@@ -39,12 +39,12 @@ evidence file. If the course guidelines PDF sets a page limit, trim to fit. Upda
 docs/PROGRESS.md (Steps 12-14 DONE), docs/HANDOFF.md and docs/OPEN_ISSUES.md. Commit with:
 "docs(ms2): reconcile specification and progress report with evidence".
 
+Work directly on main: commit each step, then `git pull --ff-only origin main` and
+`git push origin main`. If the pull cannot fast-forward, someone else pushed: stop
+and reconcile; do not force.
+
 STEP 15: audit and package.
-  git push origin ms2/step-12-benchmark
-  git switch main && git pull --ff-only origin main
-  git merge --ff-only ms2/step-12-benchmark && git push origin main
-(If the fast-forward fails, main has moved: stop and reconcile; do not force.)
-Clone main fresh into a new folder and re-run make test (expect 1 xfailed, exit 0).
+Make sure all your Step 13-14 commits are pushed to main. Then clone main fresh into a new folder and re-run make test (expect 1 xfailed, exit 0).
 Build the archive from the final commit:
   SHA=$(git rev-parse HEAD)
   git archive --format=zip -o cs4094-ms2-${SHA:0:7}.zip "$SHA"
