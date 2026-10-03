@@ -218,13 +218,13 @@ def test_worker_manifest_removes_port_without_adding_server_or_storage():
 def test_exact_package_pin_rejects_modified_source(tmp_path, monkeypatch):
     package = tmp_path / "hokea"
     package.mkdir()
-    (package / "cluster.py").write_text("pinned\n")
+    (package / "cluster.py").write_bytes(b"pinned\n")  # bytes: write_text would emit CRLF on Windows
     pin = tmp_path / "pin.json"
     pin.write_text(json.dumps({"revision": adapter.HOKEA_SHA,
         "package_files": {"cluster.py": hashlib.sha256(b"pinned\n").hexdigest()}}))
     monkeypatch.setattr(adapter, "PIN", pin)
     assert adapter.verify_package(package) == adapter.HOKEA_SHA
-    (package / "cluster.py").write_text("upgrade\n")
+    (package / "cluster.py").write_bytes(b"upgrade\n")
     with pytest.raises(RuntimeError, match="source mismatch"):
         adapter.verify_package(package)
 

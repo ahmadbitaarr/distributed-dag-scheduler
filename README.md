@@ -19,6 +19,12 @@ The design is fixed by [docs/CS4094_MS2_Architecture.md](docs/CS4094_MS2_Archite
 
 The native test harness (`tests/harness/runtime.py`, `NativeHarness`) uses POSIX process groups (`os.killpg`). Run it on Linux, macOS, or WSL. The Compose backend also needs Docker.
 
+**Windows users: enable long paths before cloning or pulling.** Some committed evidence paths under `results/handoffs/step-10/` exceed Windows' 260-character limit. Without long paths, `git clone`, `git pull` and `git switch` fail partway with `Filename too long` and leave a half-updated working tree.
+
+```bash
+git config --global core.longpaths true
+```
+
 ## Build
 
 ```bash
