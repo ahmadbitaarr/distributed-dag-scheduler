@@ -1,10 +1,12 @@
 # Distributed DAG Task Scheduler — CS4094 MS2
 
-A fault-tolerant distributed DAG task scheduler for a video-processing workload: one scheduler, polling workers, and an immutable HTTP artifact store.
+A distributed DAG task scheduler for a video-processing workload: one scheduler, polling workers, and an immutable HTTP artifact store. The intended semester goal is fault tolerance; MS2 preserves the intentional worker-crash liveness gap described below.
 
 The design is fixed by [docs/CS4094_MS2_Architecture.md](docs/CS4094_MS2_Architecture.md). Work proceeds one step at a time per [docs/implementation-roadmap.md](docs/implementation-roadmap.md). For current status, see [docs/PROGRESS.md](docs/PROGRESS.md), [docs/HANDOFF.md](docs/HANDOFF.md) and [docs/OPEN_ISSUES.md](docs/OPEN_ISSUES.md).
 
-> **MS2 status:** this is an in-progress milestone. Worker-crash task reassignment is **intentionally not implemented** in MS2. It is the milestone's demonstrated liveness failure.
+> **MS2 status:** Steps 0–13 are accepted at `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`. Step 14 finalizes documentation; Step 15 is the next audit/packaging step after review. Worker-crash task reassignment is **intentionally not implemented** in MS2. The task/job remain RUNNING and descendants BLOCKED. Course execution was attempted and blocked by an external Hokea runner mismatch.
+
+Final reports: [MS2 progress report](docs/ms2-progress-report.md), [revised specification](docs/specification.md), [claim-to-test matrix](docs/ms2-claim-evidence.md), and [PDF exports](docs/pdf/README.md). Independent results: [Step 13 verification](results/handoffs/step-13/VERIFICATION.md).
 
 ## Required toolchain
 
@@ -12,10 +14,11 @@ The design is fixed by [docs/CS4094_MS2_Architecture.md](docs/CS4094_MS2_Archite
 |---|---|---|
 | Java | 21 **JDK** | You need the full JDK (e.g. `openjdk-21-jdk`), not only a JRE. With only a JRE, Maven fails with a misleading `release version 21 not supported`. |
 | Maven | 3.9.x | Verified with 3.9.9. |
-| Python | 3.12 | Used for pytest orchestration, the harness and benchmarks. Provided by the harness container. A host Python is needed only for `make demo` and the Compose backend (standard library plus pytest). |
+| Python | 3.12 | Provided by the harness container. Host Python is needed for demo, benchmark and offline evidence checks (standard library), and host-driven Compose/Hokea tests (pytest from `requirements.txt`; Hokea additionally needs its pinned package/dependencies). |
 | pytest | pinned in `requirements.txt` | The only third-party Python dependency. |
 | FFmpeg / ffprobe | any recent | Only workers need these, for video operations. The worker image installs them. |
-| Docker + Docker Compose v2 | Engine 27.x, Compose 2.29 verified | Used for the containerized deployment. |
+| Docker + Docker Compose plugin | Engine 27.1.1 / Compose 2.29.1 in Step 12; Engine 29.7.2 / Compose v5.5.1 in Step 13 | Use `docker compose`, not the legacy standalone command. |
+| POSIX shell and Make | recipes in `Makefile` | Used by the evaluator targets; see the direct shell alternative below. |
 
 The native test harness (`tests/harness/runtime.py`, `NativeHarness`) uses POSIX process groups (`os.killpg`). Run it on Linux, macOS, or WSL. The Compose backend also needs Docker.
 
@@ -74,9 +77,80 @@ Pinned images: `maven:3.9.9-eclipse-temurin-21` (build stage) and `eclipse-temur
 | `make demo` | Against `make up`: upload the committed workloads and run the functional DAG and the video DAG. Checks the results and writes all outputs to `results/demo/<timestamp>/`. |
 | `make test` | In the Linux harness container: `mvn -B verify`, then the full pytest suite. Requires **exactly one** XFAIL, the intentional worker-crash oracle. Evidence goes to `results/latest-tests/<unique-run>/<test>/`. |
 | `make fault-demo` | Build and run the same crash oracle with `--runxfail`. MS2 must return nonzero specifically from `RecoveryNotObserved`; evidence is retained. |
+| `make bench` | Build Compose images and run the full concurrent-jobs × workers × five-repetitions matrix. Raw and summary data go to `results/benchmark/<UTC timestamp>/`. |
 | `make down` | Stop the deployment. Artifact files and `results/` are kept. |
 
-`make bench` is added at roadmap Step 12. On Windows without `make`, run the recipe lines from `Makefile` directly, for example `sh deploy/harness/run.sh` from Git Bash.
+On Windows without `make`, run the recipe lines from `Makefile` directly, for example `sh deploy/harness/run.sh` from Git Bash. A Linux/WSL-native checkout avoids the earlier OneDrive bind-mount issue.
+
+A complete local flow from the repository root is:
+
+```bash
+java -version
+mvn -version
+python3 --version
+docker compose version
+docker info
+make build
+make up
+make demo
+make down
+make test
+# Run separately: this must be nonzero solely from RecoveryNotObserved.
+make fault-demo
+fault_status=$?
+printf "fault-demo shell exit: %s\n" "$fault_status"
+# The intended fault failure does not skip these later commands.
+make bench
+make down
+```
+
+Use a shell without `set -e` for this walkthrough, or run fault-demo separately. Inspect the traceback and cleanup evidence as well as the actual exit: build/setup/probe/safety/export/cleanup failures are not the intended demonstration. Step 13 recorded the intentional nonzero result but did not preserve its shell `$?`; no historical code is inferred. `make test` independently deploys native services inside the harness container; `make demo` uses the live Compose deployment. The first `make down` releases the demo services before testing/benchmarking. Stop any native processes launched manually as well.
+
+### Client upload, submit, status and fetch
+
+After building the JARs and starting a deployment, the existing CLI can be used directly:
+
+```bash
+# Prints an immutable source descriptor; this fixture upload is separate from the arithmetic DAG.
+java -jar client/target/client-0.2.0.jar upload workloads/video/fixture.srt
+java -jar client/target/client-0.2.0.jar submit workloads/functional/functional.json
+java -jar client/target/client-0.2.0.jar status 00000000-0000-4000-8000-000000000001
+# Repeat status until SUCCEEDED, then substitute outputs.result.key from its JSON:
+java -jar client/target/client-0.2.0.jar fetch '<outputs.result.key>' results/client-result.txt
+```
+
+The committed functional manifest has that stable job ID; submitting identical content with the same ID replays the original job. Use a new UUID in a copy of the manifest for a new job. For a video submission, upload its source objects and place the returned descriptors in the source bindings described in [docs/api.md](docs/api.md); `make demo` does this automatically. A successful arithmetic fetch contains `result=22`. The CLI honors `SCHEDULER_URL` and `ARTIFACT_BASE_URL` for nondefault addresses. These four operations are covered by `test_java_client_upload_submit_status_fetch`.
+
+### Benchmark and saved evidence
+
+`make bench` runs the Step 12 matrix: C=1/4/16, W=1/2/4, five fresh deployments per configuration, four excluded warmup jobs and 24 measured six-task jobs per run. No faults are injected. For a small reproduction, use a fresh output directory:
+
+```bash
+docker compose -f deploy/compose/compose.yaml build
+python3 -m benchmarks.run --backend compose --out results/benchmark/verify-$(date -u +%Y%m%dT%H%M%SZ) --configs c1-w1 --repetitions 1
+python3 -m benchmarks.report '<completed-benchmark-directory>'
+```
+
+The driver writes `environment.json`, `runs.csv`, `jobs.csv`, `tasks.csv`, `summary.csv` and `summary.json`; per-run harness evidence is retained below its output root. It exports and tears down each fresh deployment. Use the report generator on a completed directory; do not overwrite the accepted results under `results/handoffs/step-12/`. Those 45 measured runs and the independent Step 13 one-repetition result are different experiments. See [docs/handoffs/step-12.md](docs/handoffs/step-12.md) for aggregation, aborted runs and shared-host limitations; there is no recovery-time measurement.
+
+Test exports live in `results/latest-tests/<fresh-run>/<test>/`, demo outputs in `results/demo/<timestamp>/`, and benchmark output in the directory printed by the driver. Only selected committed evidence is under `results/handoffs/`. With host Python, recheck every exported test/benchmark history as follows:
+
+```bash
+python3 - '<export-root>' <<'PY'
+from pathlib import Path
+import sys
+from tests.harness.check_evidence import check_directory
+paths = sorted(Path(sys.argv[1]).rglob('manifests.json'))
+if not paths:
+    raise SystemExit('No exported histories found')
+for manifest in paths:
+    print(manifest.parent, check_directory(manifest.parent))
+PY
+```
+
+Any exception is a real validation failure. The demo uses its own manifest/summary layout and checks histories live; it is not a `check_evidence` directory. Inspect `metadata.json` for actual source attribution, outcome, export and cleanup success, plus fault/probe/safety files for the crash oracle. The 40/40 Step 13 count comes from its committed verification record; generated directories in the original checkout are not reproduced by that summary alone.
+
+Normal test/benchmark cleanup is harness-owned, including after the intentional failure. `make down` keeps `.runtime/objects` and `results/` for inspection; scheduler state and the store index are not restored from those retained files. For interrupted Compose/Hokea runs, inspect their recorded run-owned resource names and follow [deploy/hokea/README.md](deploy/hokea/README.md) for Hokea cleanup. Remove only resources belonging to that run. Preserve evidence before discarding runtime object directories; do not use blanket Docker prune or namespace deletion.
 
 ## Tests
 
@@ -93,11 +167,11 @@ The harness image is `deploy/harness/Dockerfile`: Ubuntu 24.04, JDK 21, Maven 3.
 | Suite | Location | Contents |
 |---|---|---|
 | JUnit | `*/src/test/java` | Wire contract and DAG validation, the scheduler state machine (including concurrency and the silent-owner gap), and the artifact store over real HTTP. |
-| Unit (pytest) | `tests/unit/` | The history checker falsifies each safety invariant on a real saved history. |
+| Unit (pytest) | `tests/unit/` | History-checker falsification, fault-oracle checks and Hokea adapter/packaging tests. |
 | Integration | `tests/integration/` | API, worker and client lifecycle, the functional workload, replay and retry safety, and the video pipeline. |
 | Fault | `tests/faults/` | The worker-crash reassignment oracle: one strict XFAIL limited to `RecoveryNotObserved`. |
 
-`pytest.ini` enables `xfail_strict`, and `MS2_REQUIRE_XFAIL=1` fails the run unless exactly one XFAIL occurs. Every test exports its evidence. `python -m tests.harness.check_evidence <dir>` re-checks the safety invariants offline. See [docs/evidence.md](docs/evidence.md).
+`pytest.ini` enables `xfail_strict`, and `MS2_REQUIRE_XFAIL=1` fails the run unless exactly one XFAIL occurs. Service-backed tests using the system fixture export their evidence; pure unit tests do not launch a deployment. `python -m tests.harness.check_evidence <dir>` re-checks the safety invariants offline. See [docs/evidence.md](docs/evidence.md).
 
 ## Workloads
 
@@ -149,10 +223,8 @@ host Python (with requirements.txt installed), not Docker-in-Docker:
 
 ```bash
 docker compose -f deploy/compose/compose.yaml build
-MS2_BACKEND=compose MS2_REQUIRE_XFAIL=1 MS2_RUN_LABEL=step10-compose-01 python3 -m pytest -q tests/faults/test_worker_crash.py
+unset MS2_RUN_LABEL  # let the fixture choose a fresh timestamp+UUID
+MS2_BACKEND=compose MS2_REQUIRE_XFAIL=1 python3 -m pytest -q tests/faults/test_worker_crash.py
 ```
 
-Set `MS2_SOURCE_REV` to the actual tested source before a host-Python run. See
-`docs/handoffs/step-10.md` for current results, remaining gates and exact evidence
-paths. Step 10 is a BLOCKED local checkpoint: native strict XFAIL is verified,
-but Compose, `make test`, and the real-failure demonstration remain unfinished.
+Set `MS2_SOURCE_REV` to the actual tested source before a host-Python run; a dirty implementation requires its own accurate identifier. Steps 10–13 are accepted. Historical Step 10 handoffs retain intermediate blocked states for provenance; current acceptance is documented by `results/handoffs/step-11/FINAL-RESULTS.md` and `results/handoffs/step-13/VERIFICATION.md`. Step 13 reported 86 passes, exactly one intentional XFAIL and no failures, and separately exposed the sole `RecoveryNotObserved` failure.

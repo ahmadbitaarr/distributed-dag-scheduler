@@ -2,9 +2,9 @@
 
 This file describes how MS2 records what happened and how anyone can falsify the safety claims from saved files, without reading console output. It implements architecture §14.
 
-## What every test exports
+## What service-backed tests export
 
-The pytest `system` fixture runs one isolated deployment per test. Before teardown, even when the test fails, it writes the following to `results/latest-tests/<unique-run>/<test-name>/`:
+The pytest `system` fixture runs one isolated deployment per service-backed test; pure unit tests do not start services or create these exports. Before teardown, even when the test fails, it writes the following to `results/latest-tests/<unique-run>/<test-name>/`:
 
 | File | Contents |
 |---|---|

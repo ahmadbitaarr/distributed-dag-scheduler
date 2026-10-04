@@ -1,8 +1,6 @@
 # CS4094 MS2 Progress Report: Distributed DAG Task Scheduler
 
-> **Draft.** Two items wait on the Step 13 independent verification: this note and the last limitation in Section G. *[PENDING Step 13]*
-
-Revised specification: [specification.md](specification.md). Every number below comes from evidence committed under `results/handoffs/`, and the per-step records are in `docs/handoffs/`.
+Revised specification: [specification.md](specification.md). Numeric results are attributed to the committed evidence under `results/handoffs/`; per-step records are in `docs/handoffs/`. The [claim-to-test matrix](ms2-claim-evidence.md) links the supported claims to their checks. Steps 0–13 are accepted at `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`; this report is the Step 14 documentation close-out.
 
 ## A. What works
 
@@ -16,7 +14,7 @@ All planned MS2 functionality works on the happy path.
 
 **Workloads.** The five-task functional DAG produces `result=22`. The video DAG turns a committed 10-second synthetic clip into 720p and 360p MP4s, a PNG thumbnail, fixture subtitles and a publish manifest.
 
-**Tooling.** Every test exports its event history, metrics and snapshots, and an offline checker re-verifies the safety properties from those files. Everything runs under Docker Compose with 1 CPU / 512 MiB per service. `make build / up / demo / test / fault-demo / bench / down` drive the whole artifact, with tests running in a pinned Linux container so the host needs only Docker.
+**Tooling.** Service-backed pytest tests export event histories, metrics and snapshots, and an offline checker re-verifies the safety properties from those files. Compose services are capped at 1 CPU / 512 MiB each. `make build / up / demo / test / fault-demo / bench / down` provide the evaluator flow documented in [README.md](../README.md). The test and fault-demo targets use a pinned Linux harness container; build uses a host JDK and Maven, and demo/benchmark use host Python.
 
 ## B. Repository layout
 
@@ -32,9 +30,9 @@ All planned MS2 functionality works on the happy path.
 
 ## C. Tests and results
 
-The current suite has 61 JUnit tests (wire contract, scheduler state machine, artifact store over real HTTP) and 87 pytest tests (unit, integration, Hokea, and the crash oracle).
+The suite contains 61 JUnit tests (wire contract, scheduler state machine and artifact store over real HTTP; retained counts in `results/handoffs/step-10/checks/focused-java/command.log`). Step 12 records `mvn -B verify` exit 0 and 86 pytest passes plus one expected failure after the history-checker fix.
 
-The latest full run gave `mvn -B verify` exit 0, then **86 passed and 1 expected failure** (exit 0), with the run configured to fail unless exactly one test xfails (Step 12, `results/handoffs/step-12/`). On a separate Docker host, Step 10 gave `make test` 62 passed + 1 xfailed (exit 0) and `make fault-demo` exit 2 with the single intended failure. Re-checking all exported histories offline found no violations.
+Step 13 independently verified tested revision `f27aec9e1230b07c191f34f6a2278eafb0351f4f` from a fresh Ubuntu checkout: **`make test` collected 87 pytest tests, with 86 passed, exactly 1 intentional XFAIL and 0 failures**. The XFAIL is the crash-reassignment oracle. All **40/40 generated evidence directories** passed `check_evidence`, including the real-failure crash run. No implementation changes were required. The committed [Step 13 verification record](../results/handoffs/step-13/VERIFICATION.md) attributes these results to Ubuntu 24.04.4 LTS, Docker 29.7.2, Compose v5.5.1 and Python 3.12.3; its test counts are not a new JUnit count.
 
 We found and fixed six defects during verification. Each has a test that fails on the old code.
 
@@ -58,7 +56,7 @@ The property we leave broken is MS1's second liveness claim: *a failed worker's 
 
 In MS2 that never happens: X stays RUNNING under the dead worker, Y stays BLOCKED, and the job stays RUNNING. The cause is structural. The only ways out of a RUNNING attempt are reports from its owner, and the owner is dead. The test also checks that safety holds throughout: X is never falsely completed, Y never starts early, and X never succeeds twice.
 
-`make test` runs this as one strict expected failure that accepts only the `RecoveryNotObserved` exception. Any other error, or an unexpected pass, fails the build. `make fault-demo` runs it normally and exits nonzero with the real traceback (Step 10: exit 2, message *"Expected X to be reassigned to healthy worker B with attempt_no > 1 within the controlled 10 s window; X remains RUNNING under killed worker A, Y BLOCKED…"*). The 10 seconds is a test limit, not a bound on recovery time.
+`make test` runs this as one strict expected failure that accepts only the `RecoveryNotObserved` exception. Any other error, or an unexpected pass, fails the build. `make fault-demo` runs the same oracle with `--runxfail` and exposes a real nonzero failure. Step 13 confirmed that its only failure was `RecoveryNotObserved`: X remained RUNNING under killed A instead of being reassigned to healthy B. The exact Step 13 shell exit code was not preserved and is not claimed. The 10 seconds is an observation budget, not a bound on recovery time. The task and job remain RUNNING; neither is described as failed or completed.
 
 ## E. Performance (Step 12)
 
@@ -79,18 +77,20 @@ All three metrics come from the scheduler's own monotonic clock:
 | 1 | 1 | 1,398 / 1,454 | 5.7 / 450 | 4.20 (0.02) |
 | 1 | 2 | 1,149 / 1,202 | 4.4 / 228 | 5.09 (0.06) |
 | 1 | 4 | 961 / 1,027 | 4.9 / 80 | 6.04 (0.10) |
-| 4 | 1 | 5,435 / 5,543 | 1,107 / 2,251 | 4.34 (0.01) |
-| 4 | 2 | 2,800 / 2,921 | 459 / 1,133 | 8.31 (0.04) |
-| 4 | 4 | 1,488 / 1,570 | 82 / 469 | 15.36 (0.04) |
-| 16 | 1 | 19,561 / 21,889 | 3,934 / 9,731 | 4.35 (0.06) |
-| 16 | 2 | 9,951 / 11,122 | 1,881 / 4,785 | 8.56 (0.03) |
-| 16 | 4 | 5,151 / 5,718 | 834 / 2,329 | 16.69 (0.28) |
+| 4 | 1 | 5,435 / 5,543 | 1,107.4 / 2,251 | 4.34 (0.01) |
+| 4 | 2 | 2,800 / 2,921 | 459.3 / 1,133 | 8.31 (0.04) |
+| 4 | 4 | 1,488 / 1,570 | 81.5 / 469 | 15.36 (0.04) |
+| 16 | 1 | 19,561 / 21,889 | 3,934.4 / 9,731 | 4.35 (0.06) |
+| 16 | 2 | 9,951 / 11,122 | 1,881.0 / 4,785 | 8.56 (0.03) |
+| 16 | 4 | 5,151 / 5,718 | 834.2 / 2,329 | 16.69 (0.28) |
+
+Step 13 also completed a separate **c1-w1, one-repetition Compose reproduction** with 24 completed jobs, 3.6789568629381906 tasks/s, job p50 1605.221847 ms and scheduling p50 24.604612 ms. Those independent-host observations are in the Step 13 verification record; they are not pooled into the Step 12 matrix.
 
 **Workers are the bottleneck.** Each one-slot worker completes about 4.2 tasks per second, so once there is enough work (C ≥ 4), throughput roughly doubles with each doubling of workers. At C = 1 a single job only ever has three tasks that can run at once, so extra workers help less: 5.1 and 6.0 tasks/s instead of 8 and 16.
 
 **The scheduler keeps up.** When a worker is idle, it gets a ready task in about 5 ms. The large scheduling latencies in the table are tasks waiting for a busy worker, and they grow with C/W as queueing predicts. Task execution time stayed at 172–188 ms from C = 1 to C = 16.
 
-**Where a task's time goes.** Each task takes roughly 240 ms on a worker:
+**Where a task's time goes.** The following approximate cost breakdown is an interpretation of the Step 12 timings, not separately instrumented component measurements. Each task takes roughly 240 ms on a worker:
 
 - 100 ms for the operation itself;
 - 75–90 ms moving and verifying files over HTTP;
@@ -106,7 +106,7 @@ Raw data, the full method and the generated tables are in `results/handoffs/step
 
 ## F. Deployment
 
-**Local.** `make up` starts one scheduler (port 8080), one artifact store (port 8081) and `WORKERS` workers under Docker Compose. Containers never restart automatically, so a killed worker stays dead for the crash test. `make demo` and `make down` were verified with three worker containers.
+**Local.** `make up` starts one scheduler (port 8080), one artifact store (port 8081) and `WORKERS` workers under Docker Compose. Containers never restart automatically, so a killed worker stays dead for the crash test. Step 13 verified `make up`, `make demo` and successful `make down`: the functional output was `result=22`; `video720.mp4` was H.264 at 1280x720, `video360.mp4` was H.264 at 640x360, and `thumbnail.png` was PNG at 1280x720. Fixture subtitles were generated and demo history checks passed.
 
 **Course cluster.** The Hokea adapter (Step 11) is pinned to Hokea revision `427b94634b1736ba8e59d4977836162aa58bd2cb` and passed local Hokea, Compose and Make verification: `make test` 84 passed + 1 xfailed, and `make fault-demo` with only the intended failure.
 
@@ -120,8 +120,8 @@ We also attempted a run on the course cluster (namespace `team-06`, public GHCR 
 - Workers are trusted; their results are not recomputed.
 - Failed operations are retried forever, so an operation that always fails leaves its job running.
 - Benchmark numbers come from one shared Windows host with a synthetic workload. They include polling delay, depend on the host's memory, and do not cover recovery time.
-- Cluster behavior is unverified until a correctly pinned course runner is available.
-- *[PENDING Step 13: findings from the independent clean-checkout verification.]*
+- Course-cluster service behavior remains unverified: execution was attempted and blocked during setup by the external runner mismatch (Section F).
+- Independent clean-checkout verification (Step 13) passed the normal suite, intentional recovery failure, functional/media demo, all 40 evidence-directory checks and the small benchmark reproduction without implementation changes. A transient `java.io.IOException: connection closed before all data received` harness diagnostic caused no test failure; the exact fault-demo shell exit code was not retained. This verification does not establish course-cluster execution or recovery support.
 
 ## H. Deviations
 
@@ -133,7 +133,7 @@ Step 12 was developed on a separate branch while Step 11 was being finished. It 
 
 ## I. MS3 handoff
 
-MS3 adds scheduler-side leases on the existing injected monotonic clock. When a lease expires, the attempt is marked expired and the task goes back to the end of the ready queue.
+The approved MS3 extension is scheduler-side leases on the existing injected monotonic clock; none are implemented in MS2. When a lease expires, the attempt is marked expired and the task goes back to the end of the ready queue.
 
 Most of the groundwork already exists:
 

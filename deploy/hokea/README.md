@@ -1,12 +1,13 @@
 # Step 11 Hokea orchestration
 
-Current state: **BLOCKED — adapter and packaging implemented; Docker execution
-unavailable in Work. Course cluster execution NOT VERIFIED.**
+Current state: **LOCAL HOKEA/DOCKER VERIFICATION COMPLETE; COURSE EXECUTION ATTEMPTED AND BLOCKED BY AN EXTERNAL RUNNER PACKAGE MISMATCH.**
 
-Start from accepted `main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df` plus this
-uncommitted Step 11 patch. Steps 0–10 remain accepted. Read [API.md](API.md) for
-the exact source-grounded API decisions and [CLUSTER-HANDOFF.md](CLUSTER-HANDOFF.md)
-for user-controlled external execution. Do not start Step 12.
+Steps 0–13 are accepted at `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`.
+Step 14 closes documentation; Step 15 follows review. Local Step 11 observations
+are in `results/handoffs/step-11/FINAL-RESULTS.md`; the latest independent suite
+result is `results/handoffs/step-13/VERIFICATION.md`. Read [API.md](API.md) for
+the unchanged API/pin and [CLUSTER-HANDOFF.md](CLUSTER-HANDOFF.md) for an optional
+user-controlled rerun once staff supplies the correctly pinned course runner.
 
 ## Adapter contract
 
@@ -25,7 +26,7 @@ are reused. Production Java, Dockerfiles and Compose behavior are unchanged.
 | `MS2_HOKEA_ARTIFACT_STORE_IMAGE` | Existing store image, default `dag-ms2/artifact-store:0.2.0`. |
 | `MS2_HOKEA_WORKER_IMAGE` | Existing worker image, default `dag-ms2/worker:0.2.0`. |
 | `MS2_HOKEA_EXPOSE` | Kubernetes scheduler/store only; `internal` default, optional `nodeport` for a reachable external harness. Worker always internal. |
-| `MS2_SOURCE_REV` | Exact tested source identifier; use `results/handoffs/step-11/SOURCE.json` until a user-accepted new commit exists. |
+| `MS2_SOURCE_REV` | Exact current tested source identifier. A clean accepted checkout uses its actual `git rev-parse HEAD`; the Step 11 source manifest identifies only those historical runs. |
 | `MS2_EVIDENCE_DIR` | Export root; default fixture behavior retained. Runner wrapper sets writable `/project/runs`. |
 | `MS2_RUN_LABEL` | Optional fresh unique label; omit for automatic timestamp+UUID. Never reuse an explicit label. |
 | `MS2_REQUIRE_XFAIL=1` | Require exactly one expected XFAIL for a selection containing the crash oracle. |
@@ -43,9 +44,11 @@ A and B have separate named clusters and worker sessions. A alone receives the
 X gate and 120,000 ms operation timeout. B uses normal defaults. A is never
 restarted. No scheduler ownership/recovery logic is implemented in this adapter.
 
-## Local verification still required on a Docker-capable host
+## Reproducing completed local verification
 
-These are **unexecuted commands**, not recorded successes. Use Python 3.12,
+The local gates below were completed in Step 11; they are rerun instructions, not
+unexecuted acceptance work. Use fresh evidence labels/directories and the actual
+current source. Step 13 separately verifies the normal Make suite. Use Python 3.12,
 pytest 8.3.4 and an installed clean course Hokea checkout at the pinned SHA
 (including its declared requests/PyYAML dependencies). Installing from a local
 course checkout is sufficient; no registry upload or account authentication is
@@ -58,7 +61,7 @@ docker compose version
 docker info
 python3 -m pytest -q tests/unit/test_hokea_adapter.py tests/unit/test_hokea_packaging.py
 docker compose -f deploy/compose/compose.yaml build
-export MS2_SOURCE_REV="$(python3 -c 'import json; print(json.load(open("results/handoffs/step-11/SOURCE.json"))["source_identifier"])')"
+export MS2_SOURCE_REV="$(git rev-parse HEAD)"  # clean accepted checkout only
 export MS2_BACKEND=hokea MS2_HOKEA_RUNTIME=docker
 export MS2_EVIDENCE_DIR=results/handoffs/step-11/external-local-hokea
 # Each invocation automatically gets a fresh timestamp+UUID label.
@@ -94,7 +97,7 @@ capture and cleanup. Exclude `runtime/` when promoting evidence. Hokea typed eve
 exports may be empty because our event field is `event_type`; complete project
 logs plus original ambient `.raw` files are retained instead.
 
-Then run current-checkpoint regressions on this host:
+For a new reproduction, the following unchanged regressions can be run on the same host:
 
 ```bash
 unset MS2_BACKEND MS2_HOKEA_RUNTIME MS2_EVIDENCE_DIR MS2_REQUIRE_XFAIL MS2_RUN_LABEL

@@ -1,9 +1,18 @@
-# User-controlled course execution — NOT VERIFIED
+# User-controlled course rerun — external runner mismatch
 
-No course credentials were opened or installed. No course API request, registry
-upload or external mutation was performed. This is an **unexecuted** handoff.
-First finish local Docker gates in [README.md](README.md); Step 11 currently stays
-BLOCKED. Do not run Step 12 from this checkpoint.
+The user attempted course execution during Step 11 in `team-06`, using public
+immutable GHCR images. Hokea launched the runner, transferred the package, started
+pytest and copied evidence out. All three tests errored during fixture setup,
+before project services started, because the runner package mismatched pinned
+Hokea `427b94634b1736ba8e59d4977836162aa58bd2cb` (`Hokea source mismatch at check.py`).
+This was an external environment limitation, not the intentional XFAIL. Local
+Hokea/Docker verification is complete; Steps 0–13 are accepted.
+
+See `results/handoffs/step-11/FINAL-RESULTS.md` and the preserved
+`acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md` for the observed attempt.
+The sequence below is a **future user-controlled rerun**, conditional on a correctly
+pinned staff-provided runner and authorized access. No course/GitHub authenticated
+action was performed in Step 14. Do not relax the package pin.
 
 ## Required prerequisites
 
@@ -48,7 +57,7 @@ export TEAM_NAMESPACE=team-NN
 export SCHEDULER_IMAGE='registry.example/team-NN/scheduler@sha256:<64-hex>'
 export ARTIFACT_IMAGE='registry.example/team-NN/artifact-store@sha256:<64-hex>'
 export WORKER_IMAGE='registry.example/team-NN/worker@sha256:<64-hex>'
-export STEP11_SOURCE="$(python3 -c 'import json; print(json.load(open("results/handoffs/step-11/SOURCE.json"))["source_identifier"])')"
+export STEP11_SOURCE="$(git rev-parse HEAD)"  # exact clean accepted source for this rerun
 export STEP11_PACKAGE="$(mktemp -d)/runner"
 python3 deploy/hokea/package_runner.py \
   --out "$STEP11_PACKAGE" --source-revision "$STEP11_SOURCE" \
@@ -141,5 +150,6 @@ retrieve `/project/runs/` from the runner before cleaning that runner. Preserve
 its original diagnostics; do not mark an incomplete copy or ambiguous death PASS.
 
 Return exact commands/exits/counts, logs, source/actual image IDs, namespace,
-cleanup states and copied evidence to the planning/review chat. Course results
-remain **NOT VERIFIED** until these observations actually exist.
+cleanup states and copied evidence to the planning/review chat. The earlier course attempt remains **externally blocked**, and course service
+behavior remains **unverified**, until a correctly pinned rerun actually produces
+these observations. A successful local run does not substitute for course results.

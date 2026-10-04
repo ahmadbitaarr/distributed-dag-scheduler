@@ -1,38 +1,31 @@
-# Open issues
+# Open issues and retained MS2 limitations
 
-This file records active Step 11 blockers plus retained historical limitations.
-Resolved verification items remain documented so later work does not reopen them.
+Steps 0–13 are complete and accepted at
+`main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`.
+Step 14 is the local documentation close-out awaiting user review; Step 15 is next
+and has not started. Historical handoffs and evidence remain unchanged.
 
 | ID | Status | Issue / evidence | Required action |
 |---|---|---|---|
-| S11-02 | RESOLVED — local Docker/Hokea verification | External local verification completed from a WSL-native filesystem. Compose regression passed with 2 PASS + 1 expected typed XFAIL; `make test` passed with 84 PASS + 1 expected XFAIL; `make fault-demo` failed only with the intentional `RecoveryNotObserved` oracle. The earlier OneDrive `/mnt/c` failure was an environment-path/cwd issue. | No further local implementation action required. Retain the successful WSL-native evidence as acceptance evidence. |
-| S11-03 | OPEN — external course-runner environment mismatch | Course-cluster execution was attempted in `team-06`. Access, public immutable service images, runner launch, package transfer, pytest startup, and evidence copy-out succeeded. All 3 tests then errored during fixture setup before project service execution because the Hokea package installed in the course runner did not match pinned revision `427b94634b1736ba8e59d4977836162aa58bd2cb` (`Hokea source mismatch at check.py`). | Treat as an external course-runner environment mismatch. Do not relax the project pin or add compatibility logic. Use the correctly pinned course runner/environment if supplied by course staff. Evidence: `results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a`. |
-| S11-04 | RETAINED LIMITATION | Step 11 intentionally preserves the Step 10 crash-reassignment oracle. Silent/crashed worker reclamation remains absent in MS2, so the final expected fault result is `RecoveryNotObserved`. | Do not add leases, heartbeat expiry, ownership expiration, requeue/reclamation, automatic restart, replication or failover in Step 11. |
-| S11-05 | RETAINED SCOPE BOUNDARY | Hokea integration is an orchestration/deployment adapter only. It must not change scheduler task/attempt semantics, production HTTP contracts, or add shared worker storage. | Keep Step 11 changes at the orchestration/evidence boundary. |
-| S10-03 | RETAINED HISTORICAL LIMITATION | Explicit reuse of a container run label can overwrite host-side copied results; accepted external runs used fresh unique labels. | Continue using fresh labels for future reruns. Do not claim universal overwrite prevention. |
-| S0-02 | RETAINED HISTORICAL | Earlier baseline/provenance coordination item from the accepted project history. | Historical only; do not reopen unless Planning identifies a contradiction. |
-| S1-03a | RESOLVED / HISTORICAL | Earlier local toolchain/Maven-wrapper environment limitation. Docker-based verification is now available and Step 11's current Compose/Make gates have been completed. | Do not vendor host toolchains or alter project semantics. Docker harness remains the reproducible path for future reruns. |
-| S12-01 | NOT STARTED | Step 12 work is outside the current accepted Step 11 boundary. | Do not start until Planning formally accepts Step 11. |
-| S13-S15 | NOT STARTED | Later roadmap work remains outside the current Step 11 boundary. | Follow roadmap order after formal acceptance of preceding steps. |
+| S11-02 | RESOLVED — local Docker/Hokea verification | `results/handoffs/step-11/FINAL-RESULTS.md` records local Hokea success, WSL-native Compose 2 PASS + 1 typed XFAIL, Make 84 PASS + 1 XFAIL and the sole intentional fault-demo failure. The earlier OneDrive path failure is historical. | Do not reopen completed local gates. The latest independent gate is Step 13. |
+| S11-03 | OPEN — external course-runner environment limitation | Course execution in `team-06` reached pytest but all 3 tests errored at setup before project services began: `Hokea source mismatch at check.py`, required pin `427b94634b1736ba8e59d4977836162aa58bd2cb`. See `results/handoffs/step-11/FINAL-RESULTS.md` and `acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md`. | A user-controlled rerun needs a correctly pinned staff-provided runner. Do not relax the pin or add compatibility logic. This is not the intentional XFAIL. |
+| S11-04 | INTENTIONAL MS2 CORRECTNESS GAP | Silent/crashed-worker RUNNING ownership is never reclaimed. The task and job stay RUNNING; downstream tasks stay BLOCKED. Step 13 confirms the sole `RecoveryNotObserved` failure. | Preserve the typed strict XFAIL and real fault-demo failure. No MS2 leases, heartbeats, expiry/scanning/requeue, auto-restart, scheduler replication/failover or durable recovery. |
+| S11-05 | RETAINED SCOPE BOUNDARY | Hokea remains a deployment/orchestration adapter; it does not change scheduler task/attempt semantics or HTTP contracts and does not share worker filesystems. | Keep the adapter and pin unchanged during documentation close-out. |
+| S10-03 | RETAINED EVIDENCE LIMITATION | Reusing an explicit container run label can overwrite host copy-back evidence. | Use fresh labels for every run; do not claim universal overwrite prevention. |
+| S0-02 | HISTORICAL | Earlier baseline/provenance coordination record. | Current source of truth is the accepted Step 13 baseline above; retain original attribution. |
+| S1-03a | RESOLVED / HISTORICAL | Earlier toolchain/Docker limitations were resolved by external verification. | Keep toolchains, credentials and machine configuration out of the project. |
+| S12-01 | RESOLVED / accepted | The full benchmark completed 45/45 runs. Source/environment and aborted attempts are retained in `docs/handoffs/step-12.md` and `results/handoffs/step-12/`. | Keep measurements unchanged and host/synthetic-workload limits explicit. |
+| S13-01 | RESOLVED / accepted | Independent fresh-checkout verification completed without implementation changes. `make test`: 86 PASS + 1 intentional XFAIL, 0 failures; 40/40 evidence checks. | Use `results/handoffs/step-13/VERIFICATION.md` for the observed results. Exact fault-demo shell exit was not preserved; report nonzero without inventing a code. |
+| S15-01 | NEXT / not started | Final clean-checkout submission audit and milestone packaging follow Step 14 acceptance. | Follow Roadmap Step 15; the Step 14 review ZIP is not its final audited submission artifact. |
 
-## Resolved / retained facts
+Scheduler state and artifact-store index are memory-only. Restart begins a new
+scheduler run; the store does not reconstruct its index from retained disk files.
+There is no scheduler durability, replication/failover or exactly-once external
+effects guarantee. Honest workers, available services and the documented network/
+timing assumptions still apply. Reported operation failures have no retry limit.
 
-- **S11-01 — adapter/API-fit resolution:** exact pinned Hokea source was inspected
-  and verified. Heterogeneous role images and worker readiness are handled at the
-  adapter boundary without changing production semantics. Actual local container
-  execution has now been completed externally; see resolved S11-02.
-- Local Step 11 verification is complete. The successful WSL-native Compose,
-  Hokea, Make acceptance, fault-demo, evidence validation and cleanup results are
-  the local acceptance evidence.
-- The earlier OneDrive `/mnt/c` Compose attempt is preserved as an
-  environment-path/cwd failure and is not acceptance evidence.
-- Course-cluster execution was genuinely attempted. It must not be described as
-  passed or as `NOT VERIFIED`; it is **attempted and externally blocked** by the
-  course runner's mismatched installed Hokea package.
-- The cluster failure is not the intentional `RecoveryNotObserved` result because
-  project service execution never began.
-- Do not weaken `deploy/hokea/verify_api.py`, change the pinned Hokea revision, or
-  add compatibility logic solely to accept the unknown course-runner package.
-- Steps 0–10 remain accepted at
-  `main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df`.
-- Step 11 changes remain uncommitted until final Planning review.
+Course-cluster service behavior remains unverified, but the course attempt itself
+was observed and externally blocked. Do not label it a pass, never-attempted work,
+or `RecoveryNotObserved`. Do not weaken `deploy/hokea/verify_api.py`.
+The independent Step 13 run also noted a transient connection-closed diagnostic
+that caused no test failure. Its original verification record is preserved.

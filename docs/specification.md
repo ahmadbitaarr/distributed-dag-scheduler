@@ -1,7 +1,5 @@
 # Distributed DAG Task Scheduler: Revised Specification (MS2)
 
-> **Draft.** Final once the Step 13 independent verification is complete.
-
 This revises our approved MS1 specification. The intended semester claims (quoted in each section) are unchanged. Under each one we state what the MS2 prototype actually guarantees today. Supporting tests and measurements are in the [MS2 progress report](ms2-progress-report.md). Design detail is in [the architecture](CS4094_MS2_Architecture.md), and the wire format is in [api.md](api.md).
 
 ## 1. Overview
@@ -37,7 +35,7 @@ We use the course's network, node and timing vocabulary.
 - **No task before its dependencies.** A task is offered to workers only after every parent has an accepted success. A worker starts executing only after the scheduler acknowledges its start, and its inputs are the parents' accepted outputs.
 - **No duplicate completion.** A task keeps the same identity across retries, SUCCEEDED is final, and a replayed report gets the stored receipt back. A success arriving late from an older attempt is rejected.
 
-These properties are checked automatically on the recorded event history of every test, and the checker can also be run offline on saved evidence. We assume workers are honest: the scheduler verifies identity, state and output integrity, but does not recompute results.
+These properties are checked automatically on the recorded event histories of service-backed tests, and the checker can also be run offline on saved evidence. Independent Step 13 verification recorded all 40 generated evidence directories as valid; see [VERIFICATION.md](../results/handoffs/step-13/VERIFICATION.md) and the [claim-to-test matrix](ms2-claim-evidence.md). We assume workers are honest: the scheduler verifies identity, state and output integrity, but does not recompute results.
 
 ## 4. Liveness
 
@@ -47,7 +45,7 @@ These properties are checked automatically on the recorded event history of ever
 
 Ready tasks are assigned in FIFO order. A task whose worker reports a failure goes to the back of the queue and is reassigned with a higher attempt number. There is no retry limit, so a job is never marked failed. This holds while workers stay up.
 
-If a worker crashes while holding a task, MS2 has no lease, heartbeat or timeout that would take the task back. The task stays RUNNING under the dead worker forever, and everything downstream stays blocked. This is the one correctness violation MS2 demonstrates on purpose. The test `test_worker_crash_reassignment` checks for recovery and fails, both claims above depend on this same missing mechanism, and MS3 adds it.
+If a worker crashes while holding a task, MS2 has no lease, heartbeat or timeout that would take the task back. The task stays RUNNING under the dead worker forever, and everything downstream stays blocked. This is the one correctness violation MS2 demonstrates on purpose. The test `test_worker_crash_reassignment` demands reassignment and fails with `RecoveryNotObserved`. Step 13 independently observed exactly this failure under `make fault-demo`; `make test` recorded 86 passes, exactly one intentional XFAIL and no failures. Its exact fault-demo shell exit code was not preserved. The stuck task and job stay RUNNING, and downstream Y stays BLOCKED. Both intended liveness claims are constrained by the same missing reclamation mechanism; its implementation is deferred to MS3.
 
 No progress is promised during a permanent partition, while all workers are down, or under unbounded load.
 
@@ -73,7 +71,7 @@ MS2 tests worker stops and lost or duplicated messages. Broader communication-fa
 
 **MS2 status: three of the four metrics are measured under normal operation.** We ran 1, 4 and 16 concurrent jobs against 1, 2 and 4 workers, five fresh repetitions each, with every service capped at 1 CPU and 512 MiB. All 45 runs completed.
 
-Throughput is set by the number of workers: about 4.2 tasks/s per worker, reaching 16.7 tasks/s with 4 workers. An idle worker receives a ready task within about 5 ms. Results are in progress-report Section E.
+Throughput is set by the number of workers: about 4.2 tasks/s per worker, reaching 16.7 tasks/s with 4 workers. An idle worker receives a ready task within about 5 ms. Results are in progress-report Section E and `results/handoffs/step-12/full-20261003c/`. Step 13 separately completed a one-repetition c1-w1 Compose reproduction; it does not replace the measured matrix.
 
 Recovery time cannot be measured yet, because MS2 does not recover from crashes. The crash test's 10-second observation window is a test limit, not a recovery measurement.
 
@@ -91,10 +89,12 @@ Recovery time cannot be measured yet, because MS2 does not recover from crashes.
 - the benchmark;
 - a Hokea deployment adapter for the course cluster.
 
-The Hokea adapter is verified locally. A run on the course cluster was attempted, but it was blocked before our services started because the course runner has a different Hokea version than the one we pin.
+The functional and video demo outputs were independently verified in Step 13: `result=22`, H.264 MP4s at 1280x720 and 640x360, and a PNG at 1280x720. The [Step 13 record](../results/handoffs/step-13/VERIFICATION.md) reports no implementation changes.
+
+The Hokea adapter is verified locally. A run on the course cluster was attempted, but it was blocked before our services started because the course runner has a different Hokea version than the one we pin. This remains an external environment limitation, documented in `results/handoffs/step-11/FINAL-RESULTS.md`; it is not a successful cluster workload or the intentional recovery XFAIL.
 
 **Deferred:** recovering tasks from crashed workers (MS3); scheduler durability, replication and failover; artifact-store recovery; exactly-once external effects; authentication, UI, cancellation, priorities and retry limits; performance targets and recovery-time measurement.
 
 ## 8. MS3 direction
 
-MS3 adds scheduler-side leases on the existing monotonic clock. When a lease expires, the attempt is marked expired and the task returns to the ready queue. The existing owner and attempt checks already reject late results from an expired attempt, and per-attempt output paths already stop it from overwriting newer results. Once leases exist, the crash test's expected-failure marker is removed and the same test must pass.
+The approved MS3 direction is scheduler-side leases on the existing monotonic clock; these are not current MS2 guarantees. When a lease expires, the attempt is marked expired and the task returns to the ready queue. The existing owner and attempt checks already reject late results from an expired attempt, and per-attempt output paths already stop it from overwriting newer results. Once leases exist, the crash test's expected-failure marker is removed and the same test must pass.

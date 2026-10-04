@@ -1,65 +1,61 @@
-# Current handoff — Step 11 local verification complete
+# Current handoff — Step 14 documentation close-out
 
-**Status: LOCAL IMPLEMENTATION/VERIFICATION COMPLETE. Course-cluster execution was attempted and blocked by an external course-runner Hokea package mismatch. Do not start Step 12.**
-Accepted `main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df`; Steps 0–10 accepted.
+**Status: COMPLETE LOCALLY — AWAITING USER REVIEW. Steps 0–13 are accepted.**
+Accepted repository: https://github.com/ahmadbitaarr/distributed-dag-scheduler
+Accepted branch/baseline: `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`.
+No Step 14 commit/push or authenticated GitHub/course action was performed.
 
-The canonical repository remains based on accepted
-`main @ bf0a7974dd63cc8cd1d9240177156d0a00bd26df`. Step 11 changes are currently
-uncommitted. The user performed the registry publishing and authorized
-course-cluster verification attempt.
+The progress report and revised specification are finalized with the accepted
+Step 13 findings. Intended MS1 quotations remain identical. README and Hokea
+instructions now distinguish completed local verification from the external
+course-runner mismatch. Final PDFs replace the draft exports. The command
+walkthrough is in README; the evidence matrix is `docs/ms2-claim-evidence.md`.
+Step 14 verification and review details are in `docs/handoffs/step-14.md` and
+`results/handoffs/step-14/VERIFICATION.md`.
 
-The prior coordination files contained stale Step 10 blocked text. They are now
-updated to the user's explicit accepted baseline and the completed external
-Step 10 evidence. Historical handoffs/results were preserved. Do not redo those
-steps.
+## Accepted verification to reuse
 
-New orchestration code: `tests/harness/hokea_adapter.py`; pinned Hokea package hashes,
-API verifier and flat runner generator under `deploy/hokea/`; 21 focused tests plus
-one service-exchange smoke check. No production Java, Native/Compose implementation,
-existing correctness test, architecture or roadmap changed. Runtime's Hokea dispatch
-was already present and is reused unchanged.
+`results/handoffs/step-13/VERIFICATION.md` records a fresh Ubuntu checkout of
+`f27aec9e1230b07c191f34f6a2278eafb0351f4f`: `make test` collected 87 pytest tests,
+with 86 passes, exactly one intentional XFAIL and no failures. `make fault-demo`
+returned nonzero solely from `RecoveryNotObserved`. Its exact shell exit code
+was not preserved. Functional/media outputs, 40/40 generated evidence checks and
+the one-repetition c1-w1 Compose benchmark succeeded without implementation changes.
+Step 12's full 45-run benchmark remains separately attributed to its measured source.
+No runtime tests were repeated for these documentation-only changes.
 
-Observed: 21 focused PASS; full native **84 PASS + 1 RecoveryNotObserved XFAIL**,
-exit 0; same native `--runxfail` **1 final RecoveryNotObserved failure**, exit 1,
-with setup/probe/safety/export/cleanup all successful. Offline **42 directories /
-34 histories valid**; all cleanup true. New native HTTP-exchange smoke passes.
-First smoke's incorrect terminal-owner assertion was corrected; the original failed
-run and original source attribution are retained separately. Source manifests and
-accepted 63-file manifest pass. Production JARs were reused only after comparing
-all Java/module source and POM bytes to the accepted ZIP; hashes/provenance recorded.
+## Preserved semantics and limitations
 
-**External local Step 11 verification is complete.** Using the unchanged source
-from a WSL-native filesystem, the Compose regression completed with 2 passed and
-1 expected typed XFAIL. `make test` completed with 84 passed and 1 expected XFAIL.
-`make fault-demo` failed only with the intentional `RecoveryNotObserved` oracle.
-The earlier OneDrive `/mnt/c` Compose failure was an environment-path/cwd issue
-and is not acceptance evidence.
+The scheduler keeps in-memory state under one mutex. Tasks move from BLOCKED to
+READY, ASSIGNED and RUNNING; accepted owner reports succeed or explicitly fail an
+attempt. A reported failure requeues the task with a later attempt. Success releases
+dependencies; a job succeeds only after all tasks succeed. Run/session/attempt
+identity, immutable per-attempt outputs and replay receipts protect safety.
 
-**Course-cluster execution was attempted.** Authorized access to `team-06` worked,
-and public immutable GHCR images were provided for all three services. Hokea
-created the runner Job, shipped the package, started pytest, and copied evidence
-back. All three tests then errored during fixture setup before any project service
-execution because the Hokea package installed in the course runner did not match
-the pinned revision `427b94634b1736ba8e59d4977836162aa58bd2cb`
-(`Hokea source mismatch at check.py`). Per the frozen Step 11 contract, this is
-an external course-runner environment mismatch; the project pin is not relaxed
-and the result is not classified as the intentional `RecoveryNotObserved` XFAIL.
-Evidence is preserved at
-`results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a`.
+A silently killed worker cannot report, so its task remains RUNNING under that
+session, downstream tasks remain BLOCKED, and the job remains RUNNING. B may
+complete a probe and keep polling without reclaiming A's task. Preserve the strict
+`raises=RecoveryNotObserved` XFAIL and the same `--runxfail` visible failure.
+Add no leases, heartbeats, expiry scanning/requeue, worker auto-restart, scheduler
+replication/failover, durable scheduler recovery or exactly-once external-effects claim.
 
-No local verification remains. If course staff provides the correctly pinned
-runner/environment, rerun the documented course sequence in
-`deploy/hokea/CLUSTER-HANDOFF.md` using the already-published immutable images.
-Until then, preserve the course-runner mismatch as the remaining external
-environment blocker.
+Course-cluster execution was attempted, but project services never started because
+the external runner's Hokea package mismatched frozen pin
+`427b94634b1736ba8e59d4977836162aa58bd2cb`. This is an environment limitation,
+not a successful course workload or the intentional fault result. Preserve
+`results/handoffs/step-11/FINAL-RESULTS.md` and the original cluster evidence.
 
-Read `docs/handoffs/step-11.md` and `results/handoffs/step-11/RESULTS.md` for source
-attribution, commands/exits and limitations. Architecture deviations: none.
-RUNNING ownership reclamation remains intentionally absent; add no recovery,
-leases, heartbeats, expiry/requeue, worker HTTP server or shared worker filesystem.
+## Next: Step 15, after user acceptance
 
-Recommended eventual commit message:
-`deploy(hokea): adapt MS2 services and fault harness to course runtime`.
-After Planning accepts Step 11, the user can perform the normal personal
-commit/push flow and return the full SHA, branch, clean/dirty status and push
-confirmation. No Step 12 handoff yet.
+Suggested Step 14 commit message:
+`docs(ms2): reconcile specification and progress report with evidence`.
+The user performs commit/push and returns the full accepted SHA, branch,
+clean/dirty status and push confirmation. No accepted Step 14 SHA is claimed yet.
+
+The next teammate should read Roadmap Step 15 and this handoff, start with
+`git status --short`, then record `git rev-parse HEAD` against the user-supplied
+accepted Step 14 SHA. Step 15 audits the clean accepted repository and submission
+contents, runs the documented packaged-source flow, records submission checksums
+and exclusions, and checks current course submission requirements. The review
+workspace archive from Step 14 does not certify that Step 15 has run, submit
+anything, or certify unexecuted cluster checks. Step 15 has not begun.
