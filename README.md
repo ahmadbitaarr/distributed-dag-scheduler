@@ -4,7 +4,7 @@ A distributed DAG task scheduler for a video-processing workload: one scheduler,
 
 The design is fixed by [docs/CS4094_MS2_Architecture.md](docs/CS4094_MS2_Architecture.md). Work proceeds one step at a time per [docs/implementation-roadmap.md](docs/implementation-roadmap.md). For current status, see [docs/PROGRESS.md](docs/PROGRESS.md), [docs/HANDOFF.md](docs/HANDOFF.md) and [docs/OPEN_ISSUES.md](docs/OPEN_ISSUES.md).
 
-> **MS2 status:** Steps 0–13 are accepted at `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`. Step 14 finalizes documentation; Step 15 is the next audit/packaging step after review. Worker-crash task reassignment is **intentionally not implemented** in MS2. The task/job remain RUNNING and descendants BLOCKED. Course execution was attempted and blocked by an external Hokea runner mismatch.
+> **MS2 status:** Steps 0–14 are accepted at `f4c5dceef533a98b195d7dfa2e54ec8cac788825`. Step 15 is **PASS — runtime/content audit complete**, using the supported-host results accepted by Planning; the initial Work-environment failures remain historical evidence; see [Step 15 verification](results/handoffs/step-15/VERIFICATION.md). Worker-crash task reassignment remains intentionally absent. Course service execution remains **NOT VERIFIED** after the earlier external Hokea runner mismatch.
 
 Final reports: [MS2 progress report](docs/ms2-progress-report.md), [revised specification](docs/specification.md), [claim-to-test matrix](docs/ms2-claim-evidence.md), and [PDF exports](docs/pdf/README.md). Independent results: [Step 13 verification](results/handoffs/step-13/VERIFICATION.md).
 

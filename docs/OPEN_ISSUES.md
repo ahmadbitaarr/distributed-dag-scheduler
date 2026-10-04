@@ -1,9 +1,9 @@
 # Open issues and retained MS2 limitations
 
-Steps 0–13 are complete and accepted at
-`main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`.
-Step 14 is the local documentation close-out awaiting user review; Step 15 is next
-and has not started. Historical handoffs and evidence remain unchanged.
+Steps 0–14 are complete and accepted at `f4c5dceef533a98b195d7dfa2e54ec8cac788825`.
+Step 15 is PASS/runtime-content audit complete using the supported-host results
+accepted by Planning. Initial Work-host failures remain historical environment-limited
+evidence; existing raw evidence and Step 0–14 historical handoffs remain unchanged.
 
 | ID | Status | Issue / evidence | Required action |
 |---|---|---|---|
@@ -12,11 +12,11 @@ and has not started. Historical handoffs and evidence remain unchanged.
 | S11-04 | INTENTIONAL MS2 CORRECTNESS GAP | Silent/crashed-worker RUNNING ownership is never reclaimed. The task and job stay RUNNING; downstream tasks stay BLOCKED. Step 13 confirms the sole `RecoveryNotObserved` failure. | Preserve the typed strict XFAIL and real fault-demo failure. No MS2 leases, heartbeats, expiry/scanning/requeue, auto-restart, scheduler replication/failover or durable recovery. |
 | S11-05 | RETAINED SCOPE BOUNDARY | Hokea remains a deployment/orchestration adapter; it does not change scheduler task/attempt semantics or HTTP contracts and does not share worker filesystems. | Keep the adapter and pin unchanged during documentation close-out. |
 | S10-03 | RETAINED EVIDENCE LIMITATION | Reusing an explicit container run label can overwrite host copy-back evidence. | Use fresh labels for every run; do not claim universal overwrite prevention. |
-| S0-02 | HISTORICAL | Earlier baseline/provenance coordination record. | Current source of truth is the accepted Step 13 baseline above; retain original attribution. |
+| S0-02 | HISTORICAL | Earlier baseline/provenance coordination record. | Current source of truth is the accepted Step 14 revision above; retain original attribution. |
 | S1-03a | RESOLVED / HISTORICAL | Earlier toolchain/Docker limitations were resolved by external verification. | Keep toolchains, credentials and machine configuration out of the project. |
 | S12-01 | RESOLVED / accepted | The full benchmark completed 45/45 runs. Source/environment and aborted attempts are retained in `docs/handoffs/step-12.md` and `results/handoffs/step-12/`. | Keep measurements unchanged and host/synthetic-workload limits explicit. |
 | S13-01 | RESOLVED / accepted | Independent fresh-checkout verification completed without implementation changes. `make test`: 86 PASS + 1 intentional XFAIL, 0 failures; 40/40 evidence checks. | Use `results/handoffs/step-13/VERIFICATION.md` for the observed results. Exact fault-demo shell exit was not preserved; report nonzero without inventing a code. |
-| S15-01 | NEXT / not started | Final clean-checkout submission audit and milestone packaging follow Step 14 acceptance. | Follow Roadmap Step 15; the Step 14 review ZIP is not its final audited submission artifact. |
+| S15-01 | RESOLVED — supported-host results accepted by Planning | Step 15 runtime/content audit PASS: build/up/demo/first down/test exit 0; 86 PASS + 1 expected XFAIL, no real failures; fault-demo exit 2 solely from RecoveryNotObserved; cleanup successful. Bounded c1-w1 benchmark exit 0, 24 jobs. Full Step 15 matrix manually interrupted for deadline, not claimed complete. Initial Work-host failures remain historical. | Preserve accepted Step 12 data and initial logs. See `results/handoffs/step-15/VERIFICATION.md`. User controls later commit and final archive regeneration; Canvas-specific details remain unchecked. |
 
 Scheduler state and artifact-store index are memory-only. Restart begins a new
 scheduler run; the store does not reconstruct its index from retained disk files.

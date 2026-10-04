@@ -1,12 +1,13 @@
 # MS2 sequential progress
 
-Status: **STEP 14 DOCUMENTATION CLOSE-OUT COMPLETE LOCALLY — AWAITING USER REVIEW.**
-Current step: **14 — Finish the revised specification and progress report**
-Next step: **15 — Audit and package the milestone**, after user acceptance of Step 14.
+Status: **STEP 15 PASS — runtime/content audit complete; supported-host results accepted by Planning.**
+Current step: **15 — Audit and package the milestone**
+Next action: user-controlled Git close-out and regeneration of the final submission archive from the accepted Step 15 SHA.
 
 Repository: https://github.com/ahmadbitaarr/distributed-dag-scheduler
-Accepted baseline: **main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d**.
-**Steps 0–13 are complete and accepted.** No Step 14 commit or push was performed.
+Audited accepted source: **f4c5dceef533a98b195d7dfa2e54ec8cac788825**.
+**Steps 0–14 are complete and accepted.** No Step 15 commit or Git operation performed.
+See `results/handoffs/step-15/VERIFICATION.md`; the unchanged post-package receipt describes the initial, environment-limited candidate.
 
 Architecture: `docs/CS4094_MS2_Architecture.md`
 SHA-256: `7d2f931bfcf308ccc2b32a899e8976e75656dab81f51b940df1aa136b37a8ef1`
@@ -31,8 +32,8 @@ attribution; they are historical records, not the current workflow state.
 | 11 — Hokea adapter | DONE / accepted; course environment limitation retained | included in accepted main baseline | `results/handoffs/step-11/FINAL-RESULTS.md`; local Hokea, Compose and Make verified; cluster setup blocked by pinned-package mismatch |
 | 12 — Performance experiment | DONE / accepted | measured clean source `8c5f3cb3c94ed9abdd18c4f178c0ef02e46ab1a3` | `docs/handoffs/step-12.md`; `results/handoffs/step-12/full-20261003c/`; all 45 measured runs complete |
 | 13 — Independent verification | DONE / accepted | tested `f27aec9e1230b07c191f34f6a2278eafb0351f4f`; accepted close-out baseline `bf43c619…` | `results/handoffs/step-13/VERIFICATION.md` |
-| 14 — Documentation close-out | DONE locally / awaiting user review | documentation changes against accepted baseline; no new accepted SHA | `docs/handoffs/step-14.md`; `results/handoffs/step-14/VERIFICATION.md`; final reports/PDFs |
-| 15 — Milestone audit and package | NOT STARTED | | Next after Step 14 acceptance |
+| 14 — Documentation close-out | DONE / accepted | `f4c5dceef533a98b195d7dfa2e54ec8cac788825` | `docs/handoffs/step-14.md`; `results/handoffs/step-14/VERIFICATION.md`; final reports/PDFs |
+| 15 — Milestone audit and package | PASS / runtime-content audit complete | audited accepted Step 14 source; supported-host results accepted by Planning; no Step 15 commit | 86 PASS + 1 expected XFAIL; sole intended fault failure; bounded benchmark exit 0. Full Step 15 matrix interrupted, not claimed complete. `results/handoffs/step-15/VERIFICATION.md` |
 
 Step 13 independently verified a fresh Ubuntu checkout: `make test` gave 86 passes,
 exactly one intentional XFAIL and no failures. `make fault-demo` was nonzero solely
@@ -58,6 +59,15 @@ service execution with `Hokea source mismatch at check.py`. The pin remains
 does not reopen accepted Steps 0–13. Read `docs/OPEN_ISSUES.md` and
 `deploy/hokea/CLUSTER-HANDOFF.md` before any user-controlled rerun.
 
-Step 15 has not begun. Its first checkout check is `git status --short` in the user's
-accepted repository, followed by recording `git rev-parse HEAD` and comparing the
-accepted Step 14 SHA. The user controls all commit/push and authenticated actions.
+The initial Step 15 Work-environment Make attempts all exited 2 due to missing
+prerequisites/services; their logs remain unchanged as historical evidence.
+The user subsequently completed supported-host verification, accepted by Planning:
+build/up/demo/first down/test exit 0; normal suite 86 passed + 1 expected XFAIL,
+0 real failures; fault-demo exit 2 solely from RecoveryNotObserved. Final cleanup
+succeeded. Full make bench completed multiple configurations before manual deadline
+interruption; it is not a completed matrix. The c1-w1 one-repetition verification
+exited 0 with 24 completed jobs. Exact metrics and attribution are in the Step 15
+verification record; accepted Step 12 results remain unchanged.
+Step 15 is PASS/runtime-content audit complete. The user controls later Git
+operations and regenerates the final submission archive from the accepted Step 15
+SHA. No Canvas or course-cluster action occurred here; no MS3 work began.
