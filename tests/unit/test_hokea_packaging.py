@@ -29,7 +29,7 @@ def test_roundtrip_imports_exact_oracles_and_preserves_nested_files(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     assert "3 tests collected" in result.stdout
     assert (output / "_project/tests/faults/test_worker_crash.py").read_bytes() == (ROOT / "tests/faults/test_worker_crash.py").read_bytes()
-    assert payload["environment"]["MS2_REQUIRE_XFAIL"] == "1"
+    assert payload["environment"]["MS2_REQUIRE_XFAIL"] == "0"
     assert payload["environment"]["MS2_HOKEA_RUNTIME"] == "kubernetes"
 
 

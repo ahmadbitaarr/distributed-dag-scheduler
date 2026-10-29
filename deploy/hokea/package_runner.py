@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BUDGET = 900_000  # Pinned hokea.runner.CONFIGMAP_BUDGET, text bytes on the wire.
 FILES = [
     "tests/__init__.py", "tests/conftest.py", "tests/harness/__init__.py",
-    "tests/harness/api.py", "tests/harness/runtime.py", "tests/harness/hokea_adapter.py",
+    "tests/harness/api.py", "tests/harness/runtime.py", "tests/harness/netfault.py", "tests/harness/hokea_adapter.py",
     "tests/harness/check_evidence.py", "tests/faults/test_worker_crash.py",
     "tests/integration/test_functional_workload.py", "tests/integration/test_hokea_smoke.py",
     "workloads/functional/functional.json", "workloads/functional/expected.json",
@@ -45,7 +45,7 @@ for name, item in payload["files"].items():
 sys.path.insert(0, str(project))
 os.environ.update(payload["environment"])
 if "--collect-only" in sys.argv or "--co" in sys.argv:
-    # Collection does not execute the fault oracle. Execution always requires one XFAIL.
+    # Collection does not execute the fault oracle. Execution requires zero XFAILs since MS3.
     os.environ.pop("MS2_REQUIRE_XFAIL", None)
 os.environ["MS2_EVIDENCE_DIR"] = str(here / "runs")
 pytest_plugins = ["tests.conftest"]
@@ -60,7 +60,7 @@ testpaths = test_entry.py
 addopts = -ra --strict-markers
 xfail_strict = true
 markers =
-    intentional_ms2: the one narrowly scoped worker-crash liveness oracle
+    faults: fault-injection tests (crash, restart, pause, message loss/delay/duplication, partition)
 '''
 
 
@@ -68,7 +68,7 @@ def build(output, images, source_revision, *, root=ROOT, allow_preloaded_tags=Fa
     if not source_revision or any(c.isspace() for c in source_revision):
         raise ValueError("A nonempty source identifier without whitespace is required")
     env = {"MS2_BACKEND": "hokea", "MS2_HOKEA_RUNTIME": "kubernetes",
-           "MS2_REQUIRE_XFAIL": "1", "MS2_SOURCE_REV": source_revision}
+           "MS2_REQUIRE_XFAIL": "0", "MS2_SOURCE_REV": source_revision}
     for role in ["scheduler", "artifact-store", "worker"]:
         image = images[role]
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9./_:@-]*", image):

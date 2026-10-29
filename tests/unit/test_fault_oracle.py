@@ -1,4 +1,4 @@
-"""Step 10 safeguards: malformed evidence must not become the liveness XFAIL.
+"""Step 10 safeguards, kept for MS3: malformed evidence must not pass as (or hide) a recovery verdict.
 
 These small synthetic inputs are unit fixtures, not runtime milestone evidence.
 """

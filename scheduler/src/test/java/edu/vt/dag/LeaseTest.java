@@ -122,6 +122,7 @@ class LeaseTest {
         assertEquals("LEASE_EXPIRED", code(() -> core.report(success(a))));
         assertEquals("LEASE_EXPIRED", code(() -> core.report(failure(a))));
         assertEquals("LEASE_EXPIRED", code(() -> core.heartbeat(a.identity())));
+        assertEquals("LEASE_EXPIRED", code(() -> core.start(a.identity())), "even a replayed start whose ack was cached");
         assertEquals(before, core.snapshot(job));
         assertEquals(eventsBefore, events().size());
         assertEquals(metricsBefore.get("counters"), core.metrics().get("counters"));

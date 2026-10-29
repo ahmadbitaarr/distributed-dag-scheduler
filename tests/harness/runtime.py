@@ -8,6 +8,7 @@ import time
 import uuid
 from pathlib import Path
 from .api import Api, request, wait_for
+from .netfault import FaultProxy
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -35,6 +36,7 @@ class NativeHarness:
         self.scheduler = f"http://127.0.0.1:{free_port()}"
         self.artifacts = f"http://127.0.0.1:{free_port()}"
         self.workers = []
+        self.proxies = {}
 
     def launch(self, name, module, env):
         log = open(self.evidence / f"{name}.jsonl", "w")
@@ -61,9 +63,14 @@ class NativeHarness:
             self.close()
             raise
 
-    def start_worker(self, env=None):
+    def start_worker(self, env=None, proxy=False, seed=0):
+        """Start a one-slot worker. With proxy=True its scheduler traffic goes through a FaultProxy."""
         name = f"worker-{len(self.workers) + 1}"
-        self.launch(name, "worker", {"SCHEDULER_URL": self.scheduler, "ARTIFACT_BASE_URL": self.artifacts, **(env or {})})
+        scheduler = self.scheduler
+        if proxy:
+            self.proxies[name] = FaultProxy(self.scheduler, self.evidence / f"proxy-{name}.jsonl", seed)
+            scheduler = self.proxies[name].url
+        self.launch(name, "worker", {"SCHEDULER_URL": scheduler, "ARTIFACT_BASE_URL": self.artifacts, **(env or {})})
         self.workers.append(name)
         wait_for(lambda: any(e["event_type"] == "worker_session_started" for e in self.worker_events(name)), description=f"{name} readiness")
         return name
@@ -81,6 +88,19 @@ class NativeHarness:
 
     def worker_running(self, name):
         return self.processes[name].poll() is None
+
+    def proxy(self, name):
+        return self.proxies[name]
+
+    def worker_session(self, name):
+        return next(e["worker_session_id"] for e in self.worker_events(name) if e["event_type"] == "worker_session_started")
+
+    def pause_worker(self, name):
+        """Freeze every thread of the worker (SIGSTOP): a slow or unreachable node, not a dead one."""
+        os.killpg(self.processes[name].pid, signal.SIGSTOP)
+
+    def resume_worker(self, name):
+        os.killpg(self.processes[name].pid, signal.SIGCONT)
 
     def restart_scheduler(self):
         """Start a new scheduler run on the same address; the old run's state is gone (architecture §8)."""
@@ -109,7 +129,11 @@ class NativeHarness:
         return {"worker": name, "pid": process.pid, "signal": "SIGKILL", "exit_code": code}
 
     def close(self):
+        for proxy in self.proxies.values():
+            proxy.close()
         for process in reversed(list(self.processes.values())):
+            if process.poll() is None:
+                os.killpg(process.pid, signal.SIGCONT)      # a paused process cannot handle SIGTERM
             if process.poll() is None:
                 os.killpg(process.pid, signal.SIGTERM)
                 try:
@@ -149,7 +173,9 @@ class ComposeHarness(NativeHarness):
             self.close()
             raise
 
-    def start_worker(self, env=None):
+    def start_worker(self, env=None, proxy=False, seed=0):
+        if proxy:
+            raise NotImplementedError("Per-link network faults need the native backend (make test)")
         name = f"worker-{len(self.workers) + 1}"
         options = []
         for key, value in (env or {}).items():
@@ -172,6 +198,12 @@ class ComposeHarness(NativeHarness):
 
     def stop_artifacts(self):
         self.compose("stop", "artifact-store")
+
+    def pause_worker(self, name):
+        subprocess.run(["docker", "pause", self.worker_containers[name]], check=True, capture_output=True)
+
+    def resume_worker(self, name):
+        subprocess.run(["docker", "unpause", self.worker_containers[name]], check=True, capture_output=True)
 
     def kill_worker(self, name):
         subprocess.run(["docker", "kill", "--signal=KILL", self.worker_containers[name]], check=True, capture_output=True)

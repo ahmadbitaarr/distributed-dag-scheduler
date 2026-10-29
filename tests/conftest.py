@@ -69,5 +69,5 @@ def pytest_sessionfinish(session, exitstatus):
         reporter = session.config.pluginmanager.get_plugin("terminalreporter")
         count = len(reporter.stats.get("xfailed", []))
         if count != int(required):
-            reporter.write_sep("!", f"MS2 requires {required} intentional XFAIL; observed {count}")
+            reporter.write_sep("!", f"Run requires exactly {required} XFAIL; observed {count}")
             session.exitstatus = pytest.ExitCode.TESTS_FAILED

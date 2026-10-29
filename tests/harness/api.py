@@ -185,12 +185,12 @@ def check_history(manifest_value, snapshot, events, worker_events=()):
     all_seqs = [e["scheduler_event_seq"] for e in events]
     require(all_seqs == list(range(1, len(all_seqs) + 1)), "scheduler event sequence has a gap or reordering")
     events = [e for e in events if e.get("job_id") == manifest_value["job_id"]]
-    successes, started, assigned, owners = {}, {}, {}, {}
+    successes, started, assigned, owners, expired = {}, {}, {}, {}, set()
     definitions = {t["task_id"]: t for t in manifest_value["tasks"]}
     completed = None
     for e in events:
         name, kind = e.get("task_id"), e["event_type"]
-        if kind in ("task_assigned", "task_started", "task_failed", "task_succeeded"):
+        if kind in ("task_assigned", "task_started", "task_failed", "task_succeeded", "lease_expired"):
             require(name in definitions, f"{kind} for unknown task {name}")
             require(completed is None, f"{kind} for {name} after job_completed")
         if kind == "task_assigned":
@@ -206,8 +206,13 @@ def check_history(manifest_value, snapshot, events, worker_events=()):
             started[e["scheduler_event_seq"]] = (name, e["attempt_no"], e["worker_session_id"])
         elif kind == "task_failed":
             require(owners.pop(name, None) == (e["attempt_no"], e["worker_session_id"]), f"{name} failure from a non-owner")
+        elif kind == "lease_expired":
+            # Expiry releases exactly the current owner; that attempt can never act again.
+            require(owners.pop(name, None) == (e["attempt_no"], e["worker_session_id"]), f"{name} lease expiry for a non-owner")
+            expired.add((name, e["attempt_no"]))
         elif kind == "task_succeeded":
             require(name not in successes, f"duplicate logical completion of {name}")
+            require((name, e["attempt_no"]) not in expired, f"{name} success from expired attempt {e['attempt_no']}")
             require(owners.pop(name, None) == (e["attempt_no"], e["worker_session_id"]), f"{name} success from a non-owner")
             report = e.get("report") or {}
             require(report.get("outcome") == "SUCCESS" and (report.get("identity") or {}).get("attempt_no") == e["attempt_no"],

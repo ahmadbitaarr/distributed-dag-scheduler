@@ -105,8 +105,10 @@ def test_stale_report_rejection_does_not_kill_the_worker(system):
     attempts = snapshot["tasks"]["A"]["attempts"]
     assert [a["state"] for a in attempts] == ["FAILED", "SUCCEEDED"]
     assert attempts[0]["identity"]["worker_session_id"] == attempts[1]["identity"]["worker_session_id"]
-    rejected = [e for e in system.worker_events(worker) if e["event_type"] == "attempt_rejected"]
-    assert rejected and rejected[0]["attempt_no"] == 1 and rejected[0]["status"] == 409
+    # The worker learns attempt 1 is over from its next heartbeat (MS3) or from its own report; either way it drops it.
+    gave_up = [e for e in system.worker_events(worker) if e.get("attempt_no") == 1
+               and e["event_type"] in ("attempt_rejected", "worker_lease_lost")]
+    assert gave_up and gave_up[0]["status"] == 409
     assert system.worker_running(worker)
 
 

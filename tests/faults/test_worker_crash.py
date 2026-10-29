@@ -1,4 +1,9 @@
-"""The oracle asks for recovery. It never asserts that remaining stuck is correct."""
+"""Liveness L2: a killed worker's unfinished task is reassigned to a healthy worker.
+
+MS2 shipped this oracle as the one intentional expected failure. MS3 leases make it pass, with
+the same experiment unchanged; it now also checks how recovery happened and how long it took on
+the scheduler's own clock. RecoveryNotObserved is still the only way the oracle reports no recovery.
+"""
 import json
 import time
 import traceback
@@ -11,6 +16,9 @@ from tests.harness.check_evidence import check_directory
 WINDOW_NS = 10_000_000_000
 LATE_POLL_NS = 8_000_000_000
 GATE_TIMEOUT_MS = 120000
+# Detection is bounded by the lease; reassignment adds the expiry scan, an idle worker's poll and
+# scheduling jitter on a shared test host. The bound is on the scheduler clock, never across processes.
+RECOVERY_SLACK_NS = 2_000_000_000
 
 
 class RecoveryNotObserved(AssertionError):
@@ -33,6 +41,20 @@ def original_attempt_running(snapshot, identity):
     assert attempt["finished_elapsed_ns"] is None
     assert snapshot["tasks"]["Y"]["state"] == "BLOCKED"
     assert snapshot["tasks"]["Y"]["attempts"] == []
+
+
+def lease_recovery(events, job, identity):
+    """Scheduler-clock decomposition of one recovery: last sign of life -> expiry -> new owner."""
+    expired = next(e for e in events if e["event_type"] == "lease_expired" and e.get("job_id") == job
+                   and e["task_id"] == identity["task_id"] and e["attempt_no"] == identity["attempt_no"])
+    assigned = next(e for e in events if e["event_type"] == "task_assigned" and e.get("job_id") == job
+                    and e["task_id"] == identity["task_id"] and e["attempt_no"] == identity["attempt_no"] + 1)
+    alive = expired["last_alive_elapsed_ns"]
+    return {"clock": "scheduler monotonic elapsed_ns", "last_alive_elapsed_ns": alive,
+            "lease_expired_elapsed_ns": expired["elapsed_ns"], "reassigned_elapsed_ns": assigned["assigned_elapsed_ns"],
+            "detection_ns": expired["elapsed_ns"] - alive, "requeue_to_assign_ns": assigned["assigned_elapsed_ns"] - expired["elapsed_ns"],
+            "recovery_ns": assigned["assigned_elapsed_ns"] - alive, "new_owner": assigned["worker_session_id"],
+            "expired_from_state": expired["old_state"]}
 
 
 def polling_evidence(events, session, run_id, after_seq):
@@ -58,8 +80,7 @@ def require_window_polling(events, session, run_id, start_seq, late_seq):
     return pairs
 
 
-@pytest.mark.intentional_ms2
-@pytest.mark.xfail(strict=True, raises=RecoveryNotObserved, reason="MS2 deliberately omits silent-worker ownership reclamation")
+@pytest.mark.faults
 def test_worker_crash_reassignment(system):
     origin = time.monotonic_ns()
     def save(name, value):
@@ -164,6 +185,20 @@ def test_worker_crash_reassignment(system):
     check_history(m, after, events, workers)
     check_history(probe, system.api.status(probe["job_id"]), system.api.events(), workers)
     assert sum(e["event_type"] == "task_succeeded" and e.get("job_id") == job and e.get("task_id") == "X" for e in events) <= 1
+    if recovered:
+        status, metrics = request(system.scheduler, "/v1/metrics")
+        assert status == 200
+        recovery = {**lease_recovery(events, job, identity), "lease_ns": metrics["lease_ns"]}
+        save("recovery.json", recovery)
+        assert after["state"] == "SUCCEEDED" and after["tasks"]["Y"]["state"] == "SUCCEEDED"
+        x = after["tasks"]["X"]
+        assert [attempt["state"] for attempt in x["attempts"]] == ["EXPIRED", "SUCCEEDED"]
+        assert x["attempts"][1]["identity"]["worker_session_id"] == b_session == recovery["new_owner"]
+        assert x["outputs"]["value"]["key"].startswith(f"runs/{identity['scheduler_run_id']}/jobs/{job}/tasks/X/attempts/2/")
+        assert recovery["expired_from_state"] == "RUNNING"
+        assert recovery["detection_ns"] >= metrics["lease_ns"], "never expire a lease early"
+        assert recovery["recovery_ns"] <= metrics["lease_ns"] + RECOVERY_SLACK_NS, recovery
+        assert sum(e["event_type"] == "task_succeeded" and e.get("job_id") == job and e.get("task_id") == "X" for e in events) == 1
     if not recovered:
         original_attempt_running(after, identity)
         assert request(system.artifacts, "/v1/objects/" + output_key, method="HEAD")[0] == 404
@@ -195,7 +230,7 @@ def test_worker_crash_reassignment(system):
     save("safety-checks.json", {"checked_jobs": checked, "history_check": "PASS",
                                "probe_bytes": "3", "b_session_distinct": True,
                                "a_dead": True, "b_alive": True, "services_healthy": True,
-                               "faulted_attempt_unchanged": not recovered})
+                               "faulted_attempt_unchanged": not recovered, "recovered": recovered})
     try:
         if not recovered:
             raise RecoveryNotObserved("Expected X to be reassigned to healthy worker B with attempt_no > 1 within the controlled 10 s window; X remains RUNNING under killed worker A, Y BLOCKED, job RUNNING.")

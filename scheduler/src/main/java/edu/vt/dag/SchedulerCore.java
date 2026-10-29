@@ -143,6 +143,8 @@ public final class SchedulerCore {
     public Ack start(Identity id) {
         return store.command(s->{
             var t=task(s,id);expire(s);var a=attempt(s,id);
+            // An expired attempt is dead to every message, including a replayed start whose ack was lost.
+            if(a.state==AttemptState.EXPIRED)throw new ApiException(409,"LEASE_EXPIRED","Attempt lease expired; its task was requeued");
             if(a.startAck!=null)return a.startAck;
             current(s,t,a);if(t.state!=TaskState.ASSIGNED)throw ApiException.conflict("Start requires ASSIGNED");
             a.state=AttemptState.RUNNING;t.state=TaskState.RUNNING;a.startedNs=now();renew(a);

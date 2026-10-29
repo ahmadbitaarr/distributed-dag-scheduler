@@ -82,6 +82,26 @@ def test_success_from_non_owner_is_detected(history):
     violated(history, "success from a non-owner")
 
 
+def test_success_from_expired_attempt_is_detected(history):
+    # MS3: insert a lease expiry for B's only attempt just before its success.
+    i = find(history, "task_succeeded", "B")
+    success = history["events"][i]
+    expiry = {**success, "event_type": "lease_expired", "old_state": "RUNNING", "new_state": "READY"}
+    for key in ("report", "outputs"):
+        expiry.pop(key, None)
+    history["events"].insert(i, expiry)
+    resequence(history["events"])
+    violated(history, "success from expired attempt 1")
+
+
+def test_expiry_of_a_non_owner_is_detected(history):
+    i = find(history, "task_assigned", "C")
+    stray = {**history["events"][i], "event_type": "lease_expired", "worker_session_id": "00000000-0000-4000-8000-00000000beef"}
+    history["events"].insert(i + 1, stray)
+    resequence(history["events"])
+    violated(history, "lease expiry for a non-owner")
+
+
 def test_success_without_success_report_is_detected(history):
     i = find(history, "task_succeeded", "E")
     history["events"][i]["report"] = {**history["events"][i]["report"], "outcome": "FAILURE"}
