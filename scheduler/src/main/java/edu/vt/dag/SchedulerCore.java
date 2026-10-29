@@ -6,14 +6,25 @@ import java.util.function.LongSupplier;
 import static edu.vt.dag.Model.*;
 import static edu.vt.dag.SchedulerState.*;
 
-/** Transport-independent state machine. This class intentionally has no recovery timer. */
+/**
+ * Transport-independent state machine. Ownership of an attempt is a lease on the injected
+ * monotonic clock: assignment grants it, start and heartbeats renew it, and an attempt whose
+ * deadline passes is EXPIRED and its task requeued. Expiry is applied at the start of every
+ * mutating command and by the scheduler's periodic scan, so no decision ever sees a stale lease.
+ */
 public final class SchedulerCore {
+    public static final long DEFAULT_LEASE_NS=5_000_000_000L;
     private final StateStore store;
     private final LongSupplier clock;
-    private final long origin;
-    public SchedulerCore(StateStore store,LongSupplier clock) {this.store=store;this.clock=clock;origin=clock.getAsLong();}
+    private final long origin,leaseNs;
+    public SchedulerCore(StateStore store,LongSupplier clock,long leaseNs) {
+        if(leaseNs<=0)throw new IllegalArgumentException("Lease must be positive");
+        this.store=store;this.clock=clock;this.leaseNs=leaseNs;origin=clock.getAsLong();
+    }
+    public SchedulerCore(StateStore store,LongSupplier clock) {this(store,clock,DEFAULT_LEASE_NS);}
     public SchedulerCore() {this(new MemoryStateStore(),System::nanoTime);}
     long now() {return clock.getAsLong()-origin;}
+    public long leaseNs() {return leaseNs;}
     public UUID runId() {return store.command(s->s.runId);}
     public static Map<String,Object> map(Object... pairs) {
         var m=new LinkedHashMap<String,Object>();
@@ -35,6 +46,22 @@ public final class SchedulerCore {
         s.ready.add(new TaskRef(job,t.spec.task_id()));
         event(s,"task_ready",request,null,job,t.spec.task_id(),"old_state",old,"new_state",t.state,"ready_seq",t.readySeq,"satisfied_parents",List.copyOf(t.satisfied));
     }
+    /** Expire every lease whose deadline has passed, in assignment order, and requeue each task at the FIFO tail. */
+    private int expire(SchedulerState s) {
+        long now=now();var due=new ArrayList<Attempt>();
+        for(var id:s.active.values()){var a=s.jobs.get(id.job_id()).tasks.get(id.task_id()).attempts.get(id.attempt_no()-1);if(a.leaseDeadlineNs<=now)due.add(a);}
+        due.sort(Comparator.comparingLong(a->a.assignmentSeq));
+        for(var a:due) {
+            var id=a.identity;var t=s.jobs.get(id.job_id()).tasks.get(id.task_id());TaskState old=t.state;String request="lease:"+id;
+            a.state=AttemptState.EXPIRED;a.finishedNs=now;s.active.remove(id.worker_session_id());count(s,"expired_attempts");
+            event(s,"lease_expired",request,id,null,null,"old_state",old,"new_state",TaskState.READY,"lease_deadline_elapsed_ns",a.leaseDeadlineNs,
+                "last_alive_elapsed_ns",a.lastAliveNs,"lease_renewals",a.renewals);
+            ready(s,id.job_id(),t,request,old);
+        }
+        return due.size();
+    }
+    /** Periodic scan entry point; commands also expire leases themselves before deciding. */
+    public int expireLeases() {return store.command(this::expire);}
     public record SubmissionResult(int status,Map<String,Object> body) {}
     public SubmissionResult submissionReplay(Submission r) {
         return store.command(s->{run(s,r.scheduler_run_id());var j=s.jobs.get(r.manifest().job_id());
@@ -72,17 +99,18 @@ public final class SchedulerCore {
         return a;
     }
     private void current(SchedulerState s,Task t,Attempt a) {
+        if(a.state==AttemptState.EXPIRED)throw new ApiException(409,"LEASE_EXPIRED","Attempt lease expired; its task was requeued");
         if(t.latest()!=a || !a.identity.equals(s.active.get(a.identity.worker_session_id())) ||
           !(t.state==TaskState.ASSIGNED||t.state==TaskState.RUNNING)) throw ApiException.conflict("Stale or terminal attempt");
     }
     private Assignment assignment(SchedulerState s,Identity id) {
         var t=task(s,id);var a=attempt(s,id);
-        boolean terminal=a.state==AttemptState.SUCCEEDED||a.state==AttemptState.FAILED;
+        boolean terminal=a.state==AttemptState.SUCCEEDED||a.state==AttemptState.FAILED||a.state==AttemptState.EXPIRED;
         return new Assignment(s.runId,id,t.spec,a.inputs,Model.prefix(id),a.assignmentSeq,terminal?"TERMINAL_"+a.state:"EXECUTE");
     }
     public Assignment claim(Claim r) {
         return store.command(s->{
-            ManifestValidator.claim(r);run(s,r.scheduler_run_id());
+            ManifestValidator.claim(r);run(s,r.scheduler_run_id());expire(s);
             var receipt=s.claims.get(r.claim_id());
             if(receipt!=null) {
                 if(!receipt.request().equals(r))throw ApiException.conflict("Claim ID reused with different identity");
@@ -98,9 +126,14 @@ public final class SchedulerCore {
                 var inputs=new TreeMap<String,Artifact>();
                 for(var e:t.spec.inputs().entrySet()) {var b=e.getValue();inputs.put(e.getKey(),b.source()!=null?b.source():j.tasks.get(b.task_id()).acceptedOutputs.get(b.output_name()));}
                 var a=new Attempt(id,t.readyNs,now(),inputs);t.attempts.add(a);t.state=TaskState.ASSIGNED;
+                a.lastAliveNs=a.assignedNs;a.leaseDeadlineNs=a.assignedNs+leaseNs;
                 s.active.put(r.worker_session_id(),id);j.state=JobState.RUNNING;
-                a.assignmentSeq=event(s,"task_assigned",req,id,null,null,"old_state",TaskState.READY,"new_state",t.state,"ready_seq",t.readySeq,"ready_elapsed_ns",a.readyNs,"assigned_elapsed_ns",a.assignedNs);
-                if(id.attempt_no()>1) {count(s,"retries_assigned");event(s,"task_retried",req,id,null,null,"previous_attempt_no",id.attempt_no()-1);}
+                a.assignmentSeq=event(s,"task_assigned",req,id,null,null,"old_state",TaskState.READY,"new_state",t.state,"ready_seq",t.readySeq,"ready_elapsed_ns",a.readyNs,"assigned_elapsed_ns",a.assignedNs,"lease_deadline_elapsed_ns",a.leaseDeadlineNs);
+                if(id.attempt_no()>1) {
+                    var previous=t.attempts.get(id.attempt_no()-2);count(s,"retries_assigned");
+                    event(s,"task_retried",req,id,null,null,"previous_attempt_no",id.attempt_no()-1,"previous_attempt_state",previous.state,
+                        "previous_last_alive_elapsed_ns",previous.lastAliveNs,"previous_finished_elapsed_ns",previous.finishedNs);
+                }
             }
             s.claims.put(r.claim_id(),new ClaimReceipt(r,id));
             if(id==null) {event(s,"work_empty",req,null,null,null,"worker_session_id",r.worker_session_id());return null;}
@@ -109,17 +142,26 @@ public final class SchedulerCore {
     }
     public Ack start(Identity id) {
         return store.command(s->{
-            var t=task(s,id);var a=attempt(s,id);
+            var t=task(s,id);expire(s);var a=attempt(s,id);
             if(a.startAck!=null)return a.startAck;
             current(s,t,a);if(t.state!=TaskState.ASSIGNED)throw ApiException.conflict("Start requires ASSIGNED");
-            a.state=AttemptState.RUNNING;t.state=TaskState.RUNNING;a.startedNs=now();
+            a.state=AttemptState.RUNNING;t.state=TaskState.RUNNING;a.startedNs=now();renew(a);
             long seq=event(s,"task_started","start:"+id,id,null,null,"old_state",TaskState.ASSIGNED,"new_state",t.state);
             return a.startAck=new Ack(s.runId,seq,"ACCEPTED");
         });
     }
+    private void renew(Attempt a) {a.lastAliveNs=now();a.leaseDeadlineNs=a.lastAliveNs+leaseNs;}
+    /** Renew the caller's lease. 409 LEASE_EXPIRED (or CONFLICT) tells the worker to abandon the attempt. */
+    public Ack heartbeat(Identity id) {
+        return store.command(s->{
+            var t=task(s,id);expire(s);var a=attempt(s,id);current(s,t,a);
+            renew(a);a.renewals++;count(s,"lease_renewals");
+            return new Ack(s.runId,s.events.size(),"RENEWED");
+        });
+    }
     private void validateReport(SchedulerState s,Report r) {
         ApiException.require(r!=null && r.outputs()!=null,"Report and outputs required");
-        var t=task(s,r.identity());var a=attempt(s,r.identity());
+        var t=task(s,r.identity());expire(s);var a=attempt(s,r.identity());
         ApiException.require(r.outcome()!=null && Set.of("SUCCESS","FAILURE").contains(r.outcome()),"Outcome must be SUCCESS or FAILURE");
         if(a.receipt!=null) {
             if(!a.receipt.equals(r))throw ApiException.conflict("Conflicting report for a terminal attempt");
@@ -180,7 +222,8 @@ public final class SchedulerCore {
                 counts.merge(t.state.name(),1L,Long::sum);
                 var attempts=t.attempts.stream().map(a->map("identity",a.identity,"state",a.state,"ready_elapsed_ns",a.readyNs,
                     "assigned_elapsed_ns",a.assignedNs,"started_elapsed_ns",a.startedNs,"finished_elapsed_ns",a.finishedNs,
-                    "start_receipt",a.startAck,"report_receipt",a.receipt,"report_ack",a.reportAck)).toList();
+                    "start_receipt",a.startAck,"report_receipt",a.receipt,"report_ack",a.reportAck,
+                    "last_alive_elapsed_ns",a.lastAliveNs,"lease_deadline_elapsed_ns",a.leaseDeadlineNs,"lease_renewals",a.renewals)).toList();
                 tasks.put(t.spec.task_id(),map("state",t.state,"parents",t.spec.parents(),"satisfied_parents",List.copyOf(t.satisfied),
                     "ready_seq",t.readySeq,"owner",t.state==TaskState.ASSIGNED||t.state==TaskState.RUNNING?t.latest().identity.worker_session_id():null,
                     "attempt_no",t.attempts.size(),"attempts",attempts,"outputs",t.acceptedOutputs));
@@ -199,13 +242,21 @@ public final class SchedulerCore {
     public Map<String,Object> metrics() {
         return store.command(s->{
             var gauges=new TreeMap<String,Long>();for(var state:TaskState.values())gauges.put(state.name(),0L);
-            var jobs=new ArrayList<Long>();var latency=new ArrayList<Long>();
+            var jobs=new ArrayList<Long>();var latency=new ArrayList<Long>();var recovery=new ArrayList<Long>();
             for(var j:s.jobs.values()) {
                 if(j.completedNs!=null)jobs.add(j.completedNs-j.acceptedNs);
-                for(var t:j.tasks.values()){gauges.merge(t.state.name(),1L,Long::sum);for(var a:t.attempts)latency.add(a.assignedNs-a.readyNs);}
+                for(var t:j.tasks.values()){
+                    gauges.merge(t.state.name(),1L,Long::sum);
+                    for(int i=0;i<t.attempts.size();i++){
+                        var a=t.attempts.get(i);latency.add(a.assignedNs-a.readyNs);
+                        // Recovery: the expired attempt's last sign of life to the next owner's assignment.
+                        if(a.state==AttemptState.EXPIRED && i+1<t.attempts.size())recovery.add(t.attempts.get(i+1).assignedNs-a.lastAliveNs);
+                    }
+                }
             }
-            var counters=new TreeMap<String,Long>();for(String k:List.of("accepted_jobs","accepted_logical_successes","explicit_failed_attempts","retries_assigned","duplicate_reports","rejected_reports"))counters.put(k,s.counters.getOrDefault(k,0L));
-            return map("scheduler_run_id",s.runId,"scheduler_event_seq",s.events.size(),"counters",counters,"tasks_by_state",gauges,"ready_queue_length",s.ready.size(),"active_attempts",s.active.size(),"job_duration_ns",summary(jobs),"scheduling_latency_ns",summary(latency));
+            var counters=new TreeMap<String,Long>();for(String k:List.of("accepted_jobs","accepted_logical_successes","explicit_failed_attempts","expired_attempts","lease_renewals","retries_assigned","duplicate_reports","rejected_reports"))counters.put(k,s.counters.getOrDefault(k,0L));
+            return map("scheduler_run_id",s.runId,"scheduler_event_seq",s.events.size(),"lease_ns",leaseNs,"counters",counters,"tasks_by_state",gauges,"ready_queue_length",s.ready.size(),"active_attempts",s.active.size(),
+                "job_duration_ns",summary(jobs),"scheduling_latency_ns",summary(latency),"lease_recovery_ns",summary(recovery));
         });
     }
     private Map<String,Object> summary(List<Long> values) {

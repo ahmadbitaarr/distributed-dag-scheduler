@@ -40,6 +40,8 @@ public final class SchedulerState {
         final Map<String,Artifact> inputs;
         long assignmentSeq;
         Long startedNs,finishedNs;
+        /** Lease (MS3): owned while now < leaseDeadlineNs; renewed by start and heartbeats. */
+        long leaseDeadlineNs,lastAliveNs,renewals;
         AttemptState state=AttemptState.ASSIGNED;
         Ack startAck,reportAck;
         Report receipt;

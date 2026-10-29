@@ -38,19 +38,7 @@ class SchedulerStateMachineTest {
     long count(String type) { return events().stream().filter(e -> type.equals(e.get("event_type"))).count(); }
     long counter(String name) { return (Long) ((Map<?, ?>) core.metrics().get("counters")).get(name); }
 
-    // ---- the deliberate MS2 liveness defect ----
-
-    @Test void silentOwnerKeepsTaskForeverEvenAsTimePasses() {
-        var job = submit(manifest(task("X"), task("Y", "X")));
-        var a = claim(); core.start(a.identity());
-        time.addAndGet(TimeUnit.HOURS.toNanos(24));          // the owning worker goes silent
-        for (int i = 0; i < 50; i++) assertNull(claim(), "no silent-owner reassignment in MS2");
-        assertEquals(TaskState.RUNNING, taskSnap(job, "X").get("state"));
-        assertEquals(a.identity().worker_session_id(), taskSnap(job, "X").get("owner"));
-        assertEquals(TaskState.BLOCKED, taskSnap(job, "Y").get("state"));
-        assertEquals(JobState.RUNNING, core.snapshot(job).get("state"));
-        assertEquals(1, taskSnap(job, "X").get("attempt_no"));
-    }
+    // (MS2's silent-owner defect test moved to LeaseTest, inverted: the task is now reassigned.)
 
     // ---- atomicity: rejected commands do not change scheduling state ----
 

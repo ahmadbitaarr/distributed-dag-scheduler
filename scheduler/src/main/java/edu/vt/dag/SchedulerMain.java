@@ -6,12 +6,14 @@ import static edu.vt.dag.Model.*;
 
 public final class SchedulerMain {
     public static void main(String[] args) throws Exception {
-        var core=new SchedulerCore();var artifacts=new ArtifactClient(HttpSupport.env("ARTIFACT_BASE_URL","http://localhost:8081"));
+        long leaseMs=HttpSupport.envInt("LEASE_TIMEOUT_MS",5000),scanMs=HttpSupport.envInt("LEASE_SCAN_MS",100);
+        if(leaseMs<=0||scanMs<=0)throw new IllegalArgumentException("LEASE_TIMEOUT_MS and LEASE_SCAN_MS must be positive");
+        var core=new SchedulerCore(new MemoryStateStore(),System::nanoTime,TimeUnit.MILLISECONDS.toNanos(leaseMs));var artifacts=new ArtifactClient(HttpSupport.env("ARTIFACT_BASE_URL","http://localhost:8081"));
         HttpSupport.serve(HttpSupport.envInt("PORT",8080),ex->{
             ex.getResponseHeaders().set("X-Scheduler-Run-Id",core.runId().toString());
             String path=ex.getRequestURI().getPath();
             switch(path) {
-                case "/health", "/v1/health" -> {HttpSupport.method(ex,"GET");HttpSupport.send(ex,200,Map.of("ready",true,"scheduler_run_id",core.runId()));}
+                case "/health", "/v1/health" -> {HttpSupport.method(ex,"GET");HttpSupport.send(ex,200,Map.of("ready",true,"scheduler_run_id",core.runId(),"lease_timeout_ms",leaseMs));}
                 case "/v1/jobs" -> {
                     HttpSupport.method(ex,"POST");var r=HttpSupport.body(ex,Submission.class);ApiException.require(r!=null,"Submission required");ManifestValidator.validate(r.manifest());
                     var result=core.submissionReplay(r);
@@ -23,6 +25,7 @@ public final class SchedulerMain {
                 }
                 case "/v1/work/claim" -> {HttpSupport.method(ex,"POST");var a=core.claim(HttpSupport.body(ex,Claim.class));HttpSupport.send(ex,a==null?204:200,a);}
                 case "/v1/attempts/start" -> {HttpSupport.method(ex,"POST");var id=HttpSupport.body(ex,Identity.class);try{HttpSupport.send(ex,200,core.start(id));}catch(ApiException e){core.rejected(id,e.code);throw e;}}
+                case "/v1/attempts/heartbeat" -> {HttpSupport.method(ex,"POST");HttpSupport.send(ex,200,core.heartbeat(HttpSupport.body(ex,Identity.class)));}
                 case "/v1/attempts/report" -> {
                     HttpSupport.method(ex,"POST");var r=HttpSupport.body(ex,Report.class);
                     try {
@@ -50,6 +53,9 @@ public final class SchedulerMain {
         long[] cursor={0};
         Runnable drain=()->{boolean more;do{var page=core.events(cursor[0],1000);for(Object event:(List<?>)page.get("events"))System.out.println(Json.string(event));cursor[0]=((Number)page.get("next_after")).longValue();more=(boolean)page.get("has_more");}while(more);};
         exporter.scheduleWithFixedDelay(drain,0,50,TimeUnit.MILLISECONDS);
-        Runtime.getRuntime().addShutdownHook(new Thread(()->{exporter.shutdown();try{exporter.awaitTermination(1,TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();}drain.run();}));
+        // Lease expiry does not wait for a claim: the scan requeues orphaned tasks within LEASE_SCAN_MS of their deadline.
+        var scanner=Executors.newSingleThreadScheduledExecutor();
+        scanner.scheduleWithFixedDelay(()->{try{core.expireLeases();}catch(RuntimeException e){System.err.println(Json.string(Map.of("event_type","lease_scan_error","message",e.toString())));}},scanMs,scanMs,TimeUnit.MILLISECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{scanner.shutdownNow();exporter.shutdown();try{exporter.awaitTermination(1,TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();}drain.run();}));
     }
 }

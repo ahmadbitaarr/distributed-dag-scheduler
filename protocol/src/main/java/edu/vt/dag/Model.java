@@ -6,7 +6,7 @@ import java.util.*;
 public final class Model {
     private Model() {}
     public enum TaskState { BLOCKED, READY, ASSIGNED, RUNNING, SUCCEEDED }
-    public enum AttemptState { ASSIGNED, RUNNING, SUCCEEDED, FAILED }
+    public enum AttemptState { ASSIGNED, RUNNING, SUCCEEDED, FAILED, EXPIRED }
     public enum JobState { ACCEPTED, RUNNING, SUCCEEDED }
     public record Artifact(String key, long length, String sha256, String media_type) {}
     public record Binding(Artifact source, String task_id, String output_name) {}
