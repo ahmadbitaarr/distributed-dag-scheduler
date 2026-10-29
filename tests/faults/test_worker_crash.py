@@ -57,27 +57,21 @@ def lease_recovery(events, job, identity):
             "expired_from_state": expired["old_state"]}
 
 
-def polling_evidence(events, session, run_id, after_seq):
-    """Pair scheduler claim/empty receipts by request ID, not cross-process clocks."""
-    claims = {e["request_id"]: e for e in events if e["event_type"] == "work_claim"
-              and e.get("worker_session_id") == session and e["scheduler_run_id"] == run_id
-              and e["scheduler_event_seq"] > after_seq}
-    pairs = []
-    for e in events:
-        if (e["event_type"] == "work_empty" and e.get("worker_session_id") == session
-                and e["scheduler_run_id"] == run_id and e["request_id"] in claims):
-            claim = claims[e["request_id"]]
-            assert claim["scheduler_event_seq"] < e["scheduler_event_seq"]
-            pairs.append({"claim": claim, "empty": e})
-    return pairs
+def idle_polls(system, session):
+    """The session's empty claims so far: the scheduler's bounded per-session polling counter (MS3).
+
+    Idle polls no longer add history events, so polling evidence comes from counter reads taken in
+    order (window start, late boundary, window end); a later read can only count later claims."""
+    status, metrics = request(system.scheduler, "/v1/metrics")
+    assert status == 200
+    return metrics["polling"].get(session, {}).get("empty_claims", 0)
 
 
-def require_window_polling(events, session, run_id, start_seq, late_seq):
-    assert late_seq is not None, "Observation never reached the late polling boundary"
-    pairs = polling_evidence(events, session, run_id, start_seq)
-    assert len(pairs) >= 2, "Missing healthy-worker polling during observation"
-    assert any(p["claim"]["scheduler_event_seq"] > late_seq for p in pairs), "No fresh B claim after the late boundary"
-    return pairs
+def require_window_polling(start, late, end):
+    assert late is not None, "Observation never reached the late polling boundary"
+    assert end - start >= 2, "Missing healthy-worker polling during observation"
+    assert end > late, "No fresh B claim after the late boundary"
+    return {"empty_claims_at_start": start, "at_late_boundary": late, "at_end": end}
 
 
 @pytest.mark.faults
@@ -131,10 +125,11 @@ def test_worker_crash_reassignment(system):
     assert probe_result["tasks"]["probe"]["attempts"][0]["identity"]["worker_session_id"] == b_session
     assert system.api.get(probe_result["outputs"]["result"]) == b"3"
     check_history(probe, probe_result, system.api.events(), system.worker_events(b))
-    probe_done = max(e["scheduler_event_seq"] for e in system.api.events() if e["event_type"] == "job_completed" and e.get("job_id") == probe["job_id"])
-    wait_for(lambda: any(e["event_type"] == "work_empty" and e.get("worker_session_id") == b_session and e["scheduler_event_seq"] > probe_done for e in system.api.events()),
-             description="B polling after successful probe")
+    after_probe = idle_polls(system, b_session)
+    wait_for(lambda: idle_polls(system, b_session) > after_probe, description="B polling after successful probe")
     start_seq = system.api.events()[-1]["scheduler_event_seq"]
+    start_polls = idle_polls(system, b_session)
+    late_polls = None
     started_ns = time.monotonic_ns()
     deadline = started_ns + WINDOW_NS
     late_seq = None
@@ -149,7 +144,8 @@ def test_worker_crash_reassignment(system):
             # Events already present here cannot count as late polling. A later claim must
             # have a greater scheduler sequence, observed causally after this harness boundary.
             late_seq = system.api.events()[-1]["scheduler_event_seq"]
-            window.update({"late_scheduler_event_seq": late_seq,
+            late_polls = idle_polls(system, b_session)
+            window.update({"late_scheduler_event_seq": late_seq, "late_b_empty_claims": late_polls,
                            "late_boundary_elapsed_ns": time.monotonic_ns() - origin})
         after = system.api.status(job)
         observed_ns = time.monotonic_ns()
@@ -160,7 +156,8 @@ def test_worker_crash_reassignment(system):
                                   "finished_elapsed_ns": time.monotonic_ns() - origin,
                                   "snapshot_event_seq": after["snapshot_event_seq"],
                                   "last_scheduler_event_seq": events[-1]["scheduler_event_seq"],
-                                  "b_alive": alive, "x_state": after["tasks"]["X"]["state"],
+                                  "b_alive": alive, "b_empty_claims": idle_polls(system, b_session),
+                                  "x_state": after["tasks"]["X"]["state"],
                                   "x_attempt_no": after["tasks"]["X"]["attempt_no"]})
         assert alive, "Surviving worker died during observation"
         recovered = observed_ns <= deadline and any(
@@ -206,12 +203,10 @@ def test_worker_crash_reassignment(system):
                        and e["scheduler_event_seq"] > gate["ack_scheduler_event_seq"]
                        and e["event_type"] in {"task_failed", "task_ready", "task_retried", "task_assigned", "task_succeeded"}
                        for e in events), "X changed after the acknowledged original start"
-        # Bound polling evidence to events observed in-window, not later teardown activity.
-        end_seq = window["samples"][-1]["last_scheduler_event_seq"]
-        polls = require_window_polling([e for e in events if e["scheduler_event_seq"] <= end_seq],
-                                       b_session, system.api.run_id, start_seq, late_seq)
+        # Bound polling evidence to reads taken in-window, not later teardown activity.
+        polls = require_window_polling(start_polls, late_polls, window["samples"][-1]["b_empty_claims"])
     else:
-        polls = polling_evidence(events, b_session, system.api.run_id, start_seq)
+        polls = {"empty_claims_at_start": start_polls, "at_end": window["samples"][-1]["b_empty_claims"]}
     health = {}
     for name, base in [("scheduler", system.scheduler), ("artifact-store", system.artifacts)]:
         status, body = request(base, "/v1/health")

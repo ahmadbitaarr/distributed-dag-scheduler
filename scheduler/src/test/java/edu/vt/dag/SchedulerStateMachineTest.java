@@ -155,6 +155,24 @@ class SchedulerStateMachineTest {
         assertNull(claim(session), "both tasks are taken");
     }
 
+    @Test void idlePollingLeavesNoHistoryAndKeepsOneReceiptPerSession() {
+        // MS3: an idle system must not grow. 3 sessions x 1000 empty polls add no events.
+        var sessions = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        int before = events().size();
+        Claim last = null;
+        for (int i = 0; i < 1000; i++) for (var s : sessions) { last = new Claim(core.runId(), s, UUID.randomUUID()); assertNull(core.claim(last)); }
+        assertEquals(before, events().size());
+        assertEquals(3000L, counter("empty_claims"));
+        var polling = (Map<?, ?>) core.metrics().get("polling");
+        assertEquals(3, polling.size());
+        assertEquals(1000L, ((Map<?, ?>) polling.get(sessions.get(2).toString())).get("empty_claims"));
+        submit(manifest(task("A")));
+        assertNull(core.claim(last), "a replayed latest empty poll stays empty");
+        var a = core.claim(new Claim(core.runId(), last.worker_session_id(), UUID.randomUUID()));
+        assertEquals("A", a.identity().task_id());
+        assertEquals(1, count("work_claim"), "only a claim that receives work is recorded");
+    }
+
     // ---- submissions ----
 
     @Test void submissionReplayIsIdempotentAndConflictIsRejected() {

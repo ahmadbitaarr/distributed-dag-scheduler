@@ -10,6 +10,10 @@ public final class SchedulerState {
     final ArrayDeque<TaskRef> ready=new ArrayDeque<>();
     final Map<UUID,Identity> active=new HashMap<>();
     final Map<UUID,ClaimReceipt> claims=new HashMap<>();
+    /** Each session's latest empty claim, so a replayed idle poll stays empty without one record per poll. */
+    final Map<UUID,Claim> idleClaims=new HashMap<>();
+    /** Bounded polling evidence per session: {empty claims, elapsed_ns of the latest}. */
+    final Map<UUID,long[]> polling=new TreeMap<>();
     final List<Map<String,Object>> events=new ArrayList<>();
     final Map<String,Long> counters=new TreeMap<>();
     long readySequence;

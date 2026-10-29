@@ -47,30 +47,25 @@ def test_invalid_kill_precondition_is_an_ordinary_failure(damage):
     assert not isinstance(error.value, RecoveryNotObserved)
 
 
-def pair(sequence, request_id, session="B", run="run"):
-    return [{"event_type": kind, "request_id": request_id, "worker_session_id": session,
-             "scheduler_run_id": run, "scheduler_event_seq": sequence + i}
-            for i, kind in enumerate(["work_claim", "work_empty"])]
+# Polling evidence (MS3): B's empty-claim counter read at window start, at the late boundary and at
+# the end. Counters are per session, so another worker's or an old run's polls cannot be counted for B.
 
-
-def test_polling_requires_a_new_late_claim_not_a_late_replayed_receipt():
-    events = pair(11, "early") + pair(21, "late")
-    assert len(require_window_polling(events, "B", "run", 10, 20)) == 2
-    events[-2]["scheduler_event_seq"] = 19  # empty arrived late; claim predates boundary
+def test_polling_requires_a_new_late_claim():
+    assert require_window_polling(0, 5, 7) == {"empty_claims_at_start": 0, "at_late_boundary": 5, "at_end": 7}
     with pytest.raises(AssertionError, match="fresh B claim"):
-        require_window_polling(events, "B", "run", 10, 20)
+        require_window_polling(0, 5, 5)                    # B stopped polling before the late boundary
 
 
-@pytest.mark.parametrize("late", [[], pair(21, "wrong-worker", "A"), pair(21, "wrong-run", run="old")])
-def test_early_or_unrelated_polling_cannot_hide_an_unhealthy_b(late):
+@pytest.mark.parametrize("counts", [(3, 3, 3), (3, 4, 4), (0, 1, 1)])
+def test_early_or_absent_polling_cannot_hide_an_unhealthy_b(counts):
     with pytest.raises(AssertionError) as error:
-        require_window_polling(pair(11, "one") + pair(13, "two") + late, "B", "run", 10, 20)
+        require_window_polling(*counts)
     assert not isinstance(error.value, RecoveryNotObserved)
 
 
 def test_missing_late_boundary_is_not_an_expected_recovery_failure():
     with pytest.raises(AssertionError, match="late polling boundary") as error:
-        require_window_polling(pair(11, "one"), "B", "run", 10, None)
+        require_window_polling(0, None, 5)
     assert not isinstance(error.value, RecoveryNotObserved)
 
 

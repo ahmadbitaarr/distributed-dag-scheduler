@@ -116,10 +116,18 @@ public final class SchedulerCore {
                 if(!receipt.request().equals(r))throw ApiException.conflict("Claim ID reused with different identity");
                 return receipt.identity()==null?null:assignment(s,receipt.identity());
             }
+            if(r.equals(s.idleClaims.get(r.worker_session_id())))return null;   // replay of this session's latest empty poll
             String req=r.claim_id().toString();
-            event(s,"work_claim",req,null,null,null,"worker_session_id",r.worker_session_id());
             Identity id=s.active.get(r.worker_session_id());
-            if(id==null && !s.ready.isEmpty()) {
+            if(id==null && s.ready.isEmpty()) {
+                // An idle poll records no history and replaces the session's previous idle receipt, so an
+                // idle system's memory stays flat no matter how long workers poll.
+                s.idleClaims.put(r.worker_session_id(),r);count(s,"empty_claims");
+                var p=s.polling.computeIfAbsent(r.worker_session_id(),k->new long[2]);p[0]++;p[1]=now();
+                return null;
+            }
+            event(s,"work_claim",req,null,null,null,"worker_session_id",r.worker_session_id());
+            if(id==null) {
                 var ref=s.ready.remove(); var j=s.jobs.get(ref.jobId());var t=j.tasks.get(ref.taskId());
                 if(t.state!=TaskState.READY)throw new IllegalStateException("Non-ready FIFO entry");
                 id=new Identity(s.runId,ref.jobId(),ref.taskId(),t.attempts.size()+1,r.worker_session_id());
@@ -136,7 +144,6 @@ public final class SchedulerCore {
                 }
             }
             s.claims.put(r.claim_id(),new ClaimReceipt(r,id));
-            if(id==null) {event(s,"work_empty",req,null,null,null,"worker_session_id",r.worker_session_id());return null;}
             return assignment(s,id);
         });
     }
@@ -256,10 +263,15 @@ public final class SchedulerCore {
                     }
                 }
             }
-            var counters=new TreeMap<String,Long>();for(String k:List.of("accepted_jobs","accepted_logical_successes","explicit_failed_attempts","expired_attempts","lease_renewals","retries_assigned","duplicate_reports","rejected_reports"))counters.put(k,s.counters.getOrDefault(k,0L));
+            var counters=new TreeMap<String,Long>();for(String k:List.of("accepted_jobs","accepted_logical_successes","explicit_failed_attempts","expired_attempts","lease_renewals","retries_assigned","duplicate_reports","rejected_reports","empty_claims"))counters.put(k,s.counters.getOrDefault(k,0L));
             return map("scheduler_run_id",s.runId,"scheduler_event_seq",s.events.size(),"lease_ns",leaseNs,"counters",counters,"tasks_by_state",gauges,"ready_queue_length",s.ready.size(),"active_attempts",s.active.size(),
-                "job_duration_ns",summary(jobs),"scheduling_latency_ns",summary(latency),"lease_recovery_ns",summary(recovery));
+                "job_duration_ns",summary(jobs),"scheduling_latency_ns",summary(latency),"lease_recovery_ns",summary(recovery),"polling",polling(s));
         });
+    }
+    private Map<String,Object> polling(SchedulerState s) {
+        var out=new TreeMap<String,Object>();
+        s.polling.forEach((session,p)->out.put(session.toString(),map("empty_claims",p[0],"last_empty_claim_elapsed_ns",p[1])));
+        return out;
     }
     private Map<String,Object> summary(List<Long> values) {
         values.sort(Long::compare);int n=values.size();
