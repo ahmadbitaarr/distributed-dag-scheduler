@@ -41,7 +41,7 @@ Ownership of an attempt is a **lease** on the scheduler's monotonic clock. `LEAS
 - At its deadline the attempt becomes `EXPIRED`: the owner is released, a `lease_expired` event is recorded, and the task rejoins the tail of the ready queue. Its next assignment has `attempt_no + 1`, so the attempt number doubles as the lease generation (fencing token).
 - Expiry is applied at the start of every claim, start, heartbeat and report, and by a background scan every `LEASE_SCAN_MS` (default 100). No decision is ever made on a lease whose deadline has passed.
 - Every later message for an expired attempt (start, including a replay whose ack was lost; heartbeat; report of either outcome) gets `409 LEASE_EXPIRED` and changes nothing. A success report that arrives after the deadline is rejected even if nobody else has claimed the task yet.
-- Workers renew every `lease_timeout_ms / 5` by default (`HEARTBEAT_INTERVAL_MS` overrides), so four consecutive lost renewals are tolerated. A worker whose heartbeat gets `409` abandons the attempt without reporting.
+- Workers renew every `lease_timeout_ms / 5` by default (`HEARTBEAT_INTERVAL_MS` overrides), so up to three consecutive lost renewals are always tolerated (renewals are spaced by a fixed delay after each request, so a fifth attempt after four losses arrives just after the deadline). A worker whose heartbeat gets `409` abandons the attempt without reporting.
 - Accepted results never expire: a `SUCCEEDED` or `FAILED` attempt keeps its receipt, and report replays still get it.
 
 ## Artifact references and namespaces

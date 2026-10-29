@@ -1,5 +1,7 @@
 # Current handoff — Step 15 audit and packaging
 
+> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. Everything below is the MS2 record, kept for provenance.
+
 **Status: PASS — runtime/content audit complete; supported-host results accepted by Planning.**
 Audited accepted source revision: `f4c5dceef533a98b195d7dfa2e54ec8cac788825` (Steps 0–14 accepted).
 No Step 15 commit exists and no Git operation was performed.

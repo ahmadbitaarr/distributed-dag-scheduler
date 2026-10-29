@@ -1,5 +1,7 @@
 # Open issues and retained MS2 limitations
 
+> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. Everything below is the MS2 record, kept for provenance.
+
 Steps 0–14 are complete and accepted at `f4c5dceef533a98b195d7dfa2e54ec8cac788825`.
 Step 15 is PASS/runtime-content audit complete using the supported-host results
 accepted by Planning. Initial Work-host failures remain historical environment-limited
@@ -9,7 +11,7 @@ evidence; existing raw evidence and Step 0–14 historical handoffs remain uncha
 |---|---|---|---|
 | S11-02 | RESOLVED — local Docker/Hokea verification | `results/handoffs/step-11/FINAL-RESULTS.md` records local Hokea success, WSL-native Compose 2 PASS + 1 typed XFAIL, Make 84 PASS + 1 XFAIL and the sole intentional fault-demo failure. The earlier OneDrive path failure is historical. | Do not reopen completed local gates. The latest independent gate is Step 13. |
 | S11-03 | OPEN — external course-runner environment limitation | Course execution in `team-06` reached pytest but all 3 tests errored at setup before project services began: `Hokea source mismatch at check.py`, required pin `427b94634b1736ba8e59d4977836162aa58bd2cb`. See `results/handoffs/step-11/FINAL-RESULTS.md` and `acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md`. | A user-controlled rerun needs a correctly pinned staff-provided runner. Do not relax the pin or add compatibility logic. This is not the intentional XFAIL. |
-| S11-04 | INTENTIONAL MS2 CORRECTNESS GAP | Silent/crashed-worker RUNNING ownership is never reclaimed. The task and job stay RUNNING; downstream tasks stay BLOCKED. Step 13 confirms the sole `RecoveryNotObserved` failure. | Preserve the typed strict XFAIL and real fault-demo failure. No MS2 leases, heartbeats, expiry/scanning/requeue, auto-restart, scheduler replication/failover or durable recovery. |
+| S11-04 | RESOLVED IN MS3 (was the intentional MS2 gap; leases now reclaim silent owners) | Silent/crashed-worker RUNNING ownership is never reclaimed. The task and job stay RUNNING; downstream tasks stay BLOCKED. Step 13 confirms the sole `RecoveryNotObserved` failure. | Preserve the typed strict XFAIL and real fault-demo failure. No MS2 leases, heartbeats, expiry/scanning/requeue, auto-restart, scheduler replication/failover or durable recovery. |
 | S11-05 | RETAINED SCOPE BOUNDARY | Hokea remains a deployment/orchestration adapter; it does not change scheduler task/attempt semantics or HTTP contracts and does not share worker filesystems. | Keep the adapter and pin unchanged during documentation close-out. |
 | S10-03 | RETAINED EVIDENCE LIMITATION | Reusing an explicit container run label can overwrite host copy-back evidence. | Use fresh labels for every run; do not claim universal overwrite prevention. |
 | S0-02 | HISTORICAL | Earlier baseline/provenance coordination record. | Current source of truth is the accepted Step 14 revision above; retain original attribution. |

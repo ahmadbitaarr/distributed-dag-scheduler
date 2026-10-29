@@ -21,12 +21,12 @@ The video job is `inspect` → {`transcode720`, `transcode360`, `thumbnail`, `su
 
 ## 2. System model
 
-- **Network:** links can lose, delay, duplicate and reorder messages; endpoints are honest. Every state-changing request carries a stable identifier (job ID, claim ID, or the attempt's identity), so retrying it has no extra effect.
+- **Network:** fair-loss links: messages can be lost, delayed, duplicated and reordered, but a message that is retried repeatedly is eventually delivered. Endpoints are honest. Every state-changing request carries a stable identifier (job ID, claim ID, or the attempt's identity), so retrying it has no extra effect.
 - **Workers:** crash-recovery. A worker can crash, freeze, run slowly, or be cut off at any moment, and may come back. A restarted worker is a new session and cannot act on its old attempts.
 - **Scheduler:** assumed to stay up for the life of a run, and it is the only timekeeper. A restart starts a new, empty run with a new run ID; messages addressed to an old run get `409 STALE_RUN`.
 - **Artifact store:** assumed available and correct; stored objects never change.
 - **Timing:** partially synchronous. Safety never depends on timing. Progress needs the scheduler's process to keep running and, for a worker to keep a task, its heartbeats to reach the scheduler at least once per lease period. All durations are measured on one process's monotonic clock; ordering across machines comes from IDs and scheduler acknowledgments, never from comparing clocks.
-- **Leases:** every attempt is owned through a lease of `LEASE_TIMEOUT_MS` (default 5000 ms) on the scheduler's clock. Assignment grants it; the start acknowledgment and each heartbeat renew it. Workers heartbeat every `lease/5` (1 s), so four consecutive lost heartbeats are tolerated. When the deadline passes the attempt becomes EXPIRED, the task returns to the back of the ready queue, and its next attempt gets a higher attempt number. That number is the fencing token: every later message carrying the old one is rejected.
+- **Leases:** every attempt is owned through a lease of `LEASE_TIMEOUT_MS` (default 5000 ms) on the scheduler's clock. Assignment grants it; the start acknowledgment and each heartbeat renew it. Workers heartbeat every `lease/5` (1 s, measured from the end of the previous heartbeat), so up to three consecutive lost heartbeats are always tolerated. When the deadline passes the attempt becomes EXPIRED, the task returns to the back of the ready queue, and its next attempt gets a higher attempt number. That number is the fencing token: every later message carrying the old one is rejected.
 
 ## 3. Safety
 
@@ -60,11 +60,11 @@ These invariants are checked automatically on the full recorded history of every
 *Violation:* a READY task never assigned while a worker polls, or an attempt that never ends.
 *Falsifying experiment:* run many concurrent jobs, slow tasks longer than several leases, and short partitions; check that every job finishes and no live worker loses its task.
 
-**L2. A failed worker's task is reassigned.** If the worker holding a task crashes, freezes, or loses contact with the scheduler for longer than the lease, the task becomes READY again within `LEASE_TIMEOUT_MS` + `LEASE_SCAN_MS` (5.1 s by default) of the worker's last accepted renewal, measured on the scheduler's clock. It is then assigned to the next worker that asks.
-*Violation:* a task still owned by a dead worker more than `LEASE_TIMEOUT_MS` + `LEASE_SCAN_MS` after its last renewal, or (the original MS1 wording) a task permanently stuck.
+**L2. A failed worker's task is reassigned.** If the worker holding a task crashes, freezes, or loses contact with the scheduler for longer than the lease, the task's lease expires `LEASE_TIMEOUT_MS` after the worker's last accepted renewal (measured on the scheduler's clock); the next expiry scan, at most `LEASE_SCAN_MS` later plus scheduling delay, returns the task to the ready queue, and it is assigned to the next worker that asks. The quantitative bound is P-REC (§6).
+*Violation:* (the original MS1 wording) a task permanently stuck with a dead owner, or, quantitatively, a task still owned by a dead worker more than `LEASE_TIMEOUT_MS` + 2 s after its last renewal while a worker is polling.
 *Falsifying experiment:* kill or freeze a worker at each stage of an attempt (after claim, during the operation, after uploading but before reporting) and watch for reassignment.
 
-**When the system may stop making progress (by design):** while no worker is running or reachable; during a permanent partition between workers and the scheduler; while the scheduler is down (its restart loses all jobs, §5); and for a task whose operation always fails, which is retried forever because there is no retry limit (the job stays RUNNING, never FAILED). A link that loses four or more consecutive heartbeats can make a live worker lose its task; that costs repeated work, never a duplicate completion.
+**When the system may stop making progress (by design):** while no worker is running or reachable; during a permanent partition between workers and the scheduler; while the scheduler is down (its restart loses all jobs, §5); and for a task whose operation always fails, which is retried forever because there is no retry limit (the job stays RUNNING, never FAILED). A link that loses four or more consecutive heartbeats can make a live worker lose its task; that costs repeated work, never a duplicate completion. A link that is not fair-loss, for example one that drops every report from a worker but delivers its heartbeats, keeps that worker's task renewed and unfinished for as long as it lasts; this is outside the network model.
 
 ## 5. Fault model
 
