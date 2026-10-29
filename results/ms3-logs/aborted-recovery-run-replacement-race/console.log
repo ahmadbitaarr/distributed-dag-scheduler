@@ -1,0 +1,61 @@
+{"configuration": "baseline-c1-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 3.033815629921545, "job_p50_ms": 1374.417822, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 102.1, "error": null}
+{"configuration": "crash-c1-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 2.3467560896266746, "job_p50_ms": 1863.664156, "recovery_p50_ms": 5007.205045, "recovery_max_ms": 5036.983376, "wall_seconds": 110.7, "error": null}
+{"configuration": "baseline-c1-w4-r2", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 1.672427069570625, "job_p50_ms": 3448.684469, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 138.3, "error": null}
+{"configuration": "crash-c1-w4-r2", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 1.9607665561595817, "job_p50_ms": 2991.460978, "recovery_p50_ms": 5042.685511, "recovery_max_ms": 5072.0392, "wall_seconds": 125.1, "error": null}
+{"configuration": "baseline-c1-w4-r3", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 1.8747884597332358, "job_p50_ms": 3081.271638, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 122.0, "error": null}
+{"configuration": "crash-c1-w4-r3", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 2.058792812996724, "job_p50_ms": 2556.912604, "recovery_p50_ms": 5045.056763, "recovery_max_ms": 5048.22707, "wall_seconds": 121.9, "error": null}
+{"configuration": "baseline-c4-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 4.789603169126032, "job_p50_ms": 1900.565894, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 70.9, "error": null}
+{"configuration": "crash-c4-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 5.72732669717386, "job_p50_ms": 2257.922798, "recovery_p50_ms": 5016.080621, "recovery_max_ms": 5117.903552, "wall_seconds": 72.0, "error": null}
+{"configuration": "baseline-c4-w4-r2", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 5.320319703453963, "job_p50_ms": 4296.01986, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 75.0, "error": null}
+{"configuration": "crash-c4-w4-r2", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 10.429612791719377, "job_p50_ms": 1668.054682, "recovery_p50_ms": 5011.562139, "recovery_max_ms": 5076.819215, "wall_seconds": 56.0, "error": null}
+{"configuration": "baseline-c4-w4-r3", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 8.267406040156002, "job_p50_ms": 1684.880844, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 68.1, "error": null}
+{"configuration": "crash-c4-w4-r3", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 5.160249562388852, "job_p50_ms": 2151.211385, "recovery_p50_ms": 5015.080025, "recovery_max_ms": 5419.524744, "wall_seconds": 76.8, "error": null}
+{"configuration": "baseline-c16-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 3.127409457846411, "job_p50_ms": 21665.001139, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 85.3, "error": null}
+{"configuration": "crash-c16-w4-r1", "status": "complete", "completed_jobs": 24, "kills": 2, "kills_holding_task": 2, "expired_attempts": 2, "tasks_per_second": 6.2013748534352535, "job_p50_ms": 12728.82676, "recovery_p50_ms": 5032.565036, "recovery_max_ms": 6634.88869, "wall_seconds": 70.4, "error": null}
+{"configuration": "baseline-c16-w4-r2", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 5.242471487767043, "job_p50_ms": 16190.404805, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 69.8, "error": null}
+Exception in thread Thread-2594 (crash_and_replace):
+Traceback (most recent call last):
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 1041, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 992, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\benchmarks\recovery.py", line 85, in crash_and_replace
+    replacement = system.start_worker()
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\runtime.py", line 183, in start_worker
+    result = self.compose("run", "-d", "--no-deps", "--name", self.project + "-" + name, *options, "worker")
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\runtime.py", line 164, in compose
+    return subprocess.run(["docker", "compose", "-f", str(ROOT / "deploy/compose/compose.yaml"), "-p", self.project, *args],
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          env=self.compose_env, check=True, capture_output=True, text=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['docker', 'compose', '-f', 'C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\deploy\\compose\\compose.yaml', '-p', 'ms2-b0e7195355', 'run', '-d', '--no-deps', '--name', 'ms2-b0e7195355-worker-5', 'worker']' returned non-zero exit status 1.
+{"configuration": "crash-c16-w4-r2", "status": "censored", "completed_jobs": 24, "kills": 1, "kills_holding_task": 1, "expired_attempts": 2, "tasks_per_second": null, "job_p50_ms": 11653.544296, "recovery_p50_ms": 5112.642212, "recovery_max_ms": 5609.914719, "wall_seconds": 63.8, "error": null}
+{"configuration": "baseline-c16-w4-r3", "status": "complete", "completed_jobs": 24, "kills": 0, "kills_holding_task": 0, "expired_attempts": 0, "tasks_per_second": 7.000683906874346, "job_p50_ms": 9494.640542, "recovery_p50_ms": null, "recovery_max_ms": null, "wall_seconds": 66.0, "error": null}
+Exception in thread Thread-2884 (crash_and_replace):
+Traceback (most recent call last):
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 1041, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 992, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\benchmarks\recovery.py", line 85, in crash_and_replace
+    replacement = system.start_worker()
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\runtime.py", line 183, in start_worker
+    result = self.compose("run", "-d", "--no-deps", "--name", self.project + "-" + name, *options, "worker")
+  File "C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\tests\harness\runtime.py", line 164, in compose
+    return subprocess.run(["docker", "compose", "-f", str(ROOT / "deploy/compose/compose.yaml"), "-p", self.project, *args],
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          env=self.compose_env, check=True, capture_output=True, text=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hasan\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['docker', 'compose', '-f', 'C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\deploy\\compose\\compose.yaml', '-p', 'ms2-82a853669d', 'run', '-d', '--no-deps', '--name', 'ms2-82a853669d-worker-5', 'worker']' returned non-zero exit status 1.
+{"configuration": "crash-c16-w4-r3", "status": "censored", "completed_jobs": 24, "kills": 1, "kills_holding_task": 1, "expired_attempts": 2, "tasks_per_second": null, "job_p50_ms": 7096.499869, "recovery_p50_ms": 5387.179583, "recovery_max_ms": 5661.993174, "wall_seconds": 70.1, "error": null}
+EXIT=1

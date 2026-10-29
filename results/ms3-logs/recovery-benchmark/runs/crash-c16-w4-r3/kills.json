@@ -1,0 +1,32 @@
+[
+  {
+    "worker": "worker-1",
+    "session": "e4248a2c-b82b-4c43-9e39-8da73fa522ac",
+    "holding": [
+      "abdc4830-d2bb-4f71-b93f-3b66bb52b645",
+      "F",
+      1,
+      true
+    ],
+    "kill_requested_utc": "2026-10-29T17:00:57.328065+00:00",
+    "container": "c0643d2d2594cc27cd1d5b8006ee4ca9069a7666452cc563aa50fb5b14185eed",
+    "signal": "SIGKILL",
+    "exit_code": 137,
+    "replacement": "worker-5"
+  },
+  {
+    "worker": "worker-2",
+    "session": "d2dbedc7-4575-4dd9-bfeb-0e36295a76c9",
+    "holding": [
+      "5fe40898-75c6-468a-bf8b-474bf799f102",
+      "F",
+      1,
+      true
+    ],
+    "kill_requested_utc": "2026-10-29T17:01:02.656794+00:00",
+    "container": "2350b78738f3e864e2924f9fb364e463a3b77600dcc05361e781c61e47ac3064",
+    "signal": "SIGKILL",
+    "exit_code": 137,
+    "replacement": "worker-6"
+  }
+]

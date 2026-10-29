@@ -70,7 +70,40 @@ Key results from the submitted run (`make-test-3`):
 
 ## E. Performance
 
-PERF_PLACEHOLDER
+**Method.** `make bench-recovery` (`benchmarks/recovery.py`) uses the Step 12 workload and closed loop: six-task jobs with 100 ms fixture operations, 4 warmup jobs, then 24 measured jobs with at most C in flight. Here W = 4 workers and C ∈ {1, 4, 16}, with three fresh Compose deployments per configuration and mode (1 CPU and 512 MiB per service). *Baseline* injects nothing. *Crash* SIGKILLs a worker that is executing a task after the 6th and the 14th measured completions, and immediately starts a replacement worker. All times are on the scheduler's monotonic clock. Source `d4fcda9`; the service code is identical to the tested `966965e`. Raw data: `results/ms3-logs/recovery-benchmark/`.
+
+| C | Mode | Complete runs | Throughput, tasks/s (mean ± sd) | Job time p50 / p95 (ms) | Jobs hit by a kill: p50 (ms) | Recoveries | Recovery p50 / p95 / max (ms) | Detection p50 (ms) | Requeue → new owner p50 / max (ms) |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | baseline | 3/3 | 4.40 ± 2.23 | 1,042 / 5,207 | – | – | – | – | – |
+| 1 | crash | 2/3 | 4.03 ± 0.01 | 1,035 / 6,250 | 6,250 | 4 | 5,004 / 5,045 / 5,045 | 5,004 | 0 / 1 |
+| 4 | baseline | 3/3 | 14.78 ± 1.33 | 1,563 / 1,805 | – | – | – | – | – |
+| 4 | crash | 3/3 | 9.66 ± 0.24 | 1,690 / 6,656 | 6,872 | 5 | 5,058 / 5,103 / 5,103 | 5,053 | 0 / 64 |
+| 16 | baseline | 3/3 | 11.85 ± 6.12 | 5,851 / 20,143 | – | – | – | – | – |
+| 16 | crash | 3/3 | 9.92 ± 5.16 | 6,006 / 28,598 | 11,407 | 4 | 5,052 / 10,328 / 10,328 | 5,005 | 0 / 5,324 |
+
+Percentiles are nearest-rank over the jobs of complete runs; throughput is the mean (standard deviation) of per-run values.
+
+**Recovery takes one lease.** Each of the 16 kills was requested while its victim was executing a task. In 13 of them the task was still unfinished when the SIGKILL landed; on this host `docker kill` took up to about a second, and the other 3 victims had just reported. All 13 orphaned tasks were recovered:
+
+- Detection took 5.00–5.09 s, never less than the 5 s lease.
+- In 12 of 13, the task was reassigned within 64 ms of its expiry, for a recovery of 5.00–5.10 s.
+- In one C=16 run every worker was busy, so the requeued task waited 5.3 s at the back of the queue, for a recovery of 10.3 s. That is what FIFO requeueing implies, and it is why P-REC is stated only for the case where an idle worker is polling.
+
+**What a crash costs a job.** A job that lost a task to a crash took a median of 6.3 s (C=1), 6.9 s (C=4) and 11.4 s (C=16), against 1.0, 1.7 and 6.0 s for the other jobs in the same runs: roughly one lease plus a re-run of the task. Jobs that were not hit were not slowed; their medians were within 8% of the baseline's at every C (1.03 vs 1.04 s, 1.68 vs 1.56 s, 5.98 vs 5.85 s). With two crashes in a 24-job run, throughput fell from 14.8 to 9.7 tasks/s at C=4. At C=1 and C=16 the difference is within run-to-run noise.
+
+**Throughput and today's host.** Fault-free throughput at W = 4 was 4.4, 14.8 and 11.9 tasks/s at C = 1, 4 and 16. Step 12 measured 6.0, 15.4 and 16.7 on the same laptop. The difference comes from the host, not from leases:
+
+- **Variance today was large.** These runs began in a slow period: the first C=1 baseline ran at 1.8 tasks/s and the next two at 5.7.
+- **A same-day control rules out the code.** The unchanged MS2 code at C=1, W=4 ran at 3.06 tasks/s, the same as MS3's code measured at the same time (2.99–3.30 tasks/s; `results/ms3-logs/perf-attribution/`).
+- **Heartbeats add almost no traffic here.** They start one second into an attempt, and these tasks finish in a fraction of a second.
+
+MS2's fault-free matrix (MS2 report §E) therefore remains our throughput characterization. An idle worker receives a ready task in about 5 ms; workers, not the scheduler, limit throughput.
+
+**Memory.** After the MS3 fix, an idle scheduler's heap is flat. Real work costs about 10 KB of heap per completed task, so one run holds about 11,000 tasks with the default 128 MiB heap (`results/ms3-logs/memory-probe/`).
+
+**Completeness.** 17 of the 18 runs completed. In the remaining one (crash, C=1, repetition 1), the benchmark driver's 6-second HTTP read of the event stream timed out during the slow period, and the driver stopped. The system had completed all 27 submitted jobs correctly, and both of that run's kills were recovered, but the run is excluded from the table. The histories of all 18 runs (503 jobs) pass the offline safety checker. Three earlier attempts were stopped and are kept as records (`results/ms3-logs/README.md`): one killed idle workers, one ran on code from before the memory fix, and one hit a driver race when starting replacement workers.
+
+**Environment.** The same laptop as MS2: Windows 11, 12 CPUs, 16 GB RAM, Docker Desktop 27.1.1 with its Linux VM capped at 3 GB, shared with a browser and an IDE.
 
 ## F. Deployment
 

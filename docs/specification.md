@@ -97,7 +97,13 @@ Faults are injected by the harness: SIGKILL and SIGSTOP/SIGCONT on worker proces
 
 **Guarantee (P-REC).** A crashed worker's task is never detected earlier than `LEASE_TIMEOUT_MS` after its last renewal, and, when an idle worker is polling, is reassigned within `LEASE_TIMEOUT_MS` + 2 s of it. Under load (no idle worker), the recovered task additionally waits behind the tasks already queued, by FIFO. The bound is tested in every crash test.
 
-**Measured results** (details in the progress report, §E): RESULTS_PLACEHOLDER
+**Measured results** (details in the progress report, §E):
+
+- **Recovery.** With W = 4 and two busy workers killed in each of 8 runs, 13 tasks were orphaned and all 13 were recovered. Detection took 5.00–5.09 s. Recovery took 5.00–5.10 s when a worker was free, and once 10.3 s, when every worker was busy and the task waited its turn in the queue.
+- **Cost to a job.** A job hit by a crash finished about one lease later than its peers (median 6.3 s against 1.0 s at C = 1). Other jobs were not slowed.
+- **Throughput.** It is set by the number of workers: about 4.2 tasks/s per one-slot worker, reaching 16.7 tasks/s with 4 workers at C = 16 (MS2 matrix). On the noisier host of the MS3 runs, fault-free throughput at W = 4 was 4.4, 14.8 and 11.9 tasks/s at C = 1, 4 and 16. A same-day control of the MS2 code showed that the gap is the host, not leases.
+- **Scheduling latency.** An idle worker receives a ready task in about 5 ms.
+- **Memory.** An idle scheduler's heap stays flat; real work costs about 10 KB per completed task (§1, Capacity).
 
 Throughput and job time are characterizations, not commitments: they depend on the host and on the synthetic workload. A deployment trades recovery time against false expiry by choosing `LEASE_TIMEOUT_MS`; recovery time is approximately the lease, plus up to one scan interval and one poll interval.
 
