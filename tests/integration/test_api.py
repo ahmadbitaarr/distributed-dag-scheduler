@@ -121,7 +121,9 @@ def test_counters_gauges_and_snapshot_sequence_are_consistent(system):
     assert snapshot["snapshot_event_seq"] == len(events)                    # nothing else ran
     _, metrics = request(system.scheduler, "/v1/metrics")
     assert metrics["counters"] == {"accepted_jobs": 1, "accepted_logical_successes": 1, "explicit_failed_attempts": 1,
+                                   "expired_attempts": 0, "lease_renewals": 0,       # MS3 lease counters; no heartbeats here
                                    "retries_assigned": 1, "duplicate_reports": 1, "rejected_reports": 1}
+    assert metrics["lease_ns"] == 5_000_000_000 and metrics["lease_recovery_ns"]["count"] == 0
     assert metrics["tasks_by_state"] == {"BLOCKED": 0, "READY": 1, "ASSIGNED": 0, "RUNNING": 0, "SUCCEEDED": 1}
     assert metrics["ready_queue_length"] == 1 and metrics["active_attempts"] == 0
     assert metrics["scheduling_latency_ns"]["count"] == 2

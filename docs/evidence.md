@@ -1,6 +1,6 @@
 # Evidence, event schema, and history checks
 
-This file describes how MS2 records what happened and how anyone can falsify the safety claims from saved files, without reading console output. It implements architecture §14.
+This file describes how the system records what happened and how anyone can falsify the safety claims from saved files, without reading console output. It implements architecture §14.
 
 ## What service-backed tests export
 
@@ -16,6 +16,8 @@ The pytest `system` fixture runs one isolated deployment per service-backed test
 | `worker-N.jsonl`, `scheduler.jsonl`, `artifact-store.jsonl` | Raw process stdout and stderr: JSON events plus any diagnostics. |
 | `metadata.json` | Test node ID, outcome (passed/failed/skipped), xfail flag, backend, scheduler run ID, source revision (`MS2_SOURCE_REV`, set by `deploy/harness/run.sh`, with `+uncommitted` for a dirty tree), UTC start and finish, Python/Java/platform versions, the run label, and whether export/cleanup returned successfully. |
 | `compose.log` | Compose backend only: `docker compose logs` before `down`. |
+| `proxy-worker-N.jsonl` | Network-fault tests only: every request on that worker's link, with the action taken (`forward`, `delay`, `duplicate`, `drop_request`, `drop_response`) and partition/heal markers. |
+| `recovery.json` | Crash oracle: scheduler-clock last sign of life, expiry, reassignment, detection and recovery times. |
 | Test-specific files | For example `fault.json`, `gate.json` and `oracle-traceback.txt` for the crash test. |
 
 Selected evidence is copied into `results/handoffs/step-XX/` and committed. `results/latest-tests/` is gitignored.
@@ -45,8 +47,9 @@ Scheduler decision events also carry:
 |---|---|---|
 | `job_submitted` | scheduler | Acceptance committed. `state`. |
 | `task_ready` | scheduler | The task entered the FIFO. `ready_seq`, `satisfied_parents`. |
-| `task_assigned` | scheduler | Ownership and the attempt record installed. `ready_seq`, `ready_elapsed_ns`, `assigned_elapsed_ns`. |
-| `task_retried` | scheduler | An attempt numbered above 1 was assigned. `previous_attempt_no`. |
+| `task_assigned` | scheduler | Ownership, the attempt record and its lease installed. `ready_seq`, `ready_elapsed_ns`, `assigned_elapsed_ns`, `lease_deadline_elapsed_ns`. |
+| `task_retried` | scheduler | An attempt numbered above 1 was assigned. `previous_attempt_no`, `previous_attempt_state` (`FAILED` or `EXPIRED`), `previous_last_alive_elapsed_ns`. |
+| `lease_expired` | scheduler | MS3: the owner's lease passed its deadline; ownership released and the task requeued (a `task_ready` follows). `old_state`, `last_alive_elapsed_ns`, `lease_deadline_elapsed_ns`, `lease_renewals`. |
 | `task_started` | scheduler | Matching start accepted. Its sequence number is the acknowledgment the worker must receive before executing. |
 | `task_failed` | scheduler | Explicit failure accepted. `error`, `report`. |
 | `task_succeeded` | scheduler | The single logical success. `outputs`, `report`. |
@@ -60,8 +63,10 @@ Scheduler decision events also carry:
 | `worker_report_sent` | worker | The success report, with output descriptors. |
 | `worker_operation_failed` | worker | A local failure or timeout. `error`. |
 | `attempt_rejected` / `request_rejected` | worker | The scheduler rejected the worker's request. `status`, `code`. |
+| `worker_lease_lost` | worker | A heartbeat got `409`; the worker cancels the attempt. `status`, `response`. |
+| `worker_attempt_abandoned` | worker | The worker dropped an attempt after losing its lease, without reporting. `stage`. |
 | `scheduler_run_changed` | worker | The scheduler run changed; the worker discards its assignment and starts a new session. |
-| `worker_test_gate_entered` | worker | Test-only barrier inside an operation (hooks enabled only). |
+| `worker_test_gate_entered` | worker | Test-only stall point (hooks enabled only). `stage` is `before_start`, `operation` or `before_report`. |
 | `fault_injected` | harness | Record of a deliberate kill. |
 
 Worker and scheduler events are joined through `ack_scheduler_event_seq`, never by comparing timestamps.
@@ -74,6 +79,7 @@ Worker and scheduler events are joined through `ack_scheduler_event_seq`, never 
 |---|---|
 | The event sequence is gap-free and ordered. | Prerequisite: otherwise an invariant could pass vacuously. |
 | A task is assigned only after every parent's `task_succeeded`. | No task runs before its dependencies. |
+| `lease_expired` releases exactly the current owner, and an expired attempt never succeeds. | No completion without a reported success from the current owner; no duplicate completion. |
 | A start comes only from the current owner of an assigned attempt. Every `worker_operation_started` joins to that exact acknowledged start. | No task runs before its dependencies, measured at the worker. |
 | A success needs a matching SUCCESS report, the current owner, and an accepted start. | No completion without a reported success. |
 | A task has at most one active owner, and nothing is assigned after its success. | Ownership. |

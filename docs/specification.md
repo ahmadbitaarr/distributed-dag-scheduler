@@ -1,100 +1,123 @@
-# Distributed DAG Task Scheduler: Revised Specification (MS2)
+# Distributed DAG Task Scheduler: Specification (MS3)
 
-This revises our approved MS1 specification. The intended semester claims (quoted in each section) are unchanged. Under each one we state what the MS2 prototype actually guarantees today. Supporting tests and measurements are in the [MS2 progress report](ms2-progress-report.md). Design detail is in [the architecture](CS4094_MS2_Architecture.md), and the wire format is in [api.md](api.md).
+This is the living specification, revised for MS3. The approved MS1 claims are quoted at the top of each section; the text under them is what the MS3 system guarantees, under which conditions, and how to falsify it. Every claim maps to tests in the [test-to-property matrix](test-matrix.md). Changes since MS2 are listed in §9 and explained in the [MS3 progress report](ms3-progress-report.md). The wire format is in [api.md](api.md) and the event schema in [evidence.md](evidence.md).
 
 ## 1. Overview
 
 > We are building a fault-tolerant distributed task scheduler for a video-processing platform. Each uploaded video creates a directed acyclic graph (DAG) of tasks such as transcoding, thumbnail generation, subtitle generation, and publishing. Some tasks can run in parallel, while others must wait for their dependencies. The system consists of one scheduler and multiple worker nodes. The scheduler tracks dependencies and assigns ready tasks to available workers. Workers execute tasks and report completion. If a worker fails before finishing, the unfinished task can be reassigned. We are not building a full video-sharing platform, authentication, billing, or production-quality video-processing algorithms.
 
-In MS2 the system has four parts:
+A client submits a job as a JSON manifest describing a DAG of tasks drawn from a fixed operation allowlist. The system runs every task once its parents have succeeded, on whichever worker asks for work, and reports the job's outputs when every task has succeeded.
 
-- **Scheduler.** A single Java 21 process makes every job, task and attempt decision under one mutex and keeps its state in memory.
-- **Artifact store.** An HTTP service holds immutable files. Workers exchange inputs and outputs only through it.
-- **Workers.** One-slot workers poll the scheduler and run a fixed allowlist of operations: small arithmetic fixtures, ffprobe, FFmpeg transcodes and thumbnails.
-- **Client.** A Java command-line client uploads files, submits jobs, checks status and fetches results.
+| Component | Runs | Does | Talks to |
+|---|---|---|---|
+| **Scheduler** | one Java 21 process | Validates jobs, tracks dependencies, hands out ready tasks in FIFO order, grants and expires **leases**, accepts or rejects results. All decisions are made under one mutex on in-memory state. | Answers clients and workers over HTTP/JSON; checks output files exist in the artifact store (HEAD). Never calls workers. |
+| **Workers** | any number of Java processes, one task at a time | Poll for work, get a start acknowledgment, run the operation (fixture arithmetic, `ffprobe`, FFmpeg transcode/thumbnail), upload outputs, report. Renew their lease with a heartbeat every second while they hold a task. | Scheduler (claim, start, heartbeat, report); artifact store (read inputs, write outputs). No inbound port. |
+| **Artifact store** | one Java process | Stores immutable files under content-verified keys. A key, once published, never changes. | Answers workers, clients and the scheduler. |
+| **Client** | CLI or the Python harness | Uploads inputs, submits jobs, polls status, downloads outputs. | Scheduler and artifact store. |
 
-The video DAG (inspect → 720p, 360p, thumbnail and subtitles in parallel → publish) runs end to end on a committed synthetic clip. "Publish" writes a manifest of the produced files. The subtitles are a fixture file, not real transcription.
+The video job is `inspect` → {`transcode720`, `transcode360`, `thumbnail`, `subtitles`} in parallel → `publish`. `publish` writes a JSON manifest of the produced files; `subtitles` copies a fixture file rather than transcribing speech.
+
+**Not built (anti-features).** Scheduler replication, failover or durable scheduler state; artifact-store replication or recovery; exactly-once *physical* execution or exactly-once external side effects (a task can physically run more than once; only one result is ever accepted); authentication or authorization; a web UI; priorities, cancellation, deadlines or retry limits; real speech-to-text or production media pipelines; defense against malicious workers.
 
 ## 2. System model
 
-We use the course's network, node and timing vocabulary.
-
-- **Network:** fair-loss point-to-point links. Messages can be lost, delayed, duplicated or reordered; endpoints are honest. Every request that changes state carries a stable ID (job, claim or attempt identity), so a retried request has no extra effect.
-- **Workers:** crash-recovery. A worker may stop at any time, permanently or not. A restarted worker is a new session with no memory of its previous attempt.
-- **Scheduler:** assumed correct for the life of a run. A restart starts a new, empty run with a new run ID, and messages addressed to an older run are rejected. We claim no scheduler crash tolerance.
-- **Artifact store:** assumed correct and available during a run. Stored objects never change.
-- **Timing:** partially synchronous. Safety never depends on timing or synchronized clocks. Progress assumes messages are eventually delivered and operations finish within their limits. Durations are measured on a single process's monotonic clock. Ordering across machines comes from IDs and scheduler acknowledgments, never from comparing wall clocks.
+- **Network:** links can lose, delay, duplicate and reorder messages; endpoints are honest. Every state-changing request carries a stable identifier (job ID, claim ID, or the attempt's identity), so retrying it has no extra effect.
+- **Workers:** crash-recovery. A worker can crash, freeze, run slowly, or be cut off at any moment, and may come back. A restarted worker is a new session and cannot act on its old attempts.
+- **Scheduler:** assumed to stay up for the life of a run, and it is the only timekeeper. A restart starts a new, empty run with a new run ID; messages addressed to an old run get `409 STALE_RUN`.
+- **Artifact store:** assumed available and correct; stored objects never change.
+- **Timing:** partially synchronous. Safety never depends on timing. Progress needs the scheduler's process to keep running and, for a worker to keep a task, its heartbeats to reach the scheduler at least once per lease period. All durations are measured on one process's monotonic clock; ordering across machines comes from IDs and scheduler acknowledgments, never from comparing clocks.
+- **Leases:** every attempt is owned through a lease of `LEASE_TIMEOUT_MS` (default 5000 ms) on the scheduler's clock. Assignment grants it; the start acknowledgment and each heartbeat renew it. Workers heartbeat every `lease/5` (1 s), so four consecutive lost heartbeats are tolerated. When the deadline passes the attempt becomes EXPIRED, the task returns to the back of the ready queue, and its next attempt gets a higher attempt number. That number is the fencing token: every later message carrying the old one is rejected.
 
 ## 3. Safety
 
-> A task will not be marked complete unless successful completion is reported, and a task will not run before its required dependencies finish. Retried tasks will not be recorded as multiple successful completions.
+> A task will not be marked complete unless successful completion is reported, and a task will not run before its required dependencies finish. Retried tasks will not be recorded as multiple successful completions. These claims are violated if an unfinished task is marked complete, a task runs before its dependencies, or one logical task is recorded as completed multiple times.
 
-**MS2 status: all three hold within a scheduler run.**
+**Status: all three hold, under every fault in §5.** They do not depend on timing: a wrong lease setting can cost progress or duplicate work, never safety.
 
-- **No completion without a reported success.** A task becomes SUCCEEDED only on a SUCCESS report from the worker that currently owns its running attempt. Every declared output must already be published with the matching length and hash. A timeout, a failure, silence, or a file that merely exists never completes a task.
-- **No task before its dependencies.** A task is offered to workers only after every parent has an accepted success. A worker starts executing only after the scheduler acknowledges its start, and its inputs are the parents' accepted outputs.
-- **No duplicate completion.** A task keeps the same identity across retries, SUCCEEDED is final, and a replayed report gets the stored receipt back. A success arriving late from an older attempt is rejected.
+**S1. No completion without a reported success.** A task becomes SUCCEEDED only when the scheduler accepts a SUCCESS report from the attempt that currently holds its unexpired lease, and every declared output is already published in the artifact store with the reported length, SHA-256 and media type, under that attempt's own key prefix. Nothing else completes a task: not a timeout, not a lease expiry, not silence, not a file that merely exists, and not a success report from an older or expired attempt (`409 LEASE_EXPIRED` or `409 CONFLICT`).
+*Violation in the log:* a `task_succeeded` with no matching SUCCESS report from the current owner, or a `task_succeeded` for an attempt that already had a `lease_expired`.
+*Falsifying experiment:* let a worker's lease expire while it keeps working (drop its heartbeats, freeze it, or partition it), let it finish and report SUCCESS, and check whether that late report is accepted.
 
-These properties are checked automatically on the recorded event histories of service-backed tests, and the checker can also be run offline on saved evidence. Independent Step 13 verification recorded all 40 generated evidence directories as valid; see [VERIFICATION.md](../results/handoffs/step-13/VERIFICATION.md) and the [claim-to-test matrix](ms2-claim-evidence.md). We assume workers are honest: the scheduler verifies identity, state and output integrity, but does not recompute results.
+**S2. No task before its dependencies.** A task is assigned only after every parent has an accepted success, and a worker begins executing only after the scheduler acknowledged its start. Its inputs are exactly the parents' accepted outputs.
+*Violation:* a `task_assigned` before a parent's `task_succeeded`, or a `worker_operation_started` that does not join to that attempt's `task_started` acknowledgment.
+*Falsifying experiment:* submit joins and chains under concurrent workers, crashes and message loss, and compare every assignment with its parents' successes in the history.
+
+**S3. No duplicate completion.** Each logical task `(job_id, task_id)` has at most one accepted success, and at most one attempt owns it at any moment. A replayed report gets the stored receipt back (`completion_duplicate`); a report or start from a superseded, failed or expired attempt is rejected without changing state. A job completes exactly once, after all its tasks.
+*Violation:* two `task_succeeded` for one task, two concurrent owners, or a `job_completed` before all tasks succeeded.
+*Falsifying experiment:* duplicate every report, drop replies so workers resend, crash workers after their success was accepted, and resume frozen workers after their task was reassigned.
+
+S3 is about **recorded** completions. Physical execution is at-least-once: an expired attempt may still be running somewhere (frozen or partitioned) and may finish. Its outputs land under its own attempt prefix, are never referenced, and its report is rejected.
+
+These invariants are checked automatically on the full recorded history of every service-backed test (`check_history`), and offline on saved evidence (`python -m tests.harness.check_evidence <dir>`). We assume honest workers: the scheduler checks identity, state and output integrity, but does not recompute results.
 
 ## 4. Liveness
 
-> If workers remain available, every ready task will eventually be assigned and either complete or be retried after failure. If a worker fails while executing a task, that unfinished task will eventually become available for reassignment.
+> If workers remain available, every ready task will eventually be assigned and either complete or be retried after failure. If a worker fails while executing a task, that unfinished task will eventually become available for reassignment. This claim is violated if an unfinished task remains permanently stuck.
 
-**MS2 status: the first claim holds partially; the second is intentionally not met.**
+**Status: both hold.** (MS2 left L2 broken on purpose; MS3's leases fix it.)
 
-Ready tasks are assigned in FIFO order. A task whose worker reports a failure goes to the back of the queue and is reassigned with a higher attempt number. There is no retry limit, so a job is never marked failed. This holds while workers stay up.
+**L1. Ready tasks make progress.** While at least one worker is running and can reach the scheduler and artifact store, every READY task is eventually assigned (the ready queue is FIFO, so a task waits only for the tasks ahead of it), and every attempt ends: it succeeds, fails explicitly (a crash in the operation, or `OPERATION_TIMEOUT_MS`, default 30 s, elapsing), or its lease expires. A failed or expired attempt puts the task back in the queue with a higher attempt number. A worker that keeps renewing keeps its task for as long as its operation runs: slow is not dead.
+*Violation:* a READY task never assigned while a worker polls, or an attempt that never ends.
+*Falsifying experiment:* run many concurrent jobs, slow tasks longer than several leases, and short partitions; check that every job finishes and no live worker loses its task.
 
-If a worker crashes while holding a task, MS2 has no lease, heartbeat or timeout that would take the task back. The task stays RUNNING under the dead worker forever, and everything downstream stays blocked. This is the one correctness violation MS2 demonstrates on purpose. The test `test_worker_crash_reassignment` demands reassignment and fails with `RecoveryNotObserved`. Step 13 independently observed exactly this failure under `make fault-demo`; `make test` recorded 86 passes, exactly one intentional XFAIL and no failures. Its exact fault-demo shell exit code was not preserved. The stuck task and job stay RUNNING, and downstream Y stays BLOCKED. Both intended liveness claims are constrained by the same missing reclamation mechanism; its implementation is deferred to MS3.
+**L2. A failed worker's task is reassigned.** If the worker holding a task crashes, freezes, or loses contact with the scheduler for longer than the lease, the task becomes READY again within `LEASE_TIMEOUT_MS` + `LEASE_SCAN_MS` (5.1 s by default) of the worker's last accepted renewal, measured on the scheduler's clock. It is then assigned to the next worker that asks.
+*Violation:* a task still owned by a dead worker more than `LEASE_TIMEOUT_MS` + `LEASE_SCAN_MS` after its last renewal, or (the original MS1 wording) a task permanently stuck.
+*Falsifying experiment:* kill or freeze a worker at each stage of an attempt (after claim, during the operation, after uploading but before reporting) and watch for reassignment.
 
-No progress is promised during a permanent partition, while all workers are down, or under unbounded load.
+**When the system may stop making progress (by design):** while no worker is running or reachable; during a permanent partition between workers and the scheduler; while the scheduler is down (its restart loses all jobs, §5); and for a task whose operation always fails, which is retried forever because there is no retry limit (the job stays RUNNING, never FAILED). A link that loses four or more consecutive heartbeats can make a live worker lose its task; that costs repeated work, never a duplicate completion.
 
 ## 5. Fault model
 
 > The system will handle worker crashes, worker restarts, temporary worker unavailability, and delayed or lost communication. Byzantine or malicious worker behavior is outside the scope of the project. These failures will be tested by stopping workers and introducing communication problems during active jobs.
 
-MS2 tests worker stops and lost or duplicated messages. Broader communication-fault testing is planned with MS3's recovery work.
+| Fault | In scope? | Behavior | Tested by |
+|---|---|---|---|
+| Worker crash at any point (after claim, while running, after upload, after reporting) | Yes | Lease expires; task requeued and reassigned; orphan outputs ignored. | crash tests at every stage, chaos |
+| Worker restart | Yes | A new session; the old attempt can no longer act; its task is recovered by its lease. | restart test |
+| Worker freeze, slowness, long GC (temporary unavailability) | Yes | Shorter than the lease: no effect. Longer: task reassigned, and the frozen worker's late messages are rejected; it then serves new work. | pause, slow-task, partition tests |
+| Lost, delayed, duplicated, reordered worker↔scheduler messages | Yes | Retries reuse identifiers and get cached receipts; a lost reply causes a resend, never a second execution of the same attempt or a second completion. | proxy tests, chaos |
+| Worker↔scheduler partition | Yes | Shorter than the lease: the attempt survives. Longer: treated as a crash; the worker stands down when the link heals. | partition tests |
+| Client retries | Yes | Same job ID and identical manifest replays; a different manifest under the same ID is `409`. | integration tests |
+| Scheduler crash or restart | **No** (safe, not tolerated) | A new, empty run; in-flight and queued jobs are lost and must be resubmitted; old-run messages get `409 STALE_RUN`. | run-change tests |
+| Artifact store unavailable | Partly | Submissions get `503` and nothing is accepted; success reports cannot be verified and are retried. Store crash or data loss is not handled. | storage-unavailable test |
+| Scheduler↔artifact-store or worker↔artifact-store partition | No | Assumed available. Retries absorb short outages. | — |
+| Malicious or Byzantine workers (forged identities, wrong results), clock tampering | No | — | — |
 
-| Fault | MS2 behavior |
-|---|---|
-| Lost, delayed or duplicated messages | Handled. Retries reuse the same IDs and get cached replies. A lost acknowledgment causes the report to be resent, never the work to be redone. |
-| Worker restart | Safe. The new session cannot act on the old attempt. The old attempt is not recovered. |
-| Worker crash holding a task | Safe but not live: the task stays stuck (Section 4). |
-| Stale or conflicting reports | Rejected with no state change. The worker drops that attempt and keeps working. |
-| Scheduler restart | New empty run. Messages from the old run get `409 STALE_RUN`, and workers join the new run. |
-| Artifact store unavailable | Submissions get a temporary `503`, and nothing is accepted. |
-| Byzantine workers | Out of scope. |
+Faults are injected by the harness: SIGKILL and SIGSTOP/SIGCONT on worker processes (Docker kill/pause on Compose), worker stall points enabled only in tests, and a per-worker fault proxy that drops requests or replies, delays, duplicates, or partitions that worker's link to the scheduler. Every injected fault is logged next to the histories.
 
 ## 6. Performance
 
 > We will measure job completion time, task throughput, scheduling latency, and recovery time after worker failures. Performance will be evaluated by submitting increasing numbers of concurrent DAG-based jobs under normal operation and while intentionally introducing worker failures.
 
-**MS2 status: three of the four metrics are measured under normal operation.** We ran 1, 4 and 16 concurrent jobs against 1, 2 and 4 workers, five fresh repetitions each, with every service capped at 1 CPU and 512 MiB. All 45 runs completed.
+**Metrics** (all on the scheduler's monotonic clock): job completion time (accepted → completed), throughput (accepted successes per second over a run), scheduling latency (ready → assigned), and recovery time (a killed worker's last accepted renewal → the task's assignment to a new worker), split into detection (→ lease expiry) and requeue (expiry → new assignment).
 
-Throughput is set by the number of workers: about 4.2 tasks/s per worker, reaching 16.7 tasks/s with 4 workers. An idle worker receives a ready task within about 5 ms. Results are in progress-report Section E and `results/handoffs/step-12/full-20261003c/`. Step 13 separately completed a one-repetition c1-w1 Compose reproduction; it does not replace the measured matrix.
+**Workload and load generation.** A closed-loop driver keeps C ∈ {1, 4, 16} six-task jobs in flight (100 ms fixture tasks, 4 warmup jobs, 24 measured jobs), on fresh Compose deployments with 1 CPU and 512 MiB per service. `make bench` runs the fault-free matrix over W ∈ {1, 2, 4} workers (MS2); `make bench-recovery` runs W = 4 in two modes, baseline and crash, where two busy workers are SIGKILLed during each measured phase and replaced.
 
-Recovery time cannot be measured yet, because MS2 does not recover from crashes. The crash test's 10-second observation window is a test limit, not a recovery measurement.
+**Guarantee (P-REC).** A crashed worker's task is never detected earlier than `LEASE_TIMEOUT_MS` after its last renewal, and, when an idle worker is polling, is reassigned within `LEASE_TIMEOUT_MS` + 2 s of it. Under load (no idle worker), the recovered task additionally waits behind the tasks already queued, by FIFO. The bound is tested in every crash test.
 
-## 7. Scope
+**Measured results** (details in the progress report, §E): RESULTS_PLACEHOLDER
 
-**Implemented in MS2:**
+Throughput and job time are characterizations, not commitments: they depend on the host and on the synthetic workload. A deployment trades recovery time against false expiry by choosing `LEASE_TIMEOUT_MS`; recovery time is approximately the lease, plus up to one scan interval and one poll interval.
 
-- DAG submission with validation and size limits;
-- dependency tracking and parallel branches;
-- retries after reported failures, with duplicate- and stale-report handling;
-- the immutable artifact store;
-- event histories and an offline invariant checker;
-- the functional and video workloads;
-- Docker Compose deployment;
-- the benchmark;
-- a Hokea deployment adapter for the course cluster.
+## 7. Configuration that changes behavior
 
-The functional and video demo outputs were independently verified in Step 13: `result=22`, H.264 MP4s at 1280x720 and 640x360, and a PNG at 1280x720. The [Step 13 record](../results/handoffs/step-13/VERIFICATION.md) reports no implementation changes.
+| Setting | Where | Default | Effect |
+|---|---|---|---|
+| `LEASE_TIMEOUT_MS` | scheduler | 5000 | Lease length: recovery time vs. tolerance to slow links. |
+| `LEASE_SCAN_MS` | scheduler | 100 | How often expired leases are reclaimed without waiting for a claim. |
+| `HEARTBEAT_INTERVAL_MS` | worker | lease/5 from `/v1/health` | Renewal period. Must stay well below the lease. |
+| `POLL_INTERVAL_MS` | worker | 100 | Idle worker's claim interval. |
+| `OPERATION_TIMEOUT_MS` | worker | 30000 | A longer-running operation is failed explicitly and retried. |
+| `ENABLE_TEST_HOOKS` | worker | false | Test-only stall points and forced failures. Never enable in a deployment. |
 
-The Hokea adapter is verified locally. A run on the course cluster was attempted, but it was blocked before our services started because the course runner has a different Hokea version than the one we pin. This remains an external environment limitation, documented in `results/handoffs/step-11/FINAL-RESULTS.md`; it is not a successful cluster workload or the intentional recovery XFAIL.
+## 8. Resources and replication
 
-**Deferred:** recovering tasks from crashed workers (MS3); scheduler durability, replication and failover; artifact-store recovery; exactly-once external effects; authentication, UI, cancellation, priorities and retry limits; performance targets and recovery-time measurement.
+Everything runs from the repository with `make test` (Docker only). The reference host for the numbers in §6 is one Windows 11 machine (12 CPUs, 16 GB RAM) running Docker Desktop 27.1.1 with a 3 GB Linux VM, with every service capped at 1 CPU and 512 MiB. The workloads are committed: a five-task arithmetic DAG (`result=22`), a six-task benchmark DAG (`result=9`), and a byte-reproducible 10-second 1280×720 synthetic video with fixture subtitles.
 
-## 8. MS3 direction
+## 9. Changes since MS2
 
-The approved MS3 direction is scheduler-side leases on the existing monotonic clock; these are not current MS2 guarantees. When a lease expires, the attempt is marked expired and the task returns to the ready queue. The existing owner and attempt checks already reject late results from an expired attempt, and per-attempt output paths already stop it from overwriting newer results. Once leases exist, the crash test's expected-failure marker is removed and the same test must pass.
+- **L2 now holds.** Leases, worker heartbeats (`POST /v1/attempts/heartbeat`), scheduler-side expiry (before every command and every 100 ms), the EXPIRED attempt state, and `409 LEASE_EXPIRED` for every late message from an expired attempt. MS2's intentional failing test passes unchanged in substance.
+- **S1 sharpened:** "reported" now means reported by the current, unexpired lease holder; late successes are rejected even if no other worker has taken the task yet.
+- **S3 sharpened:** at-least-once physical execution and exactly-once recorded completion are now stated separately.
+- **Fault model sharpened:** each fault is listed in or out of scope, with its tests. Communication faults and pauses are now tested, not just planned.
+- **Performance:** recovery time is defined, measured and bounded.

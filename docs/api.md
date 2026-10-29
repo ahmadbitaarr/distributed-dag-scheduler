@@ -1,6 +1,6 @@
-# MS2 wire contract, version 1
+# Wire contract, version 1 (MS3)
 
-This file documents the HTTP/JSON contract the code implements. It follows architecture §§3 and 6, and the Java records in `protocol/src/main/java/edu/vt/dag/Model.java` define it. Step 2 verified the request schemas, identities and validation rules in this file (`ManifestValidatorTest`, `WireContractTest`). The scheduler and artifact HTTP behavior is listed here for reference; Steps 4–5 verify it end to end.
+This file documents the HTTP/JSON contract the code implements. MS3 added one endpoint (`POST /v1/attempts/heartbeat`), the `EXPIRED` attempt state, the `LEASE_EXPIRED` error code, and lease fields in health, snapshots, events and metrics; nothing that MS2 clients send changed. It follows architecture §§3 and 6, and the Java records in `protocol/src/main/java/edu/vt/dag/Model.java` define it. Step 2 verified the request schemas, identities and validation rules in this file (`ManifestValidatorTest`, `WireContractTest`). The scheduler and artifact HTTP behavior is listed here for reference; Steps 4–5 verify it end to end.
 
 ## General rules
 
@@ -32,6 +32,17 @@ This file documents the HTTP/JSON contract the code implements. It follows archi
 ```
 
 All five fields are required. A missing or zero `attempt_no` is `400` (`ManifestValidator.identity`). A tuple that doesn't match the current attempt's owner is `409`.
+
+## Leases (MS3)
+
+Ownership of an attempt is a **lease** on the scheduler's monotonic clock. `LEASE_TIMEOUT_MS` (default 5000) is set on the scheduler and reported by `GET /v1/health` as `lease_timeout_ms`.
+
+- Assignment grants the lease; `start` and every accepted heartbeat renew it to `now + lease`.
+- At its deadline the attempt becomes `EXPIRED`: the owner is released, a `lease_expired` event is recorded, and the task rejoins the tail of the ready queue. Its next assignment has `attempt_no + 1`, so the attempt number doubles as the lease generation (fencing token).
+- Expiry is applied at the start of every claim, start, heartbeat and report, and by a background scan every `LEASE_SCAN_MS` (default 100). No decision is ever made on a lease whose deadline has passed.
+- Every later message for an expired attempt (start, including a replay whose ack was lost; heartbeat; report of either outcome) gets `409 LEASE_EXPIRED` and changes nothing. A success report that arrives after the deadline is rejected even if nobody else has claimed the task yet.
+- Workers renew every `lease_timeout_ms / 5` by default (`HEARTBEAT_INTERVAL_MS` overrides), so four consecutive lost renewals are tolerated. A worker whose heartbeat gets `409` abandons the attempt without reporting.
+- Accepted results never expire: a `SUCCEEDED` or `FAILED` attempt keeps its receipt, and report replays still get it.
 
 ## Artifact references and namespaces
 
@@ -117,20 +128,23 @@ A replay with an equal manifest returns `200`. The same `job_id` with a differen
 
 | Endpoint | Request body | Success | Errors |
 |---|---|---|---|
-| `GET /v1/health` | none | 200 `{"ready":true,"scheduler_run_id":…}` | none |
+| `GET /v1/health` | none | 200 `{"ready":true,"scheduler_run_id":…,"lease_timeout_ms":…}` | none |
 | `POST /v1/jobs` | `{"scheduler_run_id","manifest"}` | 201 on first acceptance, 200 on identical replay: `{"scheduler_run_id","job_id","state","scheduler_event_seq"}` | 400, 409 (different manifest or stale run), 413, 503 |
 | `GET /v1/jobs/{job_id}` | none | 200 atomic snapshot: `state`, `tasks{…attempts, owner, outputs}`, `counts`, `outputs`, `snapshot_event_seq` | 400 (bad UUID), 404 `JOB_NOT_FOUND` |
 | `POST /v1/work/claim` | `{"scheduler_run_id","worker_session_id","claim_id"}` | 200 `Assignment`, or 204 when there is no work. A replayed claim returns its cached result. | 400, 409 |
-| `POST /v1/attempts/start` | `Identity` | 200 `Ack` (new or replay) | 400, 409 |
-| `POST /v1/attempts/report` | `{"identity","outcome":"SUCCESS"\|"FAILURE","outputs":{name:artifact},"error":{"code","message"}\|null}` | 200 `Ack` (new or exact replay) | 400, 409 (stale, conflicting or wrong state) |
+| `POST /v1/attempts/start` | `Identity` | 200 `Ack` (new or replay); renews the lease | 400, 409 (`LEASE_EXPIRED` for an expired attempt) |
+| `POST /v1/attempts/heartbeat` | `Identity` | 200 `Ack` with `disposition` `RENEWED`; no event is recorded | 400, 409 `LEASE_EXPIRED` (expired) or `CONFLICT` (not the current owner or already finished) |
+| `POST /v1/attempts/report` | `{"identity","outcome":"SUCCESS"\|"FAILURE","outputs":{name:artifact},"error":{"code","message"}\|null}` | 200 `Ack` (new or exact replay) | 400, 409 (`LEASE_EXPIRED`, stale, conflicting or wrong state) |
 | `GET /v1/events?after=&limit=` | none | 200 `{"scheduler_run_id","events":[…],"next_after","has_more"}`; `limit` ranges from 1 to 1000 | 400 |
-| `GET /v1/metrics` | none | 200 with counters, `tasks_by_state`, `ready_queue_length`, `active_attempts`, and p50/p95 timing summaries | none |
+| `GET /v1/metrics` | none | 200 with `lease_ns`, counters (including `expired_attempts`, `lease_renewals`), `tasks_by_state`, `ready_queue_length`, `active_attempts`, and p50/p95 summaries of job duration, scheduling latency and `lease_recovery_ns` | none |
 
 `Assignment` has the fields `scheduler_run_id`, `identity`, `task` (task definition), `inputs` (resolved artifact references), `output_prefix` (the attempt namespace), `scheduler_event_seq`, and `disposition`.
 
-`disposition` is `EXECUTE` for a claim the worker should run. A replayed claim whose attempt has already finished gets `TERMINAL_SUCCEEDED` or `TERMINAL_FAILED`, and the worker must not execute it again.
+`disposition` is `EXECUTE` for a claim the worker should run. A replayed claim whose attempt has already finished gets `TERMINAL_SUCCEEDED`, `TERMINAL_FAILED` or `TERMINAL_EXPIRED`, and the worker must not execute it again.
 
-`Ack` has the fields `scheduler_run_id`, `scheduler_event_seq` and `disposition` (`ACCEPTED`).
+`Ack` has the fields `scheduler_run_id`, `scheduler_event_seq` and `disposition` (`ACCEPTED`, or `RENEWED` for a heartbeat).
+
+Snapshot attempts also carry `last_alive_elapsed_ns`, `lease_deadline_elapsed_ns` and `lease_renewals`; attempt `state` is `ASSIGNED`, `RUNNING`, `SUCCEEDED`, `FAILED` or `EXPIRED`.
 
 Report rules:
 
@@ -155,6 +169,7 @@ Report rules:
 | 405 | `METHOD_NOT_ALLOWED` | Wrong HTTP method |
 | 409 | `CONFLICT` | Replay with different content, owner/attempt/state mismatch, or stale attempt |
 | 409 | `STALE_RUN` | `scheduler_run_id` is not the current run |
+| 409 | `LEASE_EXPIRED` | The attempt's lease expired; its task was requeued. Drop the attempt. |
 | 413 | `MANIFEST_TOO_LARGE`, `DAG_TOO_LARGE`, `ARTIFACT_TOO_LARGE` | Over a limit |
 | 503 | `ARTIFACT_UNAVAILABLE`, `OVERLOADED`, `SERVICE_UNAVAILABLE` | Transient. Retry with the same IDs. |
 
