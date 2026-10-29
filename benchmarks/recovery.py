@@ -76,7 +76,7 @@ def run_one(root, backend, c, mode, repetition):
                 sessions[system.worker_session(name)] = name
             cursor, owners = EventCursor(system.api), Owners()
             pending_kills = list(KILL_AFTER_COMPLETIONS) if mode == "crash" else []
-            threads = []
+            threads, armed, killed_sessions = [], {}, set()
 
             def crash_and_replace(victim, session, holding):
                 record = {"worker": victim, "session": session, "holding": holding,
@@ -104,14 +104,18 @@ def run_one(root, backend, c, mode, repetition):
                             active.discard(e["job_id"])
                             finished.append(e["job_id"])
                     if measured and pending_kills and len(finished) >= pending_kills[0]:
-                        # Prefer a worker executing a task: the interesting crash. Never block the closed loop.
-                        live = [s for s in sessions if system.worker_running(sessions[s]) and all(k["session"] != s for k in kills)]
+                        # Kill a worker that is executing a task (the case recovery is about). Right after a
+                        # completion every worker may be idle, so wait for one to start; never block the loop.
+                        armed.setdefault(pending_kills[0], time.monotonic())
+                        live = [s for s in list(sessions) if s not in killed_sessions]
                         running = [s for s in live if owners.held.get(s, (0, 0, 0, False))[3]]
-                        victim = (running or live)[0]
-                        pending_kills.pop(0)
-                        thread = threading.Thread(target=crash_and_replace, args=(sessions[victim], victim, owners.held.get(victim)))
-                        thread.start()
-                        threads.append(thread)
+                        if running or time.monotonic() - armed[pending_kills[0]] > 10:
+                            victim = (running or live)[0]
+                            pending_kills.pop(0)
+                            killed_sessions.add(victim)
+                            thread = threading.Thread(target=crash_and_replace, args=(sessions[victim], victim, owners.held.get(victim)))
+                            thread.start()
+                            threads.append(thread)
                     if time.monotonic() > deadline:
                         return finished, sorted(active), manifests, count - submitted
                     if active:
