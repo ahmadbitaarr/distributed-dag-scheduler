@@ -1,0 +1,24 @@
+[
+  {
+    "concurrency": 1,
+    "workers": 4,
+    "mode": "baseline",
+    "repetitions": 1,
+    "complete_runs": 1,
+    "jobs_pooled": 24,
+    "job_p50_ms": 1612.534137,
+    "job_p95_ms": 3431.250473,
+    "affected_jobs": 0,
+    "affected_job_p50_ms": null,
+    "affected_job_max_ms": null,
+    "recoveries": 0,
+    "recovery_p50_ms": null,
+    "recovery_p95_ms": null,
+    "recovery_max_ms": null,
+    "detection_p50_ms": null,
+    "requeue_p50_ms": null,
+    "requeue_max_ms": null,
+    "throughput_mean": 3.3007119942669085,
+    "throughput_stdev": null
+  }
+]

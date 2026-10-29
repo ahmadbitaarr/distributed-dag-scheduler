@@ -1,0 +1,22 @@
+[
+  {
+    "concurrency": 1,
+    "workers": 4,
+    "repetitions": 1,
+    "complete_runs": 1,
+    "censored_runs": 0,
+    "error_runs": 0,
+    "jobs_pooled": 24,
+    "job_p50_ms": 1903.037574,
+    "job_p95_ms": 2534.517039,
+    "job_p95_ms_run_median": 2534.517039,
+    "tasks_pooled": 144,
+    "scheduling_p50_ms": 4.988585,
+    "scheduling_p95_ms": 67.938358,
+    "throughput_mean": 3.0617554739579296,
+    "throughput_stdev": null,
+    "throughput_min": 3.0617554739579296,
+    "throughput_max": 3.0617554739579296,
+    "incomplete_jobs": 0
+  }
+]

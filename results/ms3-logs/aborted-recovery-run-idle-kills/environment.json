@@ -1,0 +1,43 @@
+{
+  "started_utc": "2026-10-29T15:23:10.225259+00:00",
+  "command": [
+    "C:\\Users\\Hasan\\OneDrive\\Desktop\\Capstone\\distributed-dag-scheduler\\benchmarks\\recovery.py",
+    "--backend",
+    "compose",
+    "--out",
+    "results/benchmark/recovery-ms3-final"
+  ],
+  "source_revision": "fdf5d02790bb3b85468c5b248f08f21a2045aa3b",
+  "source_dirty": true,
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "host_cpu_count": 12,
+  "backend": "compose",
+  "docker": "client 27.1.1 server 27.1.1",
+  "docker_host": "Docker Desktop (containerized); 12 CPUs; 3050102784 bytes",
+  "contract": {
+    "concurrency": [
+      1,
+      4,
+      16
+    ],
+    "workers": 4,
+    "modes": [
+      "baseline",
+      "crash"
+    ],
+    "repetitions": 3,
+    "warmup_jobs": 4,
+    "measured_jobs": 24,
+    "tasks_per_job": 6,
+    "fixture_delay_ms": 100,
+    "kill_after_measured_completions": [
+      6,
+      14
+    ],
+    "fault": "SIGKILL of a worker executing a task (else any live worker), then a replacement worker",
+    "lease_timeout_ms": "scheduler default (5000) unless LEASE_TIMEOUT_MS is set",
+    "measured_timeout_seconds": 180
+  },
+  "percentiles": "nearest-rank, pooled over complete runs"
+}

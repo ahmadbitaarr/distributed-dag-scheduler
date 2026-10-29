@@ -1,0 +1,417 @@
+tar: .: file changed as we read it
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] dag-ms2                                                            [pom]
+[INFO] protocol                                                           [jar]
+[INFO] scheduler                                                          [jar]
+[INFO] artifact-store                                                     [jar]
+[INFO] worker                                                             [jar]
+[INFO] client                                                             [jar]
+[INFO] 
+[INFO] -------------------------< edu.vt.dag:dag-ms2 >-------------------------
+[INFO] Building dag-ms2 0.2.0                                             [1/6]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] ------------------------< edu.vt.dag:protocol >-------------------------
+[INFO] Building protocol 0.2.0                                            [2/6]
+[INFO]   from protocol/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ protocol ---
+[INFO] skip non existing resourceDirectory /tmp/src/protocol/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ protocol ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ protocol ---
+[INFO] skip non existing resourceDirectory /tmp/src/protocol/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ protocol ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ protocol ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running edu.vt.dag.WireContractTest
+[INFO] Tests run: 27, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.913 s -- in edu.vt.dag.WireContractTest
+[INFO] Running edu.vt.dag.ManifestValidatorTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.074 s -- in edu.vt.dag.ManifestValidatorTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 33, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ protocol ---
+[INFO] Building jar: /tmp/src/protocol/target/protocol-0.2.0.jar
+[INFO] 
+[INFO] ------------------------< edu.vt.dag:scheduler >------------------------
+[INFO] Building scheduler 0.2.0                                           [3/6]
+[INFO]   from scheduler/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ scheduler ---
+[INFO] skip non existing resourceDirectory /tmp/src/scheduler/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ scheduler ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ scheduler ---
+[INFO] skip non existing resourceDirectory /tmp/src/scheduler/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ scheduler ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ scheduler ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running edu.vt.dag.LeaseTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.610 s -- in edu.vt.dag.LeaseTest
+[INFO] Running edu.vt.dag.SchedulerCoreTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in edu.vt.dag.SchedulerCoreTest
+[INFO] Running edu.vt.dag.SchedulerStateMachineTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.178 s -- in edu.vt.dag.SchedulerStateMachineTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 35, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ scheduler ---
+[INFO] Building jar: /tmp/src/scheduler/target/scheduler-0.2.0.jar
+[INFO] 
+[INFO] --- shade:3.6.0:shade (default) @ scheduler ---
+[INFO] Including edu.vt.dag:protocol:jar:0.2.0 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-databind:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-annotations:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-core:jar:2.18.3 in the shaded jar.
+[WARNING] Discovered module-info.class. Shading will break its strong encapsulation.
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar, protocol-0.2.0.jar, scheduler-0.2.0.jar define 1 overlapping resource: 
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 1 overlapping classes: 
+[WARNING]   - META-INF.versions.9.module-info
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 2 overlapping resources: 
+[WARNING]   - META-INF/LICENSE
+[WARNING]   - META-INF/NOTICE
+[WARNING] maven-shade-plugin has detected that some files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the file is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing /tmp/src/scheduler/target/scheduler-0.2.0.jar with /tmp/src/scheduler/target/scheduler-0.2.0-shaded.jar
+[INFO] 
+[INFO] ---------------------< edu.vt.dag:artifact-store >----------------------
+[INFO] Building artifact-store 0.2.0                                      [4/6]
+[INFO]   from artifact-store/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ artifact-store ---
+[INFO] skip non existing resourceDirectory /tmp/src/artifact-store/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ artifact-store ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ artifact-store ---
+[INFO] skip non existing resourceDirectory /tmp/src/artifact-store/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ artifact-store ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ artifact-store ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running edu.vt.dag.ArtifactStoreTest
+{"event_type":"server_error","message":"java.io.IOException: connection closed before all data received"}
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.929 s -- in edu.vt.dag.ArtifactStoreTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ artifact-store ---
+[INFO] Building jar: /tmp/src/artifact-store/target/artifact-store-0.2.0.jar
+[INFO] 
+[INFO] --- shade:3.6.0:shade (default) @ artifact-store ---
+[INFO] Including edu.vt.dag:protocol:jar:0.2.0 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-databind:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-annotations:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-core:jar:2.18.3 in the shaded jar.
+[WARNING] Discovered module-info.class. Shading will break its strong encapsulation.
+[WARNING] jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 1 overlapping classes: 
+[WARNING]   - META-INF.versions.9.module-info
+[WARNING] artifact-store-0.2.0.jar, jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar, protocol-0.2.0.jar define 1 overlapping resource: 
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 2 overlapping resources: 
+[WARNING]   - META-INF/LICENSE
+[WARNING]   - META-INF/NOTICE
+[WARNING] maven-shade-plugin has detected that some files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the file is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing /tmp/src/artifact-store/target/artifact-store-0.2.0.jar with /tmp/src/artifact-store/target/artifact-store-0.2.0-shaded.jar
+[INFO] 
+[INFO] -------------------------< edu.vt.dag:worker >--------------------------
+[INFO] Building worker 0.2.0                                              [5/6]
+[INFO]   from worker/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ worker ---
+[INFO] skip non existing resourceDirectory /tmp/src/worker/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ worker ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ worker ---
+[INFO] skip non existing resourceDirectory /tmp/src/worker/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ worker ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ worker ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ worker ---
+[INFO] Building jar: /tmp/src/worker/target/worker-0.2.0.jar
+[INFO] 
+[INFO] --- shade:3.6.0:shade (default) @ worker ---
+[INFO] Including edu.vt.dag:protocol:jar:0.2.0 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-databind:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-annotations:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-core:jar:2.18.3 in the shaded jar.
+[WARNING] Discovered module-info.class. Shading will break its strong encapsulation.
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar, protocol-0.2.0.jar, worker-0.2.0.jar define 1 overlapping resource: 
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 1 overlapping classes: 
+[WARNING]   - META-INF.versions.9.module-info
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 2 overlapping resources: 
+[WARNING]   - META-INF/LICENSE
+[WARNING]   - META-INF/NOTICE
+[WARNING] maven-shade-plugin has detected that some files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the file is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing /tmp/src/worker/target/worker-0.2.0.jar with /tmp/src/worker/target/worker-0.2.0-shaded.jar
+[INFO] 
+[INFO] -------------------------< edu.vt.dag:client >--------------------------
+[INFO] Building client 0.2.0                                              [6/6]
+[INFO]   from client/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ client ---
+[INFO] skip non existing resourceDirectory /tmp/src/client/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ client ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ client ---
+[INFO] skip non existing resourceDirectory /tmp/src/client/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ client ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ client ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ client ---
+[INFO] Building jar: /tmp/src/client/target/client-0.2.0.jar
+[INFO] 
+[INFO] --- shade:3.6.0:shade (default) @ client ---
+[INFO] Including edu.vt.dag:protocol:jar:0.2.0 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-databind:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-annotations:jar:2.18.3 in the shaded jar.
+[INFO] Including com.fasterxml.jackson.core:jackson-core:jar:2.18.3 in the shaded jar.
+[WARNING] Discovered module-info.class. Shading will break its strong encapsulation.
+[WARNING] jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 1 overlapping classes: 
+[WARNING]   - META-INF.versions.9.module-info
+[WARNING] client-0.2.0.jar, jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar, protocol-0.2.0.jar define 1 overlapping resource: 
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] jackson-annotations-2.18.3.jar, jackson-core-2.18.3.jar, jackson-databind-2.18.3.jar define 2 overlapping resources: 
+[WARNING]   - META-INF/LICENSE
+[WARNING]   - META-INF/NOTICE
+[WARNING] maven-shade-plugin has detected that some files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the file is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing /tmp/src/client/target/client-0.2.0.jar with /tmp/src/client/target/client-0.2.0-shaded.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for dag-ms2 0.2.0:
+[INFO] 
+[INFO] dag-ms2 ............................................ SUCCESS [  0.004 s]
+[INFO] protocol ........................................... SUCCESS [  5.679 s]
+[INFO] scheduler .......................................... SUCCESS [  3.076 s]
+[INFO] artifact-store ..................................... SUCCESS [  4.121 s]
+[INFO] worker ............................................. SUCCESS [  0.661 s]
+[INFO] client ............................................. SUCCESS [  0.394 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.065 s
+[INFO] Finished at: 2026-10-29T15:14:48Z
+[INFO] ------------------------------------------------------------------------
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.4, pluggy-1.6.0
+rootdir: /tmp/src
+configfile: pytest.ini
+testpaths: tests/unit, tests/integration, tests/faults
+collected 102 items
+
+tests/unit/test_fault_oracle.py .............                            [ 12%]
+tests/unit/test_history_checks.py ................                       [ 28%]
+tests/unit/test_hokea_adapter.py .................                       [ 45%]
+tests/unit/test_hokea_packaging.py ....                                  [ 49%]
+tests/integration/test_api.py ........                                   [ 56%]
+tests/integration/test_functional_workload.py .                          [ 57%]
+tests/integration/test_hokea_smoke.py .                                  [ 58%]
+tests/integration/test_system.py .....................                   [ 79%]
+tests/integration/test_worker_client.py .......                          [ 86%]
+tests/faults/test_lease_faults.py ......                                 [ 92%]
+tests/faults/test_network_faults.py .......                              [ 99%]
+tests/faults/test_worker_crash.py .                                      [100%]
+
+==================================== PASSES ====================================
+________________ test_offline_checker_detects_truncated_export _________________
+----------------------------- Captured stdout call -----------------------------
+OK    /tmp/src/results/handoffs/step-08/sample-history: 3 job histories satisfy the safety invariants
+FAIL  /tmp/pytest-of-root/pytest-0/test_offline_checker_detects_t0/evidence: HistoryViolation: events.jsonl is truncated relative to evidence-boundary.json
+- generated xml file: /tmp/src/results/latest-tests/ms3-make-test-2/junit.xml --
+=========================== short test summary info ============================
+PASSED tests/unit/test_fault_oracle.py::test_original_attempt_validation_is_an_experiment_precondition
+PASSED tests/unit/test_fault_oracle.py::test_invalid_kill_precondition_is_an_ordinary_failure[failure]
+PASSED tests/unit/test_fault_oracle.py::test_invalid_kill_precondition_is_an_ordinary_failure[success]
+PASSED tests/unit/test_fault_oracle.py::test_invalid_kill_precondition_is_an_ordinary_failure[retry]
+PASSED tests/unit/test_fault_oracle.py::test_invalid_kill_precondition_is_an_ordinary_failure[owner]
+PASSED tests/unit/test_fault_oracle.py::test_invalid_kill_precondition_is_an_ordinary_failure[child]
+PASSED tests/unit/test_fault_oracle.py::test_polling_requires_a_new_late_claim_not_a_late_replayed_receipt
+PASSED tests/unit/test_fault_oracle.py::test_early_or_unrelated_polling_cannot_hide_an_unhealthy_b[late0]
+PASSED tests/unit/test_fault_oracle.py::test_early_or_unrelated_polling_cannot_hide_an_unhealthy_b[late1]
+PASSED tests/unit/test_fault_oracle.py::test_early_or_unrelated_polling_cannot_hide_an_unhealthy_b[late2]
+PASSED tests/unit/test_fault_oracle.py::test_missing_late_boundary_is_not_an_expected_recovery_failure
+PASSED tests/unit/test_fault_oracle.py::test_reused_run_directory_refuses_to_overwrite_evidence
+PASSED tests/unit/test_fault_oracle.py::test_run_label_cannot_escape_evidence_root
+PASSED tests/unit/test_history_checks.py::test_sample_history_is_valid
+PASSED tests/unit/test_history_checks.py::test_missing_start_event_is_detected
+PASSED tests/unit/test_history_checks.py::test_sequence_gap_is_detected
+PASSED tests/unit/test_history_checks.py::test_duplicate_logical_completion_is_detected
+PASSED tests/unit/test_history_checks.py::test_child_assigned_before_parent_success_is_detected
+PASSED tests/unit/test_history_checks.py::test_success_from_non_owner_is_detected
+PASSED tests/unit/test_history_checks.py::test_success_from_expired_attempt_is_detected
+PASSED tests/unit/test_history_checks.py::test_expiry_of_a_non_owner_is_detected
+PASSED tests/unit/test_history_checks.py::test_success_without_success_report_is_detected
+PASSED tests/unit/test_history_checks.py::test_early_job_completion_is_detected
+PASSED tests/unit/test_history_checks.py::test_two_active_owners_are_detected
+PASSED tests/unit/test_history_checks.py::test_worker_operation_without_matching_ack_is_detected
+PASSED tests/unit/test_history_checks.py::test_snapshot_disagreeing_with_history_is_detected
+PASSED tests/unit/test_history_checks.py::test_offline_checker_detects_truncated_export
+PASSED tests/unit/test_history_checks.py::test_snapshot_older_than_history_is_consistent
+PASSED tests/unit/test_history_checks.py::test_older_snapshot_still_detects_a_missing_covered_success
+PASSED tests/unit/test_hokea_adapter.py::test_service_parameters_addresses_and_private_worker_env[docker]
+PASSED tests/unit/test_hokea_adapter.py::test_service_parameters_addresses_and_private_worker_env[kubernetes]
+PASSED tests/unit/test_hokea_adapter.py::test_hard_kill_target_death_evidence_and_cached_logs[docker]
+PASSED tests/unit/test_hokea_adapter.py::test_hard_kill_target_death_evidence_and_cached_logs[kubernetes]
+PASSED tests/unit/test_hokea_adapter.py::test_pending_recreation_cannot_be_mistaken_for_dead
+PASSED tests/unit/test_hokea_adapter.py::test_observation_error_is_not_worker_death
+PASSED tests/unit/test_hokea_adapter.py::test_partial_startup_is_cleaned_and_fails
+PASSED tests/unit/test_hokea_adapter.py::test_cleanup_failure_is_visible_and_does_not_skip_other_resources
+PASSED tests/unit/test_hokea_adapter.py::test_export_failure_still_cleans_resources
+PASSED tests/unit/test_hokea_adapter.py::test_no_worker_ports_restart_or_shared_storage_in_docker_bridge
+PASSED tests/unit/test_hokea_adapter.py::test_worker_manifest_removes_port_without_adding_server_or_storage
+PASSED tests/unit/test_hokea_adapter.py::test_exact_package_pin_rejects_modified_source
+PASSED tests/unit/test_hokea_adapter.py::test_factory_constructor_parameters_and_no_source_bind_mount
+PASSED tests/unit/test_hokea_adapter.py::test_strict_kubernetes_observation_propagates_command_failure
+PASSED tests/unit/test_hokea_adapter.py::test_takeover_and_missing_namespace_are_rejected
+PASSED tests/unit/test_hokea_adapter.py::test_running_pod_with_terminated_container_is_not_alive
+PASSED tests/unit/test_hokea_adapter.py::test_only_owned_wrapper_tag_is_released
+PASSED tests/unit/test_hokea_packaging.py::test_roundtrip_imports_exact_oracles_and_preserves_nested_files
+PASSED tests/unit/test_hokea_packaging.py::test_rejects_mutable_images_unless_staff_preloaded_is_explicit
+PASSED tests/unit/test_hokea_packaging.py::test_budget_failure_and_existing_directory_never_overwrite
+PASSED tests/unit/test_hokea_packaging.py::test_bootstrap_rejects_corrupted_file_and_traversal
+PASSED tests/integration/test_api.py::test_health_and_run_header
+PASSED tests/integration/test_api.py::test_endpoint_errors_are_structured
+PASSED tests/integration/test_api.py::test_request_body_limit_is_413
+PASSED tests/integration/test_api.py::test_stale_run_is_rejected_everywhere
+PASSED tests/integration/test_api.py::test_source_descriptors_are_verified_before_acceptance
+PASSED tests/integration/test_api.py::test_storage_unavailable_is_transient_and_accepts_nothing
+PASSED tests/integration/test_api.py::test_counters_gauges_and_snapshot_sequence_are_consistent
+PASSED tests/integration/test_api.py::test_rejected_commands_do_not_change_snapshots
+PASSED tests/integration/test_functional_workload.py::test_committed_functional_workload
+PASSED tests/integration/test_hokea_smoke.py::test_service_exchange
+PASSED tests/integration/test_system.py::test_functional_multiple_jobs_workers
+PASSED tests/integration/test_system.py::test_join_and_independent_branch_concurrency
+PASSED tests/integration/test_system.py::test_multiple_roots_sinks_and_all_tasks_required
+PASSED tests/integration/test_system.py::test_simultaneous_claims_and_session_single_slot
+PASSED tests/integration/test_system.py::test_submission_and_claim_receipts
+PASSED tests/integration/test_system.py::test_cached_empty_claim_stays_empty
+PASSED tests/integration/test_system.py::test_real_worker_failure_attempt_two
+PASSED tests/integration/test_system.py::test_duplicate_conflicting_stale_reports_and_retry
+PASSED tests/integration/test_system.py::test_success_requires_published_correct_outputs
+PASSED tests/integration/test_system.py::test_artifact_staging_atomic_publication_and_conflicts
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[cycle]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[duplicate]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[unknown_parent]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[self]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[duplicate_parent]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[bad_binding]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[operation]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[empty]
+PASSED tests/integration/test_system.py::test_invalid_dags_never_accepted[too_many]
+PASSED tests/integration/test_system.py::test_strict_json_types_and_unknown_fields
+PASSED tests/integration/test_system.py::test_video_pipeline
+PASSED tests/integration/test_worker_client.py::test_java_client_upload_submit_status_fetch
+PASSED tests/integration/test_worker_client.py::test_worker_has_one_slot_and_starts_only_after_ack
+PASSED tests/integration/test_worker_client.py::test_hooks_are_disabled_by_default
+PASSED tests/integration/test_worker_client.py::test_local_operation_timeout_is_an_explicit_bounded_failure
+PASSED tests/integration/test_worker_client.py::test_stale_report_rejection_does_not_kill_the_worker
+PASSED tests/integration/test_worker_client.py::test_lost_report_ack_is_replayed_not_reexecuted
+PASSED tests/integration/test_worker_client.py::test_worker_abandons_old_run_and_joins_the_new_one
+PASSED tests/faults/test_lease_faults.py::test_crash_at_each_attempt_stage_is_recovered[before_start]
+PASSED tests/faults/test_lease_faults.py::test_crash_at_each_attempt_stage_is_recovered[operation]
+PASSED tests/faults/test_lease_faults.py::test_crash_at_each_attempt_stage_is_recovered[before_report]
+PASSED tests/faults/test_lease_faults.py::test_restarted_worker_is_a_new_session_and_the_old_identity_stays_dead
+PASSED tests/faults/test_lease_faults.py::test_paused_worker_loses_its_lease_and_its_late_work_is_rejected
+PASSED tests/faults/test_lease_faults.py::test_slow_worker_with_heartbeats_keeps_its_task
+PASSED tests/faults/test_network_faults.py::test_lost_heartbeats_expire_the_lease_and_the_late_success_is_rejected
+PASSED tests/faults/test_network_faults.py::test_partition_longer_than_the_lease_moves_the_task
+PASSED tests/faults/test_network_faults.py::test_partition_shorter_than_the_lease_keeps_the_attempt
+PASSED tests/faults/test_network_faults.py::test_lost_claim_and_start_replies_are_replayed_from_receipts
+PASSED tests/faults/test_network_faults.py::test_crash_after_success_is_accepted_but_its_reply_is_lost
+PASSED tests/faults/test_network_faults.py::test_delayed_and_duplicated_messages_change_nothing
+PASSED tests/faults/test_network_faults.py::test_chaos_campaign_keeps_every_guarantee
+PASSED tests/faults/test_worker_crash.py::test_worker_crash_reassignment
+======================= 102 passed in 448.60s (0:07:28) ========================
+EXIT=0

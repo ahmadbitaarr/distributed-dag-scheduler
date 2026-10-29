@@ -1,0 +1,70 @@
+{
+  "started_utc": "2026-10-29T15:33:01.573910+00:00",
+  "command": [
+    "C:\\Users\\Hasan\\AppData\\Local\\Temp\\claude\\c--Users-Hasan-OneDrive-Desktop-Capstone-distributed-dag-scheduler\\db9f524f-c308-4c10-b415-a51ab6688670\\scratchpad\\ms2wt\\benchmarks\\run.py",
+    "--backend",
+    "compose",
+    "--out",
+    "C:/Users/Hasan/AppData/Local/Temp/claude/c--Users-Hasan-OneDrive-Desktop-Capstone-distributed-dag-scheduler/db9f524f-c308-4c10-b415-a51ab6688670/scratchpad/diag-ms2-temp",
+    "--configs",
+    "c1-w4",
+    "--repetitions",
+    "1"
+  ],
+  "source_revision": "a3ea2e656e1f52cf1460789db0b28a1f2ba4c4f5",
+  "source_dirty": true,
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "host_cpu_count": 12,
+  "backend": "compose",
+  "docker": "client 27.1.1 server 27.1.1",
+  "docker_host": "Docker Desktop (containerized); 12 CPUs; 3050102784 bytes",
+  "images": {
+    "scheduler": "sha256:8f29face75a358333317c38d7ec79e5350641749437b31624e3ae697ec18ac46 created 2026-10-29T14:56:24.57493076Z",
+    "artifact-store": "sha256:1ffb2aaa7d1a9b8e73a1699efd1cfe7b8752168fcc0e15990fc071936be6cbdc created 2026-10-29T14:55:59.808486227Z",
+    "worker": "sha256:ec8e049bd28677d0b4173dfe75985d68ad787315628c59423a71becd9acd0cbd created 2026-10-29T14:56:47.658197339Z"
+  },
+  "resources": {
+    "jvm_heap": "-Xmx128m (all services)",
+    "handler_threads": 16,
+    "service_cpu": "Docker cpus: 1.0 per service",
+    "service_memory": "Docker mem_limit: 512m per service",
+    "worker_slots": 1,
+    "poll_interval_ms": 100
+  },
+  "contract": {
+    "concurrency": [
+      1,
+      4,
+      16
+    ],
+    "workers": [
+      1,
+      2,
+      4
+    ],
+    "warmup_jobs": 4,
+    "measured_jobs": 24,
+    "tasks_per_job": 6,
+    "fixture_delay_ms": 100,
+    "repetitions": 5,
+    "measured_timeout_seconds": 120
+  },
+  "percentiles": "nearest-rank; per-configuration p50/p95 pool the samples of complete runs; job_p95_ms_run_median is the median of per-run p95s",
+  "limitations": [
+    "Shared execution host: all services, the driver and the Docker VM share one machine",
+    "Synthetic waiting workload (100 ms sleeps); characterizes coordination, not codec or CPU scaling",
+    "Polling latency (100 ms worker poll interval) is part of measured scheduling latency",
+    "Recovery time is unmeasured in MS2; no faults are injected"
+  ],
+  "subset": {
+    "configs": [
+      "c1-w4"
+    ],
+    "repetitions": 1
+  },
+  "finished_utc": "2026-10-29T15:34:31.550246+00:00",
+  "run_statuses": {
+    "complete": 1
+  }
+}
