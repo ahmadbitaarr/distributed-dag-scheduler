@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_network_faults.py::test_delayed_and_duplicated_messages_change_nothing",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "509377a5-7b41-4f42-9196-1160f2b559a2",
+  "source_revision": "966965ebdeedd26cf2d5c4b1405c627c4bbfe507",
+  "run_label": "ms3-make-test-3",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T16:10:16.553978+00:00",
+  "finished_utc": "2026-10-29T16:10:28.343432+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

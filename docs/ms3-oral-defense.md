@@ -22,7 +22,7 @@ Format (course guidelines): 25 minutes, chalkboard only. One randomly chosen mem
 
 **6. Performance guarantees (1 min).** We commit to one bound: a crashed worker's task is never declared dead before the 5 s lease, and is reassigned within lease + 2 s when an idle worker is polling. Measured: 5.0–5.1 s. Throughput is a characterization, not a promise: about 4.2 tasks/s per worker on the MS2 host, and it scales with workers until the DAG's own parallelism runs out.
 
-**7. Testing strategy (1 min).** One command, `make test`: 76 JUnit tests (leases tested on a fake clock) and 102 pytest tests against real processes. We inject faults (SIGKILL, SIGSTOP, crash points before start / during / before report, a proxy that drops, delays, duplicates or partitions one worker's link, and a seeded chaos run), and every test runs a checker over the full event history that would flag any S1–S3 violation. The checker is itself tested by injecting violations into a real history.
+**7. Testing strategy (1 min).** One command, `make test`: 77 JUnit tests (leases tested on a fake clock) and 102 pytest tests against real processes. We inject faults (SIGKILL, SIGSTOP, crash points before start / during / before report, a proxy that drops, delays, duplicates or partitions one worker's link, and a seeded chaos run), and every test runs a checker over the full event history that would flag any S1–S3 violation. The checker is itself tested by injecting violations into a real history.
 
 ## Likely questions and short answers
 

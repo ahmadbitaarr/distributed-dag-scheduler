@@ -1,0 +1,153 @@
+{
+  "clock": "harness time.monotonic_ns relative to test origin; no cross-process subtraction",
+  "budget_ns": 10000000000,
+  "start_elapsed_ns": 3971421518,
+  "start_scheduler_event_seq": 12,
+  "late_threshold_ns": 8000000000,
+  "worker_a_identity": {
+    "scheduler_run_id": "1445e4f3-c624-4cce-b6f1-951f8ff5a565",
+    "job_id": "f8d56c11-8fc3-48ec-963a-96af413c5091",
+    "task_id": "X",
+    "attempt_no": 1,
+    "worker_session_id": "2823886c-41c9-43cd-8c48-bc64f7b1fee1"
+  },
+  "worker_b_session_id": "e594567c-5d7e-4871-90ea-f87185b2ed5d",
+  "samples": [
+    {
+      "started_elapsed_ns": 3971426490,
+      "snapshot_observed_elapsed_ns": 3975325454,
+      "finished_elapsed_ns": 3976905884,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 1,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 4229119054,
+      "snapshot_observed_elapsed_ns": 4232970818,
+      "finished_elapsed_ns": 4249133952,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 3,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 4501919025,
+      "snapshot_observed_elapsed_ns": 4506834569,
+      "finished_elapsed_ns": 4511345604,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 6,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 4769304154,
+      "snapshot_observed_elapsed_ns": 4773589613,
+      "finished_elapsed_ns": 4777055920,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 8,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 5034173271,
+      "snapshot_observed_elapsed_ns": 5038876851,
+      "finished_elapsed_ns": 5042407498,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 10,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 5296018793,
+      "snapshot_observed_elapsed_ns": 5300294476,
+      "finished_elapsed_ns": 5304047561,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 12,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 5557492189,
+      "snapshot_observed_elapsed_ns": 5561361726,
+      "finished_elapsed_ns": 5570271570,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 14,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 5822131310,
+      "snapshot_observed_elapsed_ns": 5825217668,
+      "finished_elapsed_ns": 5831075330,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 17,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 6084619405,
+      "snapshot_observed_elapsed_ns": 6091987643,
+      "finished_elapsed_ns": 6094568882,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 19,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 6349020191,
+      "snapshot_observed_elapsed_ns": 6352572021,
+      "finished_elapsed_ns": 6360264276,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 22,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 6613092343,
+      "snapshot_observed_elapsed_ns": 6618756589,
+      "finished_elapsed_ns": 6622065056,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 24,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 6874035403,
+      "snapshot_observed_elapsed_ns": 6877773127,
+      "finished_elapsed_ns": 6886099427,
+      "snapshot_event_seq": 18,
+      "last_scheduler_event_seq": 18,
+      "b_alive": true,
+      "b_empty_claims": 25,
+      "x_state": "RUNNING",
+      "x_attempt_no": 2
+    }
+  ],
+  "end_elapsed_ns": 6888862719,
+  "actual_duration_ns": 2917441201,
+  "deadline_overrun_ns": 0,
+  "recovered_within_window": true
+}

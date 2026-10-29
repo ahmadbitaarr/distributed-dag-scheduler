@@ -1,0 +1,12 @@
+{
+  "clock": "scheduler monotonic elapsed_ns",
+  "last_alive_elapsed_ns": 2900561430,
+  "lease_expired_elapsed_ns": 7941989144,
+  "reassigned_elapsed_ns": 7942380450,
+  "detection_ns": 5041427714,
+  "requeue_to_assign_ns": 391306,
+  "recovery_ns": 5041819020,
+  "new_owner": "e594567c-5d7e-4871-90ea-f87185b2ed5d",
+  "expired_from_state": "RUNNING",
+  "lease_ns": 5000000000
+}

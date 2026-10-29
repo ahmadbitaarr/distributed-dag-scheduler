@@ -1,0 +1,10 @@
+{
+  "scheduler": {
+    "scheduler_run_id": "1445e4f3-c624-4cce-b6f1-951f8ff5a565",
+    "lease_timeout_ms": 5000,
+    "ready": true
+  },
+  "artifact-store": {
+    "ready": true
+  }
+}

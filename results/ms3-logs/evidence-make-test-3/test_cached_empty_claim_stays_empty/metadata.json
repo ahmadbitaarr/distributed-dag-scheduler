@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_cached_empty_claim_stays_empty",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "8b71aae5-150c-4ec8-90f4-e8ac74c5becc",
+  "source_revision": "966965ebdeedd26cf2d5c4b1405c627c4bbfe507",
+  "run_label": "ms3-make-test-3",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T16:05:09.772415+00:00",
+  "finished_utc": "2026-10-29T16:05:14.277424+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

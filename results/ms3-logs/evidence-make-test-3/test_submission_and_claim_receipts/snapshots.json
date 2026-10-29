@@ -1,0 +1,136 @@
+{
+  "0cc05cca-fe46-4149-81aa-5d3f36d8e1cc": {
+    "scheduler_run_id": "338c45d9-6b61-49b7-82ec-96a372d4df4d",
+    "job_id": "0cc05cca-fe46-4149-81aa-5d3f36d8e1cc",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 1303470204,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "A": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 1,
+        "owner": null,
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "338c45d9-6b61-49b7-82ec-96a372d4df4d",
+              "job_id": "0cc05cca-fe46-4149-81aa-5d3f36d8e1cc",
+              "task_id": "A",
+              "attempt_no": 1,
+              "worker_session_id": "0ad9232d-6a28-40ec-b11e-d67faabfca92"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 1305074580,
+            "assigned_elapsed_ns": 1390470671,
+            "started_elapsed_ns": 1476398021,
+            "finished_elapsed_ns": 1830470069,
+            "start_receipt": {
+              "scheduler_run_id": "338c45d9-6b61-49b7-82ec-96a372d4df4d",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "338c45d9-6b61-49b7-82ec-96a372d4df4d",
+                "job_id": "0cc05cca-fe46-4149-81aa-5d3f36d8e1cc",
+                "task_id": "A",
+                "attempt_no": 1,
+                "worker_session_id": "0ad9232d-6a28-40ec-b11e-d67faabfca92"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/338c45d9-6b61-49b7-82ec-96a372d4df4d/jobs/0cc05cca-fe46-4149-81aa-5d3f36d8e1cc/tasks/A/attempts/1/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "338c45d9-6b61-49b7-82ec-96a372d4df4d",
+              "scheduler_event_seq": 6,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 1476622667,
+            "lease_deadline_elapsed_ns": 6476622667,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/338c45d9-6b61-49b7-82ec-96a372d4df4d/jobs/0cc05cca-fe46-4149-81aa-5d3f36d8e1cc/tasks/A/attempts/1/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "B": {
+        "state": "READY",
+        "parents": [
+          "A"
+        ],
+        "satisfied_parents": [
+          "A"
+        ],
+        "ready_seq": 2,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "C": {
+        "state": "READY",
+        "parents": [
+          "A"
+        ],
+        "satisfied_parents": [
+          "A"
+        ],
+        "ready_seq": 3,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "D": {
+        "state": "BLOCKED",
+        "parents": [
+          "B",
+          "C"
+        ],
+        "satisfied_parents": [],
+        "ready_seq": 0,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      },
+      "E": {
+        "state": "BLOCKED",
+        "parents": [
+          "D"
+        ],
+        "satisfied_parents": [],
+        "ready_seq": 0,
+        "owner": null,
+        "attempt_no": 0,
+        "attempts": [],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "BLOCKED": 2,
+      "READY": 2,
+      "SUCCEEDED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 10
+  }
+}

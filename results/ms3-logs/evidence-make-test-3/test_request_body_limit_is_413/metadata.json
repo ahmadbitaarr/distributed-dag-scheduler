@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_api.py::test_request_body_limit_is_413",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "ac37df13-7cf0-4710-b39b-d90e30a928b8",
+  "source_revision": "966965ebdeedd26cf2d5c4b1405c627c4bbfe507",
+  "run_label": "ms3-make-test-3",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T16:03:43.326177+00:00",
+  "finished_utc": "2026-10-29T16:03:47.572047+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

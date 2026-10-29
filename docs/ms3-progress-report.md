@@ -14,7 +14,9 @@ Specification: [specification.md](specification.md). Test-to-property table: [te
 | Fault model (§5) | Crash only, safe but stuck | Crash, restart, pause, message loss/delay/duplication, partitions all tested | 14 fault tests |
 | Performance (§6) | 3 of 4 metrics | **All 4**, including recovery time, with and without failures | `make bench-recovery` (§E) |
 
-The submitted run is `results/ms3-logs/make-test-2.log` (source `fdf5d02`): `mvn -B verify` passed all 76 JUnit tests, then pytest reported **102 passed, 0 failed, 0 expected failures** (exit 0). Its JUnit XML is `results/ms3-logs/junit-make-test-2.xml`, and the per-test evidence (52 directories) is in `results/ms3-logs/evidence-make-test-2/`. Re-checking every one of its 52 job histories offline found no violations. An earlier full run (`make-test-1.log`) failed one test, which still expected MS2's exact metrics counter list; the test was updated for the two new lease counters, and nothing else changed.
+The submitted run is `results/ms3-logs/make-test-3.log` (clean source `966965e`): `mvn -B verify` passed all 77 JUnit tests, then pytest reported **102 passed, 0 failed, 0 expected failures** (exit 0). Its JUnit XML is `results/ms3-logs/junit-make-test-3.xml`, and the per-test evidence (52 directories) is in `results/ms3-logs/evidence-make-test-3/`. Re-checking all 52 of its job histories offline found no violations.
+
+Two earlier full runs are kept as logs. `make-test-1` failed one test, which still expected MS2's exact list of metrics counters. `make-test-2` passed all 102 tests, but on code from before the idle-polling fix (§B, defect 2), and it is stamped `+uncommitted` because its own log file was being written inside the repository.
 
 ## B. What changed since MS2
 
@@ -24,13 +26,16 @@ The submitted run is `results/ms3-logs/make-test-2.log` (source `fdf5d02`): `mvn
 
 **Test harness.** A per-worker fault proxy (`tests/harness/netfault.py`) can drop requests or replies, delay, duplicate, or partition one worker's link and logs every action; the harness can pause and resume workers (SIGSTOP/SIGCONT, `docker pause` on Compose). The history checker now also rejects expiry of a non-owner and any success from an expired attempt.
 
-**Tests.** 16 deterministic lease tests in JUnit (an injected clock, no sleeps), 13 new fault-injection tests, and 2 new checker-falsification tests. MS2's intentional failing oracle, `test_worker_crash_reassignment`, now passes and additionally checks the recovery path and its time bound. `make test` now requires zero expected failures.
+**Tests.** 17 new JUnit tests (16 deterministic lease tests on an injected clock, no sleeps, and one idle-polling memory test), 13 new fault-injection tests, and 2 new checker-falsification tests. MS2's intentional failing oracle, `test_worker_crash_reassignment`, now passes and additionally checks the recovery path and its time bound. `make test` now requires zero expected failures.
 
 **Benchmark.** `benchmarks/recovery.py` (`make bench-recovery`) measures recovery time by killing busy workers mid-run, against a fault-free baseline of the same code.
 
 **Docs.** The specification's claims are sharpened (§9 of the spec), the API and evidence docs cover leases, and the test-to-property matrix is new.
 
-**Defect found and fixed during MS3.** A *replayed* start for an attempt that had already expired returned its cached acknowledgment. That was safe, since the worker's heartbeat and report would then be rejected, but it broke the rule that every message from an expired attempt is refused. The restart test caught it, and a JUnit assertion now covers it.
+**Defects found and fixed during MS3.**
+
+1. *A replayed start for an expired attempt was acknowledged.* It returned its cached acknowledgment. That was safe, since the worker's heartbeat and report would then be rejected, but it broke the rule that every message from an expired attempt is refused. The restart test caught it, and a JUnit assertion now covers it.
+2. *Idle polling grew the scheduler's memory without bound (latent since MS2).* Every empty claim appended two history events and a receipt. We measured it in the harness container with four idle workers: the live heap grew **257 MiB per hour** (about 980 bytes per event), so a scheduler with its 128 MiB heap, left idle, would run out of memory in about half an hour. MS2's runs were too short to show it. An empty claim now records no event and replaces its session's previous idle receipt; per-session counters in `/v1/metrics` keep the polling evidence. After the fix the idle heap is flat. Logs: `results/ms3-logs/memory-probe/`. Real work still costs about 10 KB of heap per completed task, which bounds one run to about 11,000 tasks; the specification now states that capacity (§1).
 
 ## C. Design choices and trade-offs
 
@@ -50,15 +55,15 @@ The submitted run is `results/ms3-logs/make-test-2.log` (source `fdf5d02`): `mvn
 
 ## D. Testing
 
-`make test` runs the whole suite in a pinned Linux container: 76 JUnit tests, then the pytest suites against real scheduler, artifact-store and worker processes. Every service-backed test exports the scheduler's full event history, worker logs and snapshots and runs the safety checker on them, so S1–S3 are checked in every test, not only in the ones aimed at them. The test-to-property table is in [test-matrix.md](test-matrix.md).
+`make test` runs the whole suite in a pinned Linux container: 77 JUnit tests, then the pytest suites against real scheduler, artifact-store and worker processes. Every service-backed test exports the scheduler's full event history, worker logs and snapshots and runs the safety checker on them, so S1–S3 are checked in every test, not only in the ones aimed at them. The test-to-property table is in [test-matrix.md](test-matrix.md).
 
 Faults are injected with SIGKILL, SIGSTOP/SIGCONT, worker stall points, and a per-link proxy that logs every dropped, delayed or duplicated message (`proxy-worker-N.jsonl` in each test's evidence). Timing assertions use only the scheduler's clock, never differences between processes.
 
-Key results from the submitted run (`make-test-2`):
+Key results from the submitted run (`make-test-3`):
 
 - Leases expired 10 times across the fault tests, once for every injected crash, freeze, partition or heartbeat loss that outlasted the lease, and never in a fault-free test or in the slow-task and short-partition tests.
-- Detection took 5.01–5.12 s from the last accepted renewal, never less than the 5 s lease.
-- Recovery (last renewal → new owner) took 5.04–5.12 s when an idle worker was polling, and 6.04–6.06 s in the chaos run, where the recovered tasks waited behind queued work.
+- Detection took 5.01–5.27 s from the last accepted renewal, never less than the 5 s lease.
+- Recovery (last renewal → new owner) took 5.04–5.27 s when an idle worker was polling, and 6.04–6.05 s in the chaos run, where the recovered tasks waited behind queued work.
 - In every one of those tests, the late worker's messages were rejected or abandoned, exactly one success per task was recorded, and the job finished with the correct output.
 
 **Do the tests test anything?** For the lease logic we broke the code on purpose and checked that the tests failed. Stopping heartbeats from renewing the lease failed 2 lease tests. Skipping the expiry check before reports failed 2 others. The history checker's tests each inject one violation into a real saved history and require the checker to report it.
@@ -74,8 +79,9 @@ PERF_PLACEHOLDER
 ## G. Limitations and known risks
 
 - **The scheduler is a single point of failure.** Its state is in memory; a restart starts an empty run and in-flight jobs must be resubmitted.
+- **One run holds about 11,000 completed tasks** with the default 128 MiB heap, because the full history is kept in memory for auditing (about 10 KB per task). Sustained full load reaches that in roughly 10–15 minutes; restart the scheduler (a new run) or give it a larger heap.
 - **A paused scheduler expires live leases.** If the scheduler process itself is frozen for longer than the lease, every lease looks overdue when it resumes, and live workers' attempts are expired and redone. Safety holds; work is repeated.
-- **At-least-once execution.** A task can run more than once (after an expiry, or a lost reply that a crashed worker never retried); only one result is accepted. External side effects would need their own idempotency.
+- **At-least-once execution.** A task can run more than once: after a lease expiry, the old worker may have been frozen or cut off rather than dead and may finish too. Only one result is accepted. External side effects would need their own idempotency.
 - **No retry limit.** An operation that always fails is retried forever and its job stays RUNNING.
 - **Network faults are injected only on the worker↔scheduler link,** and only with the native backend. The artifact store is assumed available.
 - **The artifact store's index is not rebuilt** after the store restarts, although its files stay on disk.

@@ -57,7 +57,7 @@ Scheduler decision events also carry:
 | `job_completed` | scheduler | All tasks succeeded. `accepted_elapsed_ns`, `completed_elapsed_ns`. |
 | `completion_duplicate` | scheduler | An exact replay of a finished attempt's report. `receipt_event_seq`. |
 | `report_rejected` | scheduler | A start or report was rejected. `error_code`. No state change. |
-| `work_claim` / `work_empty` | scheduler | Claim diagnostics that show a worker is available and polling. |
+| `work_claim` | scheduler | A claim that received an assignment (recorded just before `task_assigned`). Since MS3, empty claims (idle polls) record no event: they are counted per session in `/v1/metrics` (`polling`), so an idle system's history does not grow. MS2 also recorded `work_empty`. |
 | `worker_session_started` | worker | A new session joined the scheduler run. |
 | `worker_operation_started` | worker | Execution began. `ack_scheduler_event_seq` is the `task_started` sequence the worker received. |
 | `worker_report_sent` | worker | The success report, with output descriptors. |

@@ -1,6 +1,6 @@
 # Test-to-property matrix (MS3)
 
-Every claim in the [specification](specification.md) is listed with the tests that would fail if it were broken. Run everything with `make test` (one command, Docker only). Run logs for the submitted run are in [results/ms3-logs/](../results/ms3-logs/), with per-test evidence (scheduler history, worker logs, proxy logs, snapshots) under `results/ms3-logs/evidence/`.
+Every claim in the [specification](specification.md) is listed with the tests that would fail if it were broken. Run everything with `make test` (one command, Docker only). Run logs for the submitted run are in [results/ms3-logs/](../results/ms3-logs/), with per-test evidence (scheduler history, worker logs, proxy logs, snapshots) under `results/ms3-logs/evidence-make-test-3/`.
 
 ## Property codes
 
@@ -83,7 +83,7 @@ Every fault test also runs `check_history` on the full scheduler and worker hist
 | Class | Tests | Properties |
 |---|---|---|
 | `LeaseTest` (MS3, injected clock, no sleeps) | 16: reassignment after expiry; expiry exactly at the deadline; heartbeats keep a slow owner; start renews; crash before start; every late message from an expired attempt is rejected with no state change; late success rejected even before anyone else claims; expiry between artifact verification and commit; accepted results never expire; resumed session gets only a new attempt; claim replay after expiry; non-owner heartbeats; FIFO order of expired tasks; recovery latency measurement; explicit failure still retries immediately; an 8-thread crash/expiry/report race | S1, S3, L1, L2, P-REC |
-| `SchedulerStateMachineTest` | 11: atomic rejection, retry numbering without cap, edge accounting, deterministic FIFO, job completion, session slot, replay, report shape, 8-thread stress | S1, S2, S3, L1, C |
+| `SchedulerStateMachineTest` | 12: idle polling leaves no history (memory stays flat), atomic rejection, retry numbering without cap, edge accounting, deterministic FIFO, job completion, session slot, replay, report shape, 8-thread stress | S1, S2, S3, L1, C |
 | `SchedulerCoreTest` | 8: transitions, wrong owner/stale run, duplicate failures, FIFO tail, atomic claims, revalidation after a concurrent failure, claim receipts, gap-free events | S1, S2, S3, C, E |
 | `WireContractTest`, `ManifestValidatorTest` | 33: DAG validation, limits, strict JSON, semantic equality, identities, key namespaces | C |
 | `ArtifactStoreTest` | 8: immutable publication, integrity checks, partial uploads invisible, concurrent publication | S1 (outputs cannot change after acceptance), C |

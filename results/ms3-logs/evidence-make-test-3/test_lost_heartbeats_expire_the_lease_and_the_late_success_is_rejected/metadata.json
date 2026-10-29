@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_network_faults.py::test_lost_heartbeats_expire_the_lease_and_the_late_success_is_rejected",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "17950574-24e3-45dd-b2bd-d3972c5d5e2b",
+  "source_revision": "966965ebdeedd26cf2d5c4b1405c627c4bbfe507",
+  "run_label": "ms3-make-test-3",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T16:09:12.537635+00:00",
+  "finished_utc": "2026-10-29T16:09:31.804404+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

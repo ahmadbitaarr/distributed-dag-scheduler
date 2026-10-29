@@ -20,7 +20,7 @@ cd distributed-dag-scheduler
 make test
 ```
 
-`make test` builds the harness image, compiles every module, runs the 76 JUnit tests, then runs all pytest suites (unit, integration and fault injection) against real scheduler, artifact-store and worker processes. Expect about 10–15 minutes and a final line like `102 passed`. Zero expected failures are allowed (`MS2_REQUIRE_XFAIL=0`). Per-test evidence is written to `results/latest-tests/<run>/<test>/`.
+`make test` builds the harness image, compiles every module, runs the 77 JUnit tests, then runs all pytest suites (unit, integration and fault injection) against real scheduler, artifact-store and worker processes. Expect about 10–15 minutes and a final line like `102 passed`. Zero expected failures are allowed (`MS2_REQUIRE_XFAIL=0`). Per-test evidence is written to `results/latest-tests/<run>/<test>/`.
 
 Windows: run from Git Bash (`sh deploy/harness/run.sh` is the same as `make test`), and set `git config --global core.longpaths true` before cloning, because some committed evidence paths are long.
 

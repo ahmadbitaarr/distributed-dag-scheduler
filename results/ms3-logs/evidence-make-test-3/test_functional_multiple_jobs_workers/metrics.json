@@ -1,0 +1,54 @@
+{
+  "scheduler_run_id": "fcd91fce-a97b-4c09-91d9-2207c04bfc03",
+  "scheduler_event_seq": 128,
+  "lease_ns": 5000000000,
+  "counters": {
+    "accepted_jobs": 4,
+    "accepted_logical_successes": 20,
+    "duplicate_reports": 0,
+    "empty_claims": 44,
+    "expired_attempts": 0,
+    "explicit_failed_attempts": 0,
+    "lease_renewals": 0,
+    "rejected_reports": 0,
+    "retries_assigned": 0
+  },
+  "tasks_by_state": {
+    "ASSIGNED": 0,
+    "BLOCKED": 0,
+    "READY": 0,
+    "RUNNING": 0,
+    "SUCCEEDED": 20
+  },
+  "ready_queue_length": 0,
+  "active_attempts": 0,
+  "job_duration_ns": {
+    "count": 4,
+    "p50": 2243808391,
+    "p95": 2581125358
+  },
+  "scheduling_latency_ns": {
+    "count": 20,
+    "p50": 241653505,
+    "p95": 532529888
+  },
+  "lease_recovery_ns": {
+    "count": 0,
+    "p50": null,
+    "p95": null
+  },
+  "polling": {
+    "194a9586-9a8d-461b-907f-4801523a3472": {
+      "empty_claims": 16,
+      "last_empty_claim_elapsed_ns": 7515897966
+    },
+    "34326e08-ffe5-45a9-8e80-63f428d05a57": {
+      "empty_claims": 25,
+      "last_empty_claim_elapsed_ns": 7473726135
+    },
+    "5f4d2bc2-03d7-462c-b3e6-ce41e2ffe866": {
+      "empty_claims": 3,
+      "last_empty_claim_elapsed_ns": 7562926111
+    }
+  }
+}

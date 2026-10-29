@@ -131,12 +131,12 @@ A replay with an equal manifest returns `200`. The same `job_id` with a differen
 | `GET /v1/health` | none | 200 `{"ready":true,"scheduler_run_id":…,"lease_timeout_ms":…}` | none |
 | `POST /v1/jobs` | `{"scheduler_run_id","manifest"}` | 201 on first acceptance, 200 on identical replay: `{"scheduler_run_id","job_id","state","scheduler_event_seq"}` | 400, 409 (different manifest or stale run), 413, 503 |
 | `GET /v1/jobs/{job_id}` | none | 200 atomic snapshot: `state`, `tasks{…attempts, owner, outputs}`, `counts`, `outputs`, `snapshot_event_seq` | 400 (bad UUID), 404 `JOB_NOT_FOUND` |
-| `POST /v1/work/claim` | `{"scheduler_run_id","worker_session_id","claim_id"}` | 200 `Assignment`, or 204 when there is no work. A replayed claim returns its cached result. | 400, 409 |
+| `POST /v1/work/claim` | `{"scheduler_run_id","worker_session_id","claim_id"}` | 200 `Assignment`, or 204 when there is no work. A replayed claim returns its cached result; for empty claims only each session's most recent one is remembered (an idle poll records nothing else). | 400, 409 |
 | `POST /v1/attempts/start` | `Identity` | 200 `Ack` (new or replay); renews the lease | 400, 409 (`LEASE_EXPIRED` for an expired attempt) |
 | `POST /v1/attempts/heartbeat` | `Identity` | 200 `Ack` with `disposition` `RENEWED`; no event is recorded | 400, 409 `LEASE_EXPIRED` (expired) or `CONFLICT` (not the current owner or already finished) |
 | `POST /v1/attempts/report` | `{"identity","outcome":"SUCCESS"\|"FAILURE","outputs":{name:artifact},"error":{"code","message"}\|null}` | 200 `Ack` (new or exact replay) | 400, 409 (`LEASE_EXPIRED`, stale, conflicting or wrong state) |
 | `GET /v1/events?after=&limit=` | none | 200 `{"scheduler_run_id","events":[…],"next_after","has_more"}`; `limit` ranges from 1 to 1000 | 400 |
-| `GET /v1/metrics` | none | 200 with `lease_ns`, counters (including `expired_attempts`, `lease_renewals`), `tasks_by_state`, `ready_queue_length`, `active_attempts`, and p50/p95 summaries of job duration, scheduling latency and `lease_recovery_ns` | none |
+| `GET /v1/metrics` | none | 200 with `lease_ns`, counters (including `expired_attempts`, `lease_renewals`, `empty_claims`), `polling` (per session: `empty_claims`, `last_empty_claim_elapsed_ns`), `tasks_by_state`, `ready_queue_length`, `active_attempts`, and p50/p95 summaries of job duration, scheduling latency and `lease_recovery_ns` | none |
 
 `Assignment` has the fields `scheduler_run_id`, `identity`, `task` (task definition), `inputs` (resolved artifact references), `output_prefix` (the attempt namespace), `scheduler_event_seq`, and `disposition`.
 

@@ -17,6 +17,8 @@ A client submits a job as a JSON manifest describing a DAG of tasks drawn from a
 
 The video job is `inspect` → {`transcode720`, `transcode360`, `thumbnail`, `subtitles`} in parallel → `publish`. `publish` writes a JSON manifest of the produced files; `subtitles` copies a fixture file rather than transcribing speech.
 
+**Capacity.** A scheduler run keeps its complete decision history in memory so that every run can be audited: about 10 KB of heap per completed task (measured: `benchmarks/idle_memory.py`). With the default 128 MiB heap, one run holds about 11,000 tasks (about 1,900 six-task jobs); beyond that the scheduler runs out of memory and has to be restarted, which starts a new, empty run (§5). Idle polling costs nothing: an idle system's memory stays flat.
+
 **Not built (anti-features).** Scheduler replication, failover or durable scheduler state; artifact-store replication or recovery; exactly-once *physical* execution or exactly-once external side effects (a task can physically run more than once; only one result is ever accepted); authentication or authorization; a web UI; priorities, cancellation, deadlines or retry limits; real speech-to-text or production media pipelines; defense against malicious workers.
 
 ## 2. System model

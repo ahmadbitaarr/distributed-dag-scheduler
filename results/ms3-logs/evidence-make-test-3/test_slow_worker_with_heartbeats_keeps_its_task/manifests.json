@@ -1,0 +1,27 @@
+{
+  "dfb4c1cb-512f-43e9-8e78-b1e8d6ef5cd3": {
+    "schema_version": 1,
+    "job_id": "dfb4c1cb-512f-43e9-8e78-b1e8d6ef5cd3",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 12000,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "X",
+        "output_name": "value"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "8286f0bd-0163-4ae1-a9f0-f232b55c8466": {
+    "schema_version": 1,
+    "job_id": "8286f0bd-0163-4ae1-a9f0-f232b55c8466",
+    "tasks": [
+      {
+        "task_id": "slow",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 5000,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "slow",
+        "output_name": "value"
+      }
+    }
+  }
+}

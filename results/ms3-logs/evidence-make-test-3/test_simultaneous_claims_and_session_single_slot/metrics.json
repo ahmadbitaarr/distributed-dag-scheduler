@@ -1,0 +1,86 @@
+{
+  "scheduler_run_id": "0f363015-bf3b-4f88-b781-886ad952e9de",
+  "scheduler_event_seq": 5,
+  "lease_ns": 5000000000,
+  "counters": {
+    "accepted_jobs": 1,
+    "accepted_logical_successes": 0,
+    "duplicate_reports": 0,
+    "empty_claims": 11,
+    "expired_attempts": 0,
+    "explicit_failed_attempts": 0,
+    "lease_renewals": 0,
+    "rejected_reports": 0,
+    "retries_assigned": 0
+  },
+  "tasks_by_state": {
+    "ASSIGNED": 1,
+    "BLOCKED": 0,
+    "READY": 0,
+    "RUNNING": 0,
+    "SUCCEEDED": 0
+  },
+  "ready_queue_length": 0,
+  "active_attempts": 1,
+  "job_duration_ns": {
+    "count": 0,
+    "p50": null,
+    "p95": null
+  },
+  "scheduling_latency_ns": {
+    "count": 1,
+    "p50": 72750518,
+    "p95": 72750518
+  },
+  "lease_recovery_ns": {
+    "count": 0,
+    "p50": null,
+    "p95": null
+  },
+  "polling": {
+    "0e71cea8-0c4f-4d4f-ab37-ceef4fe763ae": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1423031177
+    },
+    "67220d41-1d4e-4eec-a535-0c62c9a2066e": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1422421695
+    },
+    "68be88ba-c8d8-4b3a-953c-bd7683b3fb60": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1426268831
+    },
+    "6ef8c9aa-44fe-4876-8822-6c3b1730b550": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1430559274
+    },
+    "8617cd5a-5ec0-4f8c-8b8c-f6d403b7a680": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1421610664
+    },
+    "9827dc16-8888-4761-ae00-878abadd5e24": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1424248679
+    },
+    "ae7cb9b2-4f46-4b3c-99ac-0c6f2a17e20e": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1428032870
+    },
+    "ceb7093d-b21f-4564-99c9-7a35ab8abaed": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1433942994
+    },
+    "d7ce69c4-f5bd-4b5d-a0dc-5b79e6964a47": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1423306077
+    },
+    "eb152e51-d843-4146-baac-3c40546f1b9c": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1423779101
+    },
+    "f4078a09-6610-4f25-8cc7-7a6c830c7cca": {
+      "empty_claims": 1,
+      "last_empty_claim_elapsed_ns": 1433012478
+    }
+  }
+}
