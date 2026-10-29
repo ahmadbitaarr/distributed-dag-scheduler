@@ -78,14 +78,22 @@ def run_one(root, backend, c, mode, repetition):
             pending_kills = list(KILL_AFTER_COMPLETIONS) if mode == "crash" else []
             threads, armed, killed_sessions = [], {}, set()
 
+            kill_lock = threading.Lock()
+
             def crash_and_replace(victim, session, holding):
-                record = {"worker": victim, "session": session, "holding": holding,
-                          "kill_requested_utc": datetime.now(timezone.utc).isoformat()}
-                record.update(system.kill_worker(victim))
-                replacement = system.start_worker()
-                sessions[system.worker_session(replacement)] = replacement
-                record["replacement"] = replacement
-                kills.append(record)
+                # Serialized: the harness names a new worker from its worker count, so two overlapping
+                # replacements would collide. The kill is recorded before the replacement is attempted.
+                with kill_lock:
+                    record = {"worker": victim, "session": session, "holding": holding,
+                              "kill_requested_utc": datetime.now(timezone.utc).isoformat()}
+                    record.update(system.kill_worker(victim))
+                    kills.append(record)
+                    try:
+                        replacement = system.start_worker()
+                        sessions[system.worker_session(replacement)] = replacement
+                        record["replacement"] = replacement
+                    except Exception as error:      # recorded, and the run is marked censored below
+                        record["replacement_error"] = f"{type(error).__name__}: {error}"
 
             def loop(count, measured):
                 active, finished, manifests, submitted = set(), [], {}, 0
@@ -159,7 +167,8 @@ def run_one(root, backend, c, mode, repetition):
             done = [s for s in snapshots if s["state"] == "SUCCEEDED"]
             incomplete = len(unfinished) + unsubmitted
             complete = (len(done) == MEASURED_JOBS and not incomplete and len(keys) == MEASURED_JOBS * TASKS_PER_JOB
-                        and correct == MEASURED_JOBS and peak <= c and len(kills) == len(KILL_AFTER_COMPLETIONS if mode == "crash" else []))
+                        and correct == MEASURED_JOBS and peak <= c and len(kills) == len(KILL_AFTER_COMPLETIONS if mode == "crash" else [])
+                        and not any("replacement_error" in k for k in kills))
             batch_ns = (max(s["completed_elapsed_ns"] for s in done) - min(s["accepted_elapsed_ns"] for s in snapshots)) if done else None
             durations = [s["duration_ns"] / 1e6 for s in done]
             rec = [r["recovery_ms"] for r in recoveries if r["recovery_ms"] is not None]
