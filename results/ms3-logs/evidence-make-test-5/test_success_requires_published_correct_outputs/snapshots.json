@@ -1,0 +1,88 @@
+{
+  "170dafc0-99b8-4074-b385-bd187de97ba6": {
+    "scheduler_run_id": "0150e051-f94e-4693-a8f2-3dbd78db5ffd",
+    "job_id": "170dafc0-99b8-4074-b385-bd187de97ba6",
+    "state": "SUCCEEDED",
+    "accepted_elapsed_ns": 1116685711,
+    "completed_elapsed_ns": 1569078602,
+    "duration_ns": 452392891,
+    "tasks": {
+      "A": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 1,
+        "owner": null,
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "0150e051-f94e-4693-a8f2-3dbd78db5ffd",
+              "job_id": "170dafc0-99b8-4074-b385-bd187de97ba6",
+              "task_id": "A",
+              "attempt_no": 1,
+              "worker_session_id": "770e2d1e-e3c0-4daa-abf8-ac703214c0b3"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 1119293426,
+            "assigned_elapsed_ns": 1137880090,
+            "started_elapsed_ns": 1222716510,
+            "finished_elapsed_ns": 1567778857,
+            "start_receipt": {
+              "scheduler_run_id": "0150e051-f94e-4693-a8f2-3dbd78db5ffd",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "0150e051-f94e-4693-a8f2-3dbd78db5ffd",
+                "job_id": "170dafc0-99b8-4074-b385-bd187de97ba6",
+                "task_id": "A",
+                "attempt_no": 1,
+                "worker_session_id": "770e2d1e-e3c0-4daa-abf8-ac703214c0b3"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/0150e051-f94e-4693-a8f2-3dbd78db5ffd/jobs/170dafc0-99b8-4074-b385-bd187de97ba6/tasks/A/attempts/1/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "0150e051-f94e-4693-a8f2-3dbd78db5ffd",
+              "scheduler_event_seq": 8,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 1222719765,
+            "lease_deadline_elapsed_ns": 6222719765,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/0150e051-f94e-4693-a8f2-3dbd78db5ffd/jobs/170dafc0-99b8-4074-b385-bd187de97ba6/tasks/A/attempts/1/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    "counts": {
+      "SUCCEEDED": 1
+    },
+    "outputs": {
+      "result": {
+        "key": "runs/0150e051-f94e-4693-a8f2-3dbd78db5ffd/jobs/170dafc0-99b8-4074-b385-bd187de97ba6/tasks/A/attempts/1/value",
+        "length": 1,
+        "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "media_type": "application/json"
+      }
+    },
+    "snapshot_event_seq": 9
+  }
+}

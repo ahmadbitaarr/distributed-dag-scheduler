@@ -1,0 +1,112 @@
+{
+  "02064f15-cc8b-4451-9478-18624292d8c2": {
+    "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+    "job_id": "02064f15-cc8b-4451-9478-18624292d8c2",
+    "state": "SUCCEEDED",
+    "accepted_elapsed_ns": 2077112169,
+    "completed_elapsed_ns": 14627531087,
+    "duration_ns": 12550418918,
+    "tasks": {
+      "X": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 2,
+        "owner": null,
+        "attempt_no": 2,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+              "job_id": "02064f15-cc8b-4451-9478-18624292d8c2",
+              "task_id": "X",
+              "attempt_no": 1,
+              "worker_session_id": "b38bc71b-1482-4b4a-b914-557ad83260a5"
+            },
+            "state": "EXPIRED",
+            "ready_elapsed_ns": 2082858898,
+            "assigned_elapsed_ns": 2156667909,
+            "started_elapsed_ns": 2277948904,
+            "finished_elapsed_ns": 7311823645,
+            "start_receipt": {
+              "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": null,
+            "report_ack": null,
+            "last_alive_elapsed_ns": 2277951133,
+            "lease_deadline_elapsed_ns": 7277951133,
+            "lease_renewals": 0
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+              "job_id": "02064f15-cc8b-4451-9478-18624292d8c2",
+              "task_id": "X",
+              "attempt_no": 2,
+              "worker_session_id": "9f184662-d78d-4481-959d-9f6e5fecf536"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 7312486918,
+            "assigned_elapsed_ns": 7341803151,
+            "started_elapsed_ns": 7442051667,
+            "finished_elapsed_ns": 14626963772,
+            "start_receipt": {
+              "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+              "scheduler_event_seq": 11,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+                "job_id": "02064f15-cc8b-4451-9478-18624292d8c2",
+                "task_id": "X",
+                "attempt_no": 2,
+                "worker_session_id": "9f184662-d78d-4481-959d-9f6e5fecf536"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/6c2bd293-5c29-409d-9d6e-7ae510f68fbc/jobs/02064f15-cc8b-4451-9478-18624292d8c2/tasks/X/attempts/2/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "6c2bd293-5c29-409d-9d6e-7ae510f68fbc",
+              "scheduler_event_seq": 13,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 14467886611,
+            "lease_deadline_elapsed_ns": 19467886611,
+            "lease_renewals": 7
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/6c2bd293-5c29-409d-9d6e-7ae510f68fbc/jobs/02064f15-cc8b-4451-9478-18624292d8c2/tasks/X/attempts/2/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    "counts": {
+      "SUCCEEDED": 1
+    },
+    "outputs": {
+      "result": {
+        "key": "runs/6c2bd293-5c29-409d-9d6e-7ae510f68fbc/jobs/02064f15-cc8b-4451-9478-18624292d8c2/tasks/X/attempts/2/value",
+        "length": 1,
+        "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "media_type": "application/json"
+      }
+    },
+    "snapshot_event_seq": 14
+  }
+}

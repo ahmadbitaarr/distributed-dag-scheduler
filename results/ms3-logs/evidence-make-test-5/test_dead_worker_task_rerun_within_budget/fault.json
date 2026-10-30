@@ -1,0 +1,16 @@
+{
+  "worker": "worker-1",
+  "pid": 4063,
+  "signal": "SIGKILL",
+  "exit_code": -9,
+  "victim": "worker-1",
+  "survivor": "worker-2",
+  "x_identity": {
+    "scheduler_run_id": "25effdba-709e-44da-8dea-4828229671e1",
+    "job_id": "74aa2417-4703-4f23-bf47-e9c5e57aba86",
+    "task_id": "X",
+    "attempt_no": 1,
+    "worker_session_id": "81d69e10-60e6-41d1-a21c-dd6d88498e8b"
+  },
+  "kill_confirmed_elapsed_ns": 2556374063
+}

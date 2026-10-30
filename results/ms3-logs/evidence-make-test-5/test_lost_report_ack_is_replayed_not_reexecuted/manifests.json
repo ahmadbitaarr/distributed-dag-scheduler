@@ -1,0 +1,42 @@
+{
+  "665bcaee-74ff-4f4c-b505-70b29f1d182b": {
+    "schema_version": 1,
+    "job_id": "665bcaee-74ff-4f4c-b505-70b29f1d182b",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 50,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "B",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 50,
+          "value": 3
+        },
+        "parents": [
+          "A"
+        ],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "B",
+        "output_name": "value"
+      }
+    }
+  }
+}

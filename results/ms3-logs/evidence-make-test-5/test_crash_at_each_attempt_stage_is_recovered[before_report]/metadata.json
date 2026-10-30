@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_lease_faults.py::test_crash_at_each_attempt_stage_is_recovered[before_report]",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "00714390-36e2-4777-880c-835a9c641743",
+  "source_revision": "85b0ecbd0cb1e80016b593f1601356069c03e567",
+  "run_label": "ms3-make-test-5",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T21:16:53.767413+00:00",
+  "finished_utc": "2026-10-30T21:17:06.233485+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

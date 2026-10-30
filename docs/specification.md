@@ -92,7 +92,7 @@ The covered failures are worker crashes, restarts, pauses, slow execution, and t
 
 For lost, delayed, duplicated, or reordered messages, workers retry with the same request identifiers and use stored receipts where applicable. A short pause or partition need not cause expiry if the worker renews in time. A client can also retry the same job ID and identical manifest; reusing the ID with different contents returns `409`.
 
-The harness uses SIGKILL, SIGSTOP/SIGCONT, Docker kill/pause, test-only worker stall points, and a per-worker proxy for message faults. It records the injected fault alongside each run's history. See [test-matrix.md](test-matrix.md) for the individual scenarios.
+The harness uses SIGKILL, SIGSTOP/SIGCONT, Docker kill/pause, forced pod deletion on the course cluster, test-only worker stall points, and a per-worker proxy for message faults. It records the injected fault alongside each run's history. See [test-matrix.md](test-matrix.md) for the individual scenarios.
 
 These cases are not covered by the recovery guarantee:
 
@@ -111,6 +111,8 @@ Job completion time runs from acceptance to completion. Throughput counts accept
 
 The benchmark runs six-task jobs using 100 ms fixture operations, with four warmup jobs and 24 measured jobs per run. `make bench` runs the MS2 fault-free matrix for W = 1, 2, and 4 workers. `make bench-recovery` fixes W = 4 and runs at C = 1, 4, and 16 concurrent jobs, comparing fault-free deployments with runs that kill and replace busy workers. Each service is limited to one CPU and 512 MiB.
 
+Load is set by C, W and task duration. In the MS2 fault-free matrix, throughput grew with W, about 4.2 tasks/s per one-slot worker; at C = 16 with four workers we could not tell what limited throughput (progress report, Section E). The scheduler's own load grows with W even when there is no work: every request takes its single mutex, each idle worker claims every `POLL_INTERVAL_MS`, and each busy worker renews once a second. A large enough fleet would therefore saturate the scheduler, but we have not measured where. There is no admission control: work beyond capacity waits in the FIFO ready queue and job time grows, up to the memory estimate in Section 1.
+
 ### P-REC. Bounded recovery with an idle worker
 
 An attempt must not expire before `LEASE_TIMEOUT_MS` has passed since its last accepted renewal. With an idle worker polling, reassignment must happen within `LEASE_TIMEOUT_MS` plus two seconds. Without an idle worker, queueing adds delay. The bound does not cover arbitrary network delays or scheduler pauses.
@@ -128,7 +130,7 @@ The measurements, incomplete run, and hardware limitations are reported in [Sect
 
 ## 8. Resources and replication
 
-`make test` runs the container-based test suite. The host needs Docker, `make`, and a POSIX shell; the container supplies the language tools. The reference benchmark host was a Windows 11 laptop with 12 CPUs, 16 GB RAM, Docker Desktop 27.1.1, and a Linux VM capped at 3 GB. Compose services were limited to one CPU and 512 MiB each.
+`make test` runs the container-based test suite. The host needs Docker, `make`, and a POSIX shell; the container supplies the language tools. The reference benchmark host was a Windows 11 laptop with 12 CPUs, 16 GB RAM, Docker Desktop 27.1.1, and a Linux VM capped at 3 GB. Compose services were limited to one CPU and 512 MiB each. The smoke test, the functional workload and both worker-crash tests also run on the course Hokea cluster; see `deploy/hokea/README.md`.
 
 The repository contains a five-task arithmetic DAG (expected result 22), a six-task benchmark DAG (expected result 9), and a reproducible ten-second 1280 x 720 synthetic video with fixture subtitles.
 
@@ -136,4 +138,4 @@ The repository contains a five-task arithmetic DAG (expected result 22), a six-t
 
 MS3 replaces the intentionally broken worker-crash recovery behavior with leases, heartbeats at `POST /v1/attempts/heartbeat`, command-time expiry checks, and a periodic scan. Expired attempts cannot report success. The original MS2 crash-reassignment test is now expected to pass.
 
-We also clarified S1 to require a current lease holder, distinguished S3's single accepted completion from repeated execution, and made the tested fault model and recovery bound explicit. The results are in the progress report; the exact tests are in the test matrix.
+We also clarified S1 to require a current lease holder, distinguished S3's single accepted completion from repeated execution, and made the tested fault model and recovery bound explicit. After the first MS3 submission we fixed the Hokea adapter, which had rejected the course runner's Hokea build, and added the crash test requested in the MS2 feedback; both crash tests also pass on the course cluster. The results are in the progress report; the exact tests are in the test matrix.

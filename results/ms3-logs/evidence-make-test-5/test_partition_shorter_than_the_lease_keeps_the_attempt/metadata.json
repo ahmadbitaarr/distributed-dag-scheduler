@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_network_faults.py::test_partition_shorter_than_the_lease_keeps_the_attempt",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "7eba6bdb-97c4-4357-b509-187b42006fdd",
+  "source_revision": "85b0ecbd0cb1e80016b593f1601356069c03e567",
+  "run_label": "ms3-make-test-5",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T21:18:26.036183+00:00",
+  "finished_utc": "2026-10-30T21:18:36.222405+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

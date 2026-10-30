@@ -38,7 +38,7 @@ P-REC says we do not detect expiry before the 5 s lease, and require reassignmen
 
 ### 7. Testing strategy (1 min)
 
-`make test` runs 77 JUnit tests and 102 pytest tests. The submitted log records no failures or expected failures. Lease unit tests use an injected clock. Service-backed tests use real processes and inject SIGKILL, SIGSTOP, stage-specific stalls, message loss, delay, duplication and partitions, plus a seeded chaos run. We check the exported histories for S1–S3. Checker tests deliberately corrupt a saved history and require rejection.
+`make test` runs 77 JUnit tests and 107 pytest tests. The final log records 105 passed, 2 skipped (they need a local Hokea install), and no failures or expected failures. Lease unit tests use an injected clock. Service-backed tests use real processes and inject SIGKILL, SIGSTOP, stage-specific stalls, message loss, delay, duplication and partitions, plus a seeded chaos run. We check the exported histories for S1–S3. Checker tests deliberately corrupt a saved history and require rejection.
 
 ## Questions to practise
 
@@ -96,8 +96,12 @@ The selected experiment completed 17 of 18 runs. One event-stream read timed out
 
 **What cannot the system handle?**
 
-Scheduler crash recovery, artifact-store loss and malicious workers are out of scope. A link dropping every report while delivering heartbeats violates fair-loss assumptions and can stall completion. A task that always fails retries forever. Histories grow with real work; the memory probe suggests about 11,000 tasks per run with the 128 MiB heap. Hokea course-cluster execution is still unverified.
+Scheduler crash recovery, artifact-store loss and malicious workers are out of scope. A link dropping every report while delivering heartbeats violates fair-loss assumptions and can stall completion. A task that always fails retries forever. Histories grow with real work; the memory probe suggests about 11,000 tasks per run with the 128 MiB heap.
+
+**Does it run on the course cluster?**
+
+Yes. The smoke test, the functional workload, the crash oracle and the instructor's bounded re-run test pass on Hokea, with crashes done by force-deleting the pod; recovery there took 5.1–5.6 s. The MS2 "version mismatch" was our bug: we required Hokea to match a public commit byte for byte, and the runner's build differs. We now check only for the Hokea calls we make.
 
 **What changed since MS2?**
 
-Leases, heartbeats and expiry fixed the stuck-task case. We added 16 lease unit tests, an idle-polling test, 13 fault tests, 2 checker tests, the fault proxy and recovery benchmark. We also fixed replayed-start handling after expiry and the idle-polling memory leak. The specification now separates recorded completion from physical execution and states the fault assumptions more precisely.
+Leases, heartbeats and expiry fixed the stuck-task case. We added 16 lease unit tests, an idle-polling test, 14 fault tests (one is the instructor's), 2 checker tests, the fault proxy and recovery benchmark. We also fixed replayed-start handling after expiry, the idle-polling memory leak, and the Hokea adapter. The specification now separates recorded completion from physical execution and states the fault assumptions more precisely.

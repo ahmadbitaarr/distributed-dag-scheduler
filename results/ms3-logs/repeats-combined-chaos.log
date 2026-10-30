@@ -1,0 +1,16 @@
+== combined chaos repeat 1
+.                                                                        [100%]
+1 passed in 20.75s
+== combined chaos repeat 2
+.                                                                        [100%]
+1 passed in 20.31s
+== combined chaos repeat 3
+.                                                                        [100%]
+1 passed in 19.93s
+== combined chaos repeat 4
+.                                                                        [100%]
+1 passed in 20.42s
+== combined chaos repeat 5
+.                                                                        [100%]
+1 passed in 20.24s
+exit 0

@@ -4,7 +4,8 @@ Team-internal working record (October 30, 2026), written for Hasan and Ahmad. No
 
 ## Baseline and scope
 
-- Started from `main @ 6104fa7` (identical to GitHub `main`). The input archive `CS4094_MS3_FINAL_SUBMISSION.zip`, with Ahmad's humanized documents, `docs/handoffs/ms3-documentation-review.md` and his chaos-test correction, was not available on this machine. Everything here is therefore relative to `6104fa7`. Before resubmitting, the sentence-level documentation edits listed below must be carried onto the ZIP's humanized documents (or the ZIP's documents onto this branch), and his chaos-test correction compared with commit `7a358bf`.
+- Started from `main @ 6104fa7` (identical to GitHub `main`); the closeout fixes were made there first. Ahmad's `CS4094_MS3_FINAL_SUBMISSION.zip` (sha256 `b423f6ee…a70a9`, 3,647 entries) arrived afterwards and was merged. Compared with `6104fa7` it changed six documents and `tests/faults/test_network_faults.py`, added his review notes and his test-run evidence, and removed the three MS3 PDFs. No Java, adapter or Hokea code differed.
+- Merge: his files were committed verbatim (`38dab29`); the closeout updates were then re-applied to his text sentence by sentence, in his wording style. His failed and passing October 29 runs are archived in `results/ms3-logs/independent-check-ahmad/`. Not imported: his older Step 10/11 `results/latest-tests/` runs (MS2 material documented elsewhere) and eight Step 11 `runtime/` byte stores (generated artifacts). The PDFs were rebuilt from the merged Markdown with `docs/pdf/build_pdfs.py`.
 - Work is on the local branch `ms3/closeout`. Nothing was pushed to GitHub.
 - No Java service code changed, so the public MS3 images built from `6104fa7` remain the images under test.
 
@@ -26,11 +27,11 @@ Team-internal working record (October 30, 2026), written for Hasan and Ahmad. No
 | 2e | Beyond what one scheduler can handle | Yes | **Partly** | Spec §6: no admission control, FIFO queueing, memory cap ~11,000 tasks (§1); no scale-out design |
 | 3 | Artifact store "files remain on disk" is not what Hokea provides | Yes | **Resolved** | Spec §2 assumes the store is available; progress §G sentence corrected (it previously said files stay on disk) |
 | 4a | Clean, readable code for the red team | Yes | Unchanged here | Only the Hokea adapter changed in code |
-| 4b | Repetitive, unedited AI-generated documentation | Yes | **In Ahmad's ZIP** | His humanization pass is in the ZIP, not on this branch; edits here are sentence-level so they can be carried over |
+| 4b | Repetitive, unedited AI-generated documentation | Yes | **Addressed** | Ahmad's rewrite of the six documents is merged unchanged except for sentence-level factual updates; his review notes are in `docs/handoffs/ms3-documentation-review.md` |
 | 4c | Results do not map to tests and docs | Yes | **Resolved** | `docs/test-matrix.md` (now with the new test), `results/ms3-logs/README.md` (every log and evidence directory described) |
 | 4d | Label agent documentation | Yes | **Resolved** | README "Repository layout" now names `docs/handoffs/`, `HANDOFF.md`, `PROGRESS.md`, `OPEN_ISSUES.md` as agent working records |
 | 4e | Code must run on Hokea; the pin is your bug | Yes | **Resolved and verified on the cluster** | See "Hokea" below |
-| T | Implement and pass `test_crash_rerun_bounded.py` | Yes | **Resolved** | `tests/faults/test_crash_rerun_bounded.py`; passes natively (4 of 4: the full run plus 3 repeats; in the full run X was re-run 5.06 s after the kill) and on the cluster (re-run 4.5 s after pod deletion) |
+| T | Implement and pass `test_crash_rerun_bounded.py` | Yes | **Resolved** | `tests/faults/test_crash_rerun_bounded.py`; passes natively (5 of 5: runs 4 and 5 plus 3 repeats; in run 5 X was re-run 5.06 s after the kill) and on the cluster (re-run 4.5 s after pod deletion) |
 | R1 | Distribute the scheduler | Ambition | **Not resolved** | As 1a |
 | R2 | Detect worker and scheduler-node faults; no duplicated downstream work; worker detects scheduler failure; account for messaging overhead | Ambition | **Partly** | Worker faults and no duplicate downstream work: resolved (S3, children released only on an accepted success). Scheduler failure: a worker detects a restarted scheduler by its run ID and abandons the old attempt, but there is no failover. Messaging overhead: spec §6 now gives the request rates (idle 10 claims/s, busy 1 heartbeat/s per worker); not measured |
 | R3 | Minimize `sleep()`; real video tasks; at least non-uniform sleeps | Ambition | **Not resolved** | Benchmarks still use uniform 100 ms fixture sleeps; real FFmpeg tasks run only in the video pipeline test |
@@ -49,17 +50,18 @@ Team-internal working record (October 30, 2026), written for Hasan and Ahmad. No
 
 ## Chaos test
 
-The intermittent failure Ahmad saw (101 passed, 1 failed on `lease_expired`) is an experiment flaw, not a system bug. The test killed `workers[0]` at 1.5 s and paused `workers[1]` at 2.5 s, then asserted that *some* lease expired. A worker between tasks (report acknowledged, next claim not yet answered, often lengthened by the proxy's injected delay and drops) holds no lease, so if both faults landed in such a gap nothing could expire. The fix (`7a358bf`) waits until each victim owns an unfinished attempt before the fault, waits 0.5 s for messages already inside the proxy, records the attempts each victim still owns, and requires every one of them to have a `lease_expired`. This is stronger than before: the old assertion passed if any lease expired anywhere. Ahmad's correction in the ZIP could not be compared; check that it does not simply drop or loosen the assertion. Result: passed in `make-test-4` and in 5 of 5 further fresh runs (`results/ms3-logs/repeats-chaos-and-bounded.log`).
+The intermittent failure Ahmad saw (101 passed, 1 failed on `lease_expired`) is an experiment flaw, not a system bug. The test killed `workers[0]` at 1.5 s and paused `workers[1]` at 2.5 s, then asserted that *some* lease expired. A worker between tasks (report acknowledged, next claim not yet answered, often lengthened by the proxy's injected delay and drops) holds no lease, so if both faults landed in such a gap nothing could expire. His archived failed run confirms it: that chaos history contains no `lease_expired` at all. The two corrections were complementary. His (in the ZIP) gates the crash victim on task A, so it is certainly holding a running attempt when killed, and requires that exact attempt to expire, but left the pause unchecked. The closeout one (`7a358bf`) waited for each victim to hold a task, which still left a small race for the crash. The final test (`cb54bd8`) keeps his gate for the crash and freezes the second worker only while it holds a task, requiring every attempt it held to expire. Both are stronger than the original assertion, which passed if any lease expired anywhere. Result: passed in `make-test-5` and in 5 of 5 further fresh runs (`results/ms3-logs/repeats-combined-chaos.log`).
 
 ## Verification results
 
 | Check | Environment | Result |
 |---|---|---|
-| Build and JUnit (`mvn -B verify`) | Harness container (Linux, Docker Desktop 27.1.1), source `bfa3b08` | **77 passed**, 0 failed |
-| Full pytest suite (`make test`, run 4) | Same | **105 passed, 2 skipped, 0 failed, 0 expected failures**, exit 0; 53 evidence directories |
+| Build and JUnit (`mvn -B verify`) | Harness container (Linux, Docker Desktop 27.1.1), final merged source `85b0ecb` | **77 passed**, 0 failed |
+| Full pytest suite (`make test`, run 5) | Same | **105 passed, 2 skipped, 0 failed, 0 expected failures**, exit 0; 53 evidence directories; 11 lease expiries, detection 5.01–5.11 s, recovery 5.01–5.11 s with an idle worker |
+| Full pytest suite before the merge (run 4) | Same, source `bfa3b08` | 105 passed, 2 skipped |
 | Hokea adapter and packaging unit tests, including the 2 that need real Hokea | WSL Ubuntu, the course lab's uv environment with public Hokea `427b946` | **25 passed** |
-| Offline history checker over all saved evidence | `results/ms3-logs/` | **615 job histories in 127 directories, no violations** |
-| Chaos campaign, repeated | Harness container | **5 of 5 passed** (6 of 6 with run 4) |
+| Offline history checker over all saved evidence (the logs README's command) | `results/ms3-logs/` | **744 job histories, no violations**; the one directory without an event stream is reported NOT CHECKED, as intended |
+| Final (combined) chaos test, repeated | Harness container | **5 of 5 passed** (6 of 6 with run 5); the pre-merge version also 6 of 6 |
 | Bounded re-run test, repeated | Harness container | **3 of 3 passed** (4 of 4 with run 4) |
 | Course cluster, unchanged `6104fa7` package (reproduction) | `team-06`, runner `hokea-runner:2026.08.29.3` | 1 error at setup, as expected: `Hokea source mismatch at check.py` |
 | Course cluster, fixed package (`611c1de`) | Same | **4 passed**, exit 0, cleanup succeeded, 7 histories pass |
@@ -79,29 +81,23 @@ Failed: none. Blocked: none.
 | `deploy/hokea/verify_api.py` | Uses the new check; reports differing files instead of failing |
 | `deploy/hokea/package_runner.py` | Ships and imports the bounded re-run test |
 | `tests/faults/test_crash_rerun_bounded.py` | New: the instructor's test, adapted only for MS3's idle-poll metric |
-| `tests/faults/test_network_faults.py` | Chaos campaign faults land on a worker holding a task; every held attempt must expire |
+| `tests/faults/test_network_faults.py` | Ahmad's gated crash victim plus a checked freeze: both victims' attempts must expire |
 | `tests/unit/test_hokea_adapter.py` | Pin test replaced by: differing runner recorded, missing API rejected, real Hokea provides the API |
 | `tests/unit/test_hokea_packaging.py` | Expects 4 collected runner tests |
-| `docs/specification.md` | §6 P-REC test reference, recovery approximation (claim round trip), load/bottleneck paragraph (feedback 2); §8 cluster; §9 change |
-| `docs/ms3-progress-report.md` | Claim table, test counts, defects 3–4, §A closeout run, §D results, §F cluster, §G artifact store (feedback 3), §H |
-| `docs/test-matrix.md` | New test row; chaos row; Hokea unit row; run reference |
-| `docs/ms3-oral-defense.md` | Test counts; cluster Q&A |
-| `README.md` | Test count; course-cluster commands; agent-doc label (feedback 4) |
-| `results/ms3-logs/README.md` | Closeout run and cluster evidence rows |
+| `README.md`, `docs/specification.md`, `docs/ms3-progress-report.md`, `docs/test-matrix.md`, `docs/ms3-oral-defense.md`, `results/ms3-logs/README.md` | Ahmad's rewrite, plus: §5 pod deletion, §6 load/bottleneck paragraph (feedback 2), §8 and §9 cluster sentences (spec); final run, chaos failure explanation, bounded test, counts, §F cluster result, §G artifact-store restart (feedback 3), §H (report); new test, chaos and Hokea rows (matrix); test count, cluster commands, agent-doc label (feedback 4) (README); counts and a cluster Q&A (defense); closeout evidence rows and the 744-history total (logs README) |
+| `docs/handoffs/ms3-documentation-review.md` | Ahmad's review notes, unchanged |
 | `deploy/hokea/README.md`, `CLUSTER-HANDOFF.md`, `docs/OPEN_ISSUES.md`, `docs/PROGRESS.md` | MS3 status notes; the "do not relax the pin" instruction withdrawn |
 | `docs/pdf/*.pdf` | Rebuilt from the edited Markdown |
-| `results/ms3-logs/hokea-cluster/`, `make-test-4.log`, `junit-make-test-4.xml`, `evidence-make-test-4/`, `repeats-chaos-and-bounded.log`, `compose-demo.log` | New evidence; the logs README's offline-check command also fixed (it crashed on a directory whose event stream was left out) |
+| `results/ms3-logs/hokea-cluster/`, `make-test-4.*`, `make-test-5.*`, `evidence-make-test-4/`, `evidence-make-test-5/`, `independent-check-ahmad/`, `repeats-*.log`, `compose-demo.log` | New evidence (the offline-check command fix is Ahmad's version) |
 
 ## Remaining risks
 
 1. **Scheduler is still a single in-memory node** (feedback 1a, R1, S3). The professor said this is why MS2 lost credit and that we are "on track for minimal ambition credit" without it. The spec scopes it out honestly, which satisfies MS3's "meets all declared specifications", but the ambition multiplier is decided at MS5. This is the largest risk, and it needs a design decision (WAL plus restart recovery is the smaller step; replication needs consensus).
 2. **Benchmarks use uniform 100 ms sleeps** (R3, R4). Expect the professor to raise this; at minimum, non-uniform task durations and a mixed job population should come in MS4/MS5.
-3. **The ZIP merge.** The humanized documents and Ahmad's chaos fix live only in the ZIP. If the ZIP is submitted unchanged, the Hokea fix, the new test and the corrected claims are missing. If this branch is submitted unchanged, the humanization is missing.
+3. **Both of us should read the merged prose once.** Ahmad's review asks that both members can explain it in their own words; the closeout sentences were written to match his style but are new text.
 4. **Cluster coverage is four tests.** The other fault tests need the in-process proxy or SIGSTOP and run only natively.
 5. **Timing.** Recovery assertions use a 2 s slack on the scheduler clock; on the cluster one requeue took 0.56 s (a slow claim round trip), well inside it.
 
 ## Resubmission recommendation
 
-**Yes, with one condition.** The corrected branch is a meaningful improvement over the October 29 submission. It fixes the one bug the professor named outright (the Hokea pin), adds the one test he asked us to implement and pass, and verifies both on the course cluster rather than only locally. It also removes the artifact-store claim he objected to, labels the agent documents, fixes a flaky test without weakening it, and answers his load and bottleneck questions as far as our measurements allow.
-
-The condition is the ZIP. Ahmad's humanized documents are not on this branch, and this branch's fixes are not in his ZIP. Before resubmitting: (1) take the ZIP's six humanized documents, (2) re-apply the sentence-level edits listed above to them (each is a sentence or a table row), (3) compare his chaos-test correction with `7a358bf` and keep the stronger one, (4) commit, rerun `make test`, and build the ZIP from that commit with `git archive --prefix=distributed-dag-scheduler/`. Pushing to GitHub needs Ahmad's agreement. The archive built from this branch (`distributed-dag-scheduler-ms3-closeout.zip`) is complete and verified, and it can be submitted as is if the merge cannot happen in time, at the cost of the humanization pass.
+**Yes.** The merged archive (`distributed-dag-scheduler-ms3-final.zip`, built from the final commit) is a meaningful improvement over the October 29 submission. It fixes the one bug the professor named outright (the Hokea pin), adds the one test he asked us to implement and pass, and verifies both on the course cluster rather than only locally. It also carries Ahmad's rewritten documentation, removes the artifact-store claim the professor objected to, labels the agent documents, fixes the flaky chaos test without weakening it, and answers his load and bottleneck questions as far as our measurements allow. Nothing has been pushed to GitHub; pushing the branch needs Ahmad's agreement.

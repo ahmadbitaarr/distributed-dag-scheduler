@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_worker_client.py::test_stale_report_rejection_does_not_kill_the_worker",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "b025741e-8bf3-4767-aaad-b32894c12391",
+  "source_revision": "85b0ecbd0cb1e80016b593f1601356069c03e567",
+  "run_label": "ms3-make-test-5",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T21:15:31.088672+00:00",
+  "finished_utc": "2026-10-30T21:15:39.827170+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

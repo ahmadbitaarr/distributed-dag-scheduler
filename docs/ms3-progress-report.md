@@ -6,11 +6,11 @@ The [specification](specification.md) defines the properties discussed here. The
 
 ## A. Verification results
 
-The archived full test run is `results/ms3-logs/make-test-3.log`, from clean source `966965e`. Maven verification passed 77 JUnit tests, and pytest passed 102 tests with no failures or expected failures (exit code 0). The pytest XML is `results/ms3-logs/junit-make-test-3.xml`. This establishes the result for that revision, not for every change made afterward.
+The full test run we submitted on October 29 is `results/ms3-logs/make-test-3.log`, from clean source `966965e`. Maven verification passed 77 JUnit tests, and pytest passed 102 tests with no failures or expected failures (exit code 0). The pytest XML is `results/ms3-logs/junit-make-test-3.xml`. This establishes the result for that revision, not for every change made afterward.
 
-A later independent local run passed 101 pytest tests, but one timing-sensitive chaos test failed. We made a focused correction, then reran that chaos test three times; it passed each time. We have not rerun the full suite after the correction, so we cannot claim a complete post-correction pass. The later run and reruns are not part of the archived `make-test-3` evidence.
+A later independent local run passed 101 pytest tests, but the chaos test failed. Its crash and pause were timed with fixed sleeps, and in that run both landed while the victims held no task, so no lease could expire; the failed history has no `lease_expired` event. The test now holds the crash victim in a running attempt with a test gate, freezes the second worker only while it holds a task, and requires those attempts to expire. The failed run and the reruns are in `results/ms3-logs/independent-check-ahmad/`.
 
-The archived service-backed tests exported 52 evidence directories under `results/ms3-logs/evidence-make-test-3/`. The offline history checker found no safety violations in those 52 job histories. This checks the recorded executions; it does not cover every possible execution.
+The final full run, `results/ms3-logs/make-test-5.log` from clean source `85b0ecb`, includes the chaos-test correction and the Hokea fix. Maven verification passed 77 JUnit tests; pytest ran 107 tests, of which 105 passed and 2 were skipped, with no failures or expected failures (exit code 0). The skipped tests check the Hokea adapter against a real Hokea installation, which the test container does not have; they pass in the course lab environment. The run's service-backed tests exported 53 evidence directories under `results/ms3-logs/evidence-make-test-5/`, and the offline history checker found no safety violations in those 53 job histories. This checks the recorded executions; it does not cover every possible execution.
 
 The main claims map to evidence as follows:
 
@@ -18,11 +18,11 @@ The main claims map to evidence as follows:
 - S2 (dependency ordering): the integration tests in `tests/integration/` cover chains, joins, and concurrent branches. `check_history` verifies recorded assignment and start ordering.
 - S3 (single accepted completion): duplicate-report, lost-reply, restart, and pause tests cover retries and old attempts. `LeaseTest` includes an eight-thread race. The history checker also rejects duplicate success.
 - L1 (progress with available workers): functional workload, slow-task, and short-partition tests check that ready work completes and long-running tasks are not expired while renewals continue.
-- L2 (worker-failure recovery): `tests/faults/test_worker_crash.py::test_worker_crash_reassignment` is the MS2 crash oracle, now passing. Additional cases in `tests/faults/test_lease_faults.py` cover crashes before start, during an operation, and after upload; restart and pause cases cover other losses of ownership. These also check the P-REC bound when an idle worker is polling.
+- L2 (worker-failure recovery): `tests/faults/test_worker_crash.py::test_worker_crash_reassignment` is the MS2 crash oracle, now passing. Additional cases in `tests/faults/test_lease_faults.py` cover crashes before start, during an operation, and after upload; restart and pause cases cover other losses of ownership. These also check the P-REC bound when an idle worker is polling. `tests/faults/test_crash_rerun_bounded.py` is the test requested in the MS2 feedback: a worker is killed during an ordinary 20-second task, with no test hooks, and the task must run again within 60 seconds and succeed once. It and the crash oracle also passed on the course cluster (Section F).
 
 The full mapping, including tests of the checker itself, is in [test-matrix.md](test-matrix.md). Each fault test saves its scheduler history, worker events, and applicable fault or proxy logs. The event and verification formats are described in [evidence.md](evidence.md).
 
-Two earlier full runs remain in the archive. `make-test-1` had one failure: a counters test still expected MS2's exact metric list. `make-test-2` passed all 102 pytest tests but ran before the idle-memory fix. Its `+uncommitted` label came from writing the log inside the repository. Run 3 is the archived full-suite result used for the property summary above.
+Earlier full runs remain in the archive. `make-test-1` had one failure: a counters test still expected MS2's exact metric list. `make-test-2` passed all 102 pytest tests but ran before the idle-memory fix. Its `+uncommitted` label came from writing the log inside the repository. `make-test-4` ran the Hokea fix and an earlier version of the chaos correction before the documentation review was merged (105 passed, 2 skipped). Run 5 is the full-suite result used for the property summary above.
 
 ## B. What changed
 
@@ -32,11 +32,13 @@ Workers now send heartbeats while holding an attempt. The interval comes from `/
 
 We added `tests/harness/netfault.py` to inject dropped, delayed, and repeated messages or partition a worker's link to the scheduler. The harness also supports worker crashes and pauses. The history checker now detects success from an expired attempt and expiry recorded for a non-owner.
 
-The new coverage includes 16 lease JUnit tests using an injected clock, one idle-polling JUnit test, 13 fault-injection tests, and two checker-falsification tests. Together with the original crash oracle, the suite contains 14 fault tests. Recovery benchmarks are implemented in `benchmarks/recovery.py` and run through `make bench-recovery`.
+The new coverage includes 16 lease JUnit tests using an injected clock, one idle-polling JUnit test, 14 fault-injection tests (one is the crash test requested in the MS2 feedback), and two checker-falsification tests. Together with the original crash oracle, the suite contains 15 fault tests. Recovery benchmarks are implemented in `benchmarks/recovery.py` and run through `make bench-recovery`.
 
 Two bugs were found during testing. A replayed start could return a cached acknowledgment after expiry. The report path already rejected its result, but the start response was inconsistent with the lease rule. The restart test exposed this, and the JUnit suite now covers it.
 
 The second bug was idle-memory growth, inherited from MS2. Four idle workers caused the live heap to grow by about 257 MiB per hour because each empty claim created a new history event and receipt. Empty claims no longer append history events; each session replaces its previous idle receipt. Polling counts are still available at `/v1/metrics`. The follow-up probe showed no continuing idle growth. Logs are in `results/ms3-logs/memory-probe/`.
+
+After the first submission we fixed two more problems. The Hokea adapter refused to run on the course cluster (Section F), and the chaos test could fail without any system fault (Section A).
 
 ## C. Design decisions
 
@@ -50,7 +52,7 @@ We left deadline decisions to the scheduler rather than trying to estimate them 
 
 ## D. Fault-test observations
 
-The selected test run recorded ten lease expiries across the fault tests. Detection took 5.01-5.27 seconds after the last accepted renewal, never before the five-second lease. With an idle worker polling, reassignment took 5.04-5.27 seconds. The chaos test took 6.04-6.05 seconds because work was already queued. Fault-free, slow-task, and short-partition tests recorded no expiry. Tests rejected or abandoned late work and retained one accepted success per task.
+The final test run recorded 11 lease expiries across the fault tests (run 3 recorded ten). Detection took 5.01-5.11 seconds after the last accepted renewal, never before the five-second lease. With an idle worker polling, reassignment took 5.01-5.11 seconds. The chaos test took 5.87-6.32 seconds because work was already queued. Fault-free, slow-task, and short-partition tests recorded no expiry. Tests rejected or abandoned late work and retained one accepted success per task.
 
 We checked the tests against deliberately introduced defects. Disabling renewal caused two lease tests to fail; skipping the expiry check when processing reports caused two others to fail. The checker-falsification tests modify recorded histories to add invalid events and confirm that the checker rejects them. These checks are described in the test matrix.
 
@@ -88,16 +90,18 @@ Measurements were taken on the MS2 laptop: Windows 11, 12 CPUs, 16 GB RAM, Docke
 
 `make up` starts the scheduler, artifact store, and three workers in Compose, with no automatic restart and the resource caps noted above. `make demo` runs the arithmetic and video workloads.
 
-The Hokea adapter includes the fault proxy and requires zero expected failures. In the course-cluster attempt, Kubernetes accepted the runner Job and pytest collected three tests. All three stopped during setup with `Hokea source mismatch at check.py`, before running scheduler workloads. The cluster test exited with code 1. We therefore cannot claim successful Kubernetes workload verification.
+The Hokea adapter includes the fault proxy and requires zero expected failures. In the first course-cluster attempt, Kubernetes accepted the runner Job and pytest collected three tests, but all three stopped during setup with `Hokea source mismatch at check.py` (`results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md`).
 
-Our adapter's strict source-version check contributed to this compatibility problem and needs investigation. It would be inaccurate to blame the course runner without resolving the difference. The archive also contains an earlier course-cluster attempt with the same setup error at `results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md`. The later attempt described here was reported separately; its raw logs are not part of the archived MS3 evidence reviewed for this report.
+The cause was our adapter, as the MS2 feedback said. It required the installed Hokea package to match public commit `427b946` byte for byte, and the course runner image ships its own build, which differs from that commit in 7 of its 14 files. We reproduced the error on our namespace on October 30 with the unchanged code. The adapter now records the installed files' hashes in each test's evidence and stops only if Hokea lacks a class, method or option the adapter calls.
+
+The same day, `hokea test` passed all four cluster tests in 2 minutes 11 seconds (source `611c1de`, with images built from the unchanged service code at `6104fa7`): the smoke test, the functional workload, the crash oracle and the bounded re-run test, with worker crashes done by force-deleting the pod. The crash oracle's task was reassigned 5.57 seconds after its last heartbeat; in the bounded test the task ran again 4.5 seconds after its pod was deleted and succeeded once. All seven job histories passed the offline checker, and no pods were left running. The files that run on the cluster are unchanged in the final source. The logs are in `results/ms3-logs/hokea-cluster/`. The other fault tests need the in-process proxy or SIGSTOP, so they still run only locally.
 
 ## G. Known limitations
 
 Scheduler state is not durable. A crash loses queued and in-flight work, and restarting creates a new run. Retaining full histories in memory also limits run length. With the default 128 MiB heap, the memory probe suggests around 11,000 completed tasks, or roughly 10-15 minutes at sustained full load.
 
-A live worker may lose its lease during a long pause or partition, causing work to repeat. Only one completion can be accepted, but external side effects need their own idempotency. There is no retry limit, so a permanently failing operation leaves its job RUNNING. The scheduler trusts workers rather than recomputing their output. Network fault injection covers worker-to-scheduler links, not the artifact store; the store is assumed available and does not rebuild its object index after restart even if files remain on disk.
+A live worker may lose its lease during a long pause or partition, causing work to repeat. Only one completion can be accepted, but external side effects need their own idempotency. There is no retry limit, so a permanently failing operation leaves its job RUNNING. The scheduler trusts workers rather than recomputing their output. Network fault injection covers worker-to-scheduler links, not the artifact store; the store is assumed available; it keeps its object index in memory, and we do not rely on its files surviving a restart (on Hokea they do not).
 
 ## H. Later milestones
 
-Possible MS4-MS5 work includes responding to red-team findings, adding a retry limit and terminal FAILED state, storing scheduler state durably, and running fault suites under Compose and Hokea. None of these is an MS3 guarantee.
+Possible MS4-MS5 work includes responding to red-team findings, adding a retry limit and terminal FAILED state, storing scheduler state durably, and running the remaining fault suites under Compose and Hokea. None of these is an MS3 guarantee.

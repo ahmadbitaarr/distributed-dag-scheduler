@@ -4,7 +4,17 @@ We keep the selected MS3 run and earlier attempts here. Each record identifies t
 
 | Path | What it is |
 |---|---|
-| `make-test-3.log` | **The submitted full run** (`make test`, label `ms3-make-test-3`, clean source `966965e`): Maven output for all 77 JUnit tests, then pytest `-rA` for all 102 tests (102 passed, 0 failed, 0 expected failures, exit 0). |
+| `make-test-5.log` | **The final full run** (October 30, label `ms3-make-test-5`, clean source `85b0ecb`, with the Hokea fix, the bounded re-run test and the combined chaos-test correction): Maven output for all 77 JUnit tests, then pytest `-rA` for all 107 tests (105 passed, 2 skipped, 0 failed, 0 expected failures, exit 0). The skipped tests need a real Hokea install; they pass in the course lab environment. |
+| `junit-make-test-5.xml` | pytest JUnit XML for the same run (107 tests, 0 failures, 0 errors, 2 skipped). |
+| `evidence-make-test-5/<test>/` | Per-test evidence from that run, in the same layout as `evidence-make-test-3/` below; the bounded re-run test adds `fault.json` and `rerun-window.json`. |
+| `repeats-combined-chaos.log` | The final chaos test run five more times in fresh pytest sessions (code `85b0ecb`). |
+| `hokea-cluster/repro-6104fa7/` | The course-cluster failure reproduced on October 30 with the unchanged `6104fa7` runner package (`hokea test --namespace team-06 -q -k test_service_exchange`): 1 error at setup, `Hokea source mismatch at check.py`. Launcher log, exit status and the copied-out `runs/`. |
+| `hokea-cluster/closeout-611c1de/` | **The course-cluster run** after the adapter fix (`hokea test --namespace team-06 -v -rA`, source `611c1de`, the public MS3 images by digest): 4 passed in 130.6 s, launcher exit 0. `runs/<label>/<test>/` has each test's scheduler history, worker logs, snapshots and `hokea/metadata.json` (installed Hokea file hashes, pod identities, image references, cleanup); `runtime/` byte stores are omitted. The files the runner ships are unchanged in the final source. |
+| `independent-check-ahmad/` | Ahmad's independent October 29 runs on `6104fa7`: the full run in which the chaos test failed (51 service-backed tests passed; that chaos history has no `lease_expired`), one plain rerun of the chaos test, and three reruns with his first correction (`+uncommitted`). Per-test evidence only; `runtime/` omitted. |
+| `make-test-4.log`, `junit-make-test-4.xml`, `evidence-make-test-4/` | A full run of the closeout corrections before the documentation review was merged (clean source `bfa3b08`, 105 passed, 2 skipped). Superseded by run 5, whose chaos test combines both corrections. The `BrokenPipeError` in its chaos stderr is the fault proxy failing to answer the worker the test had just killed. |
+| `repeats-chaos-and-bounded.log` | Repeats on the closeout code before the merge: chaos test 5 of 5, bounded re-run test 3 of 3. |
+| `compose-demo.log` | October 30, the `make up`, `make demo`, `make down` commands on Docker Compose with three workers: all exit 0; functional job `result=22`, video job with all four outputs, history checks passed. |
+| `make-test-3.log` | The full run submitted on October 29 (`make test`, label `ms3-make-test-3`, clean source `966965e`): Maven output for all 77 JUnit tests, then pytest `-rA` for all 102 tests (102 passed, 0 failed, 0 expected failures, exit 0). |
 | `junit-make-test-3.xml` | pytest JUnit XML for the same run (102 tests, 0 failures, 0 errors, 0 skipped). |
 | `evidence-make-test-3/<test>/` | Per-test evidence from that run: `events.jsonl` (scheduler history), `snapshots.json`, `manifests.json`, `metrics.json`, `worker-N.jsonl`, `scheduler.jsonl`, `artifact-store.jsonl`, `metadata.json`, and test-specific files (`proxy-worker-N.jsonl` for network faults, `recovery.json`, `fault.json`, `gate.json` for the crash oracle). Stored artifact bytes (`runtime/`) are omitted. |
 | `make-test-1.log` | An earlier full run, kept as a record: 101 passed and 1 failed, because `test_counters_gauges_and_snapshot_sequence_are_consistent` still expected MS2's exact counter list. |
@@ -33,4 +43,4 @@ print(checked, "job histories checked: no violations")
 PY
 ```
 
-The outside-OneDrive attribution control intentionally omits its event stream. The command reports that directory as NOT CHECKED; it cannot validate that control from snapshots alone. In this archive the complete test and selected benchmark evidence provide 555 checked histories (52 + 503).
+The outside-OneDrive attribution control intentionally omits its event stream. The command reports that directory as NOT CHECKED; it cannot validate that control from snapshots alone. In this archive the test runs, cluster runs and selected benchmark provide 744 checked histories: 52, 53 and 53 from runs 3, 4 and 5, 7 from the course cluster, 76 from the independent check, and 503 from the benchmark.
