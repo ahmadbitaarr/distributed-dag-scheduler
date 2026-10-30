@@ -27,6 +27,14 @@ def all_worker_events(system):
     return [e for w in system.workers for e in system.worker_events(w)]
 
 
+def held_by(system, jobs, worker):
+    """Unfinished attempts the worker's session owns right now, as (job_id, task_id, attempt_no)."""
+    session = system.worker_session(worker)
+    return [(m["job_id"], name, t["attempt_no"]) for m in jobs
+            for name, t in system.api.status(m["job_id"])["tasks"].items()
+            if t["owner"] == session and t["state"] in ("ASSIGNED", "RUNNING")]
+
+
 def test_lost_heartbeats_expire_the_lease_and_the_late_success_is_rejected(system):
     """A live worker whose renewals are all lost looks dead. Its later SUCCESS must not count."""
     a = system.start_worker(proxy=True)
@@ -189,7 +197,11 @@ def test_chaos_campaign_keeps_every_guarantee(system):
     assert held["attempt_no"] == gate["attempt_no"]
     system.kill_worker(workers[0])
     time.sleep(1.0)
+    # Freeze the second worker while it holds a task; replies already inside its proxy get 0.5 s to land.
+    wait_for(lambda: held_by(system, jobs, workers[1]), description="worker-2 holding a task")
     system.pause_worker(workers[1])                    # long freeze: longer than the lease
+    time.sleep(0.5)
+    frozen = held_by(system, jobs, workers[1])
     replacement = system.start_worker()
     time.sleep(7.0)
     system.resume_worker(workers[1])
@@ -206,6 +218,8 @@ def test_chaos_campaign_keeps_every_guarantee(system):
                and all(e.get(k) == gate[k] for k in
                        ("job_id", "task_id", "attempt_no", "worker_session_id"))
                for e in events), "the gated crash victim's attempt must expire"
+    expired = {(e["job_id"], e["task_id"], e["attempt_no"]) for e in events if e["event_type"] == "lease_expired"}
+    assert set(frozen) <= expired, "every attempt the frozen worker held must expire"
     injected = sum(len(system.proxy(w).applied("drop_request")) + len(system.proxy(w).applied("drop_response")) for w in workers)
     assert injected > 0
     assert system.worker_running(replacement) and system.worker_running(workers[1])
