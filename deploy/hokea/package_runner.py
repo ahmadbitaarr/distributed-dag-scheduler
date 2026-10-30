@@ -1,4 +1,4 @@
-"""Build a small flat ConfigMap payload for the pinned `hokea test` runner.
+"""Build a small flat ConfigMap payload for the course `hokea test` runner.
 
 This does not contact Docker, Kubernetes, a registry, or GitHub. Correctness tests
 are shipped byte-for-byte and imported, never copied into a second oracle.
@@ -15,7 +15,7 @@ BUDGET = 900_000  # Pinned hokea.runner.CONFIGMAP_BUDGET, text bytes on the wire
 FILES = [
     "tests/__init__.py", "tests/conftest.py", "tests/harness/__init__.py",
     "tests/harness/api.py", "tests/harness/runtime.py", "tests/harness/netfault.py", "tests/harness/hokea_adapter.py",
-    "tests/harness/check_evidence.py", "tests/faults/test_worker_crash.py",
+    "tests/harness/check_evidence.py", "tests/faults/test_worker_crash.py", "tests/faults/test_crash_rerun_bounded.py",
     "tests/integration/test_functional_workload.py", "tests/integration/test_hokea_smoke.py",
     "workloads/functional/functional.json", "workloads/functional/expected.json",
     "deploy/hokea/HOKEA_API_SHA256.json",
@@ -54,6 +54,7 @@ ENTRY = '''"""Import the accepted oracles; no Hokea-specific scheduling assertio
 from tests.integration.test_hokea_smoke import test_service_exchange
 from tests.integration.test_functional_workload import test_committed_functional_workload
 from tests.faults.test_worker_crash import test_worker_crash_reassignment
+from tests.faults.test_crash_rerun_bounded import test_dead_worker_task_rerun_within_budget
 '''
 INI = '''[pytest]
 testpaths = test_entry.py

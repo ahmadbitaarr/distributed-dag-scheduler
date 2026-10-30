@@ -1,6 +1,8 @@
 """Orchestration contract tests. Fakes never contact Docker or Kubernetes."""
 import hashlib
+import inspect
 import json
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -215,18 +217,49 @@ def test_worker_manifest_removes_port_without_adding_server_or_storage():
     assert pod["spec"]["volumes"] == [{"name": "data", "emptyDir": {}}]
 
 
-def test_exact_package_pin_rejects_modified_source(tmp_path, monkeypatch):
+def test_runner_package_differing_from_reference_is_recorded_not_fatal(tmp_path, monkeypatch):
+    """The course runner's Hokea differs from the public revision in check.py; that must not block a run."""
     package = tmp_path / "hokea"
     package.mkdir()
-    (package / "cluster.py").write_bytes(b"pinned\n")  # bytes: write_text would emit CRLF on Windows
+    for name in ["check.py", "cluster.py"]:
+        (package / name).write_bytes(b"reference\n")  # bytes: write_text would emit CRLF on Windows
     pin = tmp_path / "pin.json"
-    pin.write_text(json.dumps({"revision": adapter.HOKEA_SHA,
-        "package_files": {"cluster.py": hashlib.sha256(b"pinned\n").hexdigest()}}))
+    pin.write_text(json.dumps({"revision": adapter.HOKEA_SHA, "package_files": {
+        name: hashlib.sha256(b"reference\n").hexdigest() for name in ["check.py", "cluster.py"]}}))
     monkeypatch.setattr(adapter, "PIN", pin)
-    assert adapter.verify_package(package) == adapter.HOKEA_SHA
-    (package / "cluster.py").write_bytes(b"upgrade\n")
-    with pytest.raises(RuntimeError, match="source mismatch"):
-        adapter.verify_package(package)
+    assert adapter.describe_package(package)["matches_reference"]
+    (package / "check.py").write_bytes(b"runner build\n")
+    described = adapter.describe_package(package)
+    assert not described["matches_reference"] and described["differing_files"] == ["check.py"]
+    assert described["sha256"]["check.py"] == hashlib.sha256(b"runner build\n").hexdigest()
+
+
+@pytest.mark.parametrize("mode", ["docker", "kubernetes"])
+def test_missing_hokea_api_fails_before_any_resource(mode):
+    module, name, methods, options = adapter.REQUIRED_API[mode]
+    def complete(self, **kw):
+        pass
+    complete.__signature__ = inspect.Signature(
+        [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+        + [inspect.Parameter(option, inspect.Parameter.KEYWORD_ONLY) for option in options])
+    full = type(name, (), {"__init__": complete, **{method: (lambda self: None) for method in methods}})
+    assert adapter.verify_api(mode, lambda path: SimpleNamespace(**{name: full})) is full
+    no_method = type(name, (full,), {methods[-1]: None})
+    with pytest.raises(RuntimeError, match=re.escape(f"{name}.{methods[-1]}()")):
+        adapter.verify_api(mode, lambda path: SimpleNamespace(**{name: no_method}))
+    def narrow(self, *, nodes=1):
+        pass
+    no_option = type(name, (full,), {"__init__": narrow})
+    with pytest.raises(RuntimeError, match=re.escape(f"{name}({options[-1]}=)")):
+        adapter.verify_api(mode, lambda path: SimpleNamespace(**{name: no_option}))
+    with pytest.raises(RuntimeError, match="has no"):
+        adapter.verify_api(mode, lambda path: SimpleNamespace())
+
+
+@pytest.mark.parametrize("mode", ["docker", "kubernetes"])
+def test_installed_hokea_provides_the_adapter_api(mode):
+    pytest.importorskip("hokea.kube")
+    assert adapter.verify_api(mode).__name__ == adapter.REQUIRED_API[mode][1]
 
 
 def test_factory_constructor_parameters_and_no_source_bind_mount(tmp_path):

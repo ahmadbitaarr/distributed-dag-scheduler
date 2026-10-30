@@ -1,6 +1,7 @@
-"""Pinned Hokea orchestration only; the existing Api and correctness tests own semantics."""
+"""Hokea orchestration only; the existing Api and correctness tests own semantics."""
 import hashlib
 import importlib
+import inspect
 import json
 import os
 import re
@@ -12,20 +13,46 @@ from pathlib import Path
 from .api import Api, wait_for
 from .runtime import ROOT, ready
 
+# The public Hokea revision this adapter was written against. The course runner image ships its own
+# Hokea build, which differs from it (in check.py), so the installed package is recorded, not required
+# to match byte for byte. What is required is the API below; a missing piece fails before any resource.
 HOKEA_SHA = "427b94634b1736ba8e59d4977836162aa58bd2cb"
 PIN = ROOT / "deploy/hokea/HOKEA_API_SHA256.json"
+REQUIRED_API = {
+    "docker": ("hokea.cluster", "Cluster", ["up", "down", "node", "kill", "stop", "_compose_config"],
+               ["nodes", "name", "port", "env", "cpus", "memory", "workdir", "up_timeout", "dockerfile"]),
+    "kubernetes": ("hokea.kube", "KubeCluster",
+                   ["up", "down", "node", "kill", "stop", "_kubectl", "_pod_manifest", "_peers_service_manifest"],
+                   ["nodes", "name", "port", "env", "cpus", "memory", "workdir", "up_timeout",
+                    "image", "namespace", "expose", "takeover"]),
+}
 
 
-def verify_package(package):
+def describe_package(package):
+    """Provenance only: hashes of the installed Hokea files and which differ from the reference revision."""
     pin = json.loads(PIN.read_text())
     if pin["revision"] != HOKEA_SHA:
-        raise RuntimeError("Hokea pin document disagrees with adapter revision")
+        raise RuntimeError("Hokea reference document disagrees with adapter revision")
     directory = Path(package)
-    for name, expected in pin["package_files"].items():
-        path = directory / name
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
-            raise RuntimeError(f"Hokea source mismatch at {name}; require {HOKEA_SHA}")
-    return HOKEA_SHA
+    files = {name: hashlib.sha256((directory / name).read_bytes()).hexdigest() if (directory / name).is_file() else None
+             for name in pin["package_files"]}
+    differing = sorted(name for name, digest in files.items() if digest != pin["package_files"][name])
+    return {"path": str(directory), "reference_revision": HOKEA_SHA, "matches_reference": not differing,
+            "differing_files": differing, "sha256": files}
+
+
+def verify_api(mode, import_module=importlib.import_module):
+    """Return the Hokea cluster class for mode, or fail if it lacks a method or option this adapter uses."""
+    module, name, methods, options = REQUIRED_API[mode]
+    parent = getattr(import_module(module), name, None)
+    if parent is None:
+        raise RuntimeError(f"Installed Hokea has no {module}.{name}")
+    missing = [f"{name}.{method}()" for method in methods if not callable(getattr(parent, method, None))]
+    accepted = inspect.signature(parent.__init__).parameters
+    missing += [f"{name}({option}=)" for option in options if option not in accepted]
+    if missing:
+        raise RuntimeError("Installed Hokea lacks the API this adapter uses: " + ", ".join(missing))
+    return parent
 
 
 def docker_config(config, shared_network, worker):
@@ -53,16 +80,15 @@ class Factory:
         if os.environ.get("HOKEA_TAKEOVER"):
             raise ValueError("HOKEA_TAKEOVER must be unset; this adapter never takes over existing resources")
         module = importlib.import_module("hokea.cluster")
-        verify_package(Path(module.__file__).parent)
+        self.package = describe_package(Path(module.__file__).parent)
+        parent = verify_api(mode)
         self.mode, self.namespace = mode, namespace
         if mode == "docker":
-            parent = module.Cluster
             class ServiceCluster(parent):
                 def _compose_config(self):
                     return docker_config(super()._compose_config(), self.ms2_shared, self.ms2_worker)
             self.cluster_type = ServiceCluster
         else:
-            parent = importlib.import_module("hokea.kube").KubeCluster
             class ServiceCluster(parent):
                 def _pod_manifest(self, i):
                     pod = super()._pod_manifest(i)
@@ -146,7 +172,8 @@ class HokeaHarness:
 
     def _write(self):
         (self.orchestration / "metadata.json").write_text(json.dumps({
-            "hokea_revision": HOKEA_SHA, "runtime": self.mode, "namespace": self.namespace,
+            "hokea_reference_revision": HOKEA_SHA, "hokea_package": getattr(self.factory, "package", None),
+            "runtime": self.mode, "namespace": self.namespace,
             "source_revision": os.environ.get("MS2_SOURCE_REV"), "images": self.images,
             "records": self.records, "cleanup_succeeded": self.cleanup}, indent=2))
 
@@ -241,7 +268,7 @@ class HokeaHarness:
             assert after["restart_count"] == 0, "Target worker had restarted"
         else:
             assert after["gone"] and after["instance_id"] is None
-        evidence = {"worker": name, "hokea_revision": HOKEA_SHA, "runtime": self.mode,
+        evidence = {"worker": name, "hokea_reference_revision": HOKEA_SHA, "runtime": self.mode,
                     "node": cluster.node(1).name, "node_index": 1, "old_instance_id": self.identities[name],
                     "worker_session_id": sessions.pop(), "hard_kill_requested": True, "kill_completed": True,
                     "old_instance_running": False, "automatic_restart_observed": False,
