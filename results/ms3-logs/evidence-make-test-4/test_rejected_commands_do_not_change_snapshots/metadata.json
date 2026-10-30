@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_api.py::test_rejected_commands_do_not_change_snapshots",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "91809c7e-423b-4077-b882-689a5b207d1e",
+  "source_revision": "bfa3b085c9d4ebf1e48086f7e25898d8d6422eeb",
+  "run_label": "ms3-make-test-4",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T20:16:25.925237+00:00",
+  "finished_utc": "2026-10-30T20:16:30.162429+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

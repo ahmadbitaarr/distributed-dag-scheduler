@@ -1,0 +1,135 @@
+{
+  "proposed_bound_s": 60,
+  "task_runtime_ms": 20000,
+  "operation_timeout_ms": 30000,
+  "poll_interval_ms": 100,
+  "victim_session": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+  "survivor_session": "9b8b19ab-8d45-434a-a83e-96236c7fd76d",
+  "rerun": {
+    "since_kill_s": 5.06,
+    "attempt": {
+      "scheduler_run_id": "62da73ae-bf76-41c4-8a5e-c91224d610c1",
+      "job_id": "d7756465-910c-4b00-92ee-550699d6925d",
+      "task_id": "X",
+      "attempt_no": 2,
+      "worker_session_id": "9b8b19ab-8d45-434a-a83e-96236c7fd76d"
+    }
+  },
+  "x_operation_starts": [
+    [
+      "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      1
+    ],
+    [
+      "9b8b19ab-8d45-434a-a83e-96236c7fd76d",
+      2
+    ]
+  ],
+  "x_successes": 1,
+  "job_completed_since_kill_s": 25.56,
+  "final_x_state": "SUCCEEDED",
+  "final_x_attempt_no": 2,
+  "final_y_state": "SUCCEEDED",
+  "final_job_state": "SUCCEEDED",
+  "samples": [
+    {
+      "since_kill_s": 0.01,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 0.52,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 1.03,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 1.53,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 2.03,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 2.54,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 3.04,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 3.54,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 4.05,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 4.55,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1,
+      "x_owner": "68313bc6-6784-43f4-92ea-5639e173bfd4",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    },
+    {
+      "since_kill_s": 5.06,
+      "x_state": "RUNNING",
+      "x_attempt_no": 2,
+      "x_owner": "9b8b19ab-8d45-434a-a83e-96236c7fd76d",
+      "y_state": "BLOCKED",
+      "job_state": "RUNNING",
+      "survivor_alive": true
+    }
+  ]
+}

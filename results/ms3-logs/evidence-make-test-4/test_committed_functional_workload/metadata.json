@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_functional_workload.py::test_committed_functional_workload",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "61a62733-653b-41a2-9a30-295188798859",
+  "source_revision": "bfa3b085c9d4ebf1e48086f7e25898d8d6422eeb",
+  "run_label": "ms3-make-test-4",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T20:16:30.206611+00:00",
+  "finished_utc": "2026-10-30T20:16:42.760332+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

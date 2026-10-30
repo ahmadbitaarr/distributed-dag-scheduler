@@ -1,6 +1,12 @@
-# Step 11 Hokea orchestration
+# Hokea orchestration
 
-Current state: **LOCAL HOKEA/DOCKER VERIFICATION COMPLETE; COURSE EXECUTION ATTEMPTED AND BLOCKED BY AN EXTERNAL RUNNER PACKAGE MISMATCH.**
+**MS3 status (October 30, 2026):** the smoke test, the functional workload, the crash oracle and the bounded re-run test from the MS2 feedback all pass on the course cluster (`team-06`). Evidence: `results/ms3-logs/hokea-cluster/`. Commands: "Running on the course cluster" in the top-level README.
+
+The MS2 attempt failed at setup with `Hokea source mismatch at check.py`. That was our bug, not the runner's: the adapter required the installed Hokea to equal public commit `427b946` byte for byte, and the course runner image `hokea-runner:2026.08.29.3` ships a build that differs from that commit in 7 of its 14 files (`check.py`, `cluster.py`, `kube.py`, `net.py`, `runner.py`, `runs.py`, `workload.py`). The adapter now records the installed files' hashes in each test's `hokea/metadata.json`, and fails before creating any resource only if Hokea lacks a class, method or constructor option the adapter calls (`REQUIRED_API` in `tests/harness/hokea_adapter.py`; `python3 deploy/hokea/verify_api.py` checks a local install). The runner package also ships the bounded re-run test, and no test is expected to fail.
+
+The rest of this file is the Step 11 (MS2) record. Where it says the pin must not be relaxed or expects an XFAIL, the paragraphs above supersede it.
+
+Step 11 state: **LOCAL HOKEA/DOCKER VERIFICATION COMPLETE; COURSE EXECUTION ATTEMPTED AND BLOCKED BY AN EXTERNAL RUNNER PACKAGE MISMATCH.**
 
 Steps 0–13 are accepted at `main @ bf43c619d00ee1658c5cb1eb297a5e1f59a2de8d`.
 Step 14 closes documentation; Step 15 follows review. Local Step 11 observations

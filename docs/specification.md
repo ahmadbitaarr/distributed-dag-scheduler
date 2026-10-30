@@ -95,7 +95,7 @@ Faults are injected by the harness: SIGKILL and SIGSTOP/SIGCONT on worker proces
 
 **Workload and load generation.** A closed-loop driver keeps C ∈ {1, 4, 16} six-task jobs in flight (100 ms fixture tasks, 4 warmup jobs, 24 measured jobs), on fresh Compose deployments with 1 CPU and 512 MiB per service. `make bench` runs the fault-free matrix over W ∈ {1, 2, 4} workers (MS2); `make bench-recovery` runs W = 4 in two modes, baseline and crash, where two busy workers are SIGKILLed during each measured phase and replaced.
 
-**Guarantee (P-REC).** A crashed worker's task is never detected earlier than `LEASE_TIMEOUT_MS` after its last renewal, and, when an idle worker is polling, is reassigned within `LEASE_TIMEOUT_MS` + 2 s of it. Under load (no idle worker), the recovered task additionally waits behind the tasks already queued, by FIFO. The bound is tested in every crash test.
+**Guarantee (P-REC).** A crashed worker's task is never detected earlier than `LEASE_TIMEOUT_MS` after its last renewal, and, when an idle worker is polling, is reassigned within `LEASE_TIMEOUT_MS` + 2 s of it. Under load (no idle worker), the recovered task additionally waits behind the tasks already queued, by FIFO. The bound is asserted in the crash oracle and the crash-at-each-stage tests.
 
 **Measured results** (details in the progress report, §E):
 
@@ -105,7 +105,9 @@ Faults are injected by the harness: SIGKILL and SIGSTOP/SIGCONT on worker proces
 - **Scheduling latency.** An idle worker receives a ready task in about 5 ms.
 - **Memory.** An idle scheduler's heap stays flat; real work costs about 10 KB per completed task (§1, Capacity).
 
-Throughput and job time are characterizations, not commitments: they depend on the host and on the synthetic workload. A deployment trades recovery time against false expiry by choosing `LEASE_TIMEOUT_MS`; recovery time is approximately the lease, plus up to one scan interval and one poll interval.
+Throughput and job time are characterizations, not commitments: they depend on the host and on the synthetic workload. A deployment trades recovery time against false expiry by choosing `LEASE_TIMEOUT_MS`; recovery time is approximately the lease, plus up to one scan interval, one poll interval and one claim round trip.
+
+**Load parameters and the bottleneck.** Load is set by C (jobs in flight), W (workers) and task durations. At the loads above, workers are the bottleneck: throughput grows with W, and the scheduler gives an idle worker a ready task in about 5 ms. The scheduler handles every request under one mutex, and its request rate grows with W even when there is no work (each idle worker claims every `POLL_INTERVAL_MS`, each busy worker renews every second), so a large enough fleet would saturate it; we have not measured where. There is no admission control: load above capacity waits in the FIFO ready queue, and job time grows with the queue, up to the memory capacity in §1.
 
 ## 7. Configuration that changes behavior
 
@@ -120,7 +122,7 @@ Throughput and job time are characterizations, not commitments: they depend on t
 
 ## 8. Resources and replication
 
-Everything runs from the repository with `make test` (Docker only). The reference host for the numbers in §6 is one Windows 11 machine (12 CPUs, 16 GB RAM) running Docker Desktop 27.1.1 with a 3 GB Linux VM, with every service capped at 1 CPU and 512 MiB. The workloads are committed: a five-task arithmetic DAG (`result=22`), a six-task benchmark DAG (`result=9`), and a byte-reproducible 10-second 1280×720 synthetic video with fixture subtitles.
+Everything runs from the repository with `make test` (Docker only). The smoke, functional and two crash tests also run on the course Hokea cluster (`deploy/hokea/README.md`). The reference host for the numbers in §6 is one Windows 11 machine (12 CPUs, 16 GB RAM) running Docker Desktop 27.1.1 with a 3 GB Linux VM, with every service capped at 1 CPU and 512 MiB. The workloads are committed: a five-task arithmetic DAG (`result=22`), a six-task benchmark DAG (`result=9`), and a byte-reproducible 10-second 1280×720 synthetic video with fixture subtitles.
 
 ## 9. Changes since MS2
 
@@ -129,3 +131,4 @@ Everything runs from the repository with `make test` (Docker only). The referenc
 - **S3 sharpened:** at-least-once physical execution and exactly-once recorded completion are now stated separately.
 - **Fault model sharpened:** each fault is listed in or out of scope, with its tests. Communication faults and pauses are now tested, not just planned.
 - **Performance:** recovery time is defined, measured and bounded.
+- **Course cluster:** the Hokea adapter no longer rejects the course runner's Hokea build, and the crash tests pass on the cluster.

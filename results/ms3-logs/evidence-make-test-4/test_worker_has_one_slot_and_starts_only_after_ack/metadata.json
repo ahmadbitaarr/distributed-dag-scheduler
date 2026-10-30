@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_worker_client.py::test_worker_has_one_slot_and_starts_only_after_ack",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "93f997dd-331f-4633-a3ab-eefa00538e7c",
+  "source_revision": "bfa3b085c9d4ebf1e48086f7e25898d8d6422eeb",
+  "run_label": "ms3-make-test-4",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T20:18:59.785881+00:00",
+  "finished_utc": "2026-10-30T20:19:10.250699+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

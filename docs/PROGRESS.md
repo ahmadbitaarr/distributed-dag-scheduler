@@ -1,6 +1,6 @@
 # MS2 sequential progress
 
-> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. Everything below is the MS2 record, kept for provenance.
+> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. On October 30 the course-cluster failure (Step 11) turned out to be our adapter's byte-for-byte Hokea pin; it is fixed and all four cluster tests pass (`results/ms3-logs/hokea-cluster/`). Everything below is the MS2 record, kept for provenance.
 
 Status: **STEP 15 PASS — runtime/content audit complete; supported-host results accepted by Planning.**
 Current step: **15 — Audit and package the milestone**

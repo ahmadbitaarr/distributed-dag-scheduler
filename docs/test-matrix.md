@@ -1,6 +1,6 @@
 # Test-to-property matrix (MS3)
 
-Every claim in the [specification](specification.md) is listed with the tests that would fail if it were broken. Run everything with `make test` (one command, Docker only). Run logs for the submitted run are in [results/ms3-logs/](../results/ms3-logs/), with per-test evidence (scheduler history, worker logs, proxy logs, snapshots) under `results/ms3-logs/evidence-make-test-3/`.
+Every claim in the [specification](specification.md) is listed with the tests that would fail if it were broken. Run everything with `make test` (one command, Docker only). Run logs for the final run are in [results/ms3-logs/](../results/ms3-logs/), with per-test evidence (scheduler history, worker logs, proxy logs, snapshots) under `results/ms3-logs/evidence-make-test-4/`, and the course-cluster runs under `results/ms3-logs/hokea-cluster/`.
 
 ## Property codes
 
@@ -21,7 +21,8 @@ Fault codes: **crash** (SIGKILL), **restart** (new process/session), **pause** (
 
 | Test | Fault injected | Properties |
 |---|---|---|
-| `test_worker_crash.py::test_worker_crash_reassignment` (MS2's oracle, now passing) | crash during the operation | L2, P-REC, S1, S2, S3 |
+| `test_worker_crash.py::test_worker_crash_reassignment` (MS2's oracle, now passing; also on the course cluster) | crash during the operation | L2, P-REC, S1, S2, S3 |
+| `test_crash_rerun_bounded.py::test_dead_worker_task_rerun_within_budget` (the test requested in the MS2 feedback; also on the course cluster) | crash during an ordinary 20 s task, no test hooks, a second worker already polling; X must re-run within 60 s and succeed once | L2, S1, S3 |
 | `test_lease_faults.py::test_crash_at_each_attempt_stage_is_recovered[before_start]` | crash after claim, before start | L2, P-REC, S1, S3 |
 | `…[operation]` | crash while executing | L2, P-REC, S1, S3 |
 | `…[before_report]` | crash after uploading outputs, before reporting (orphan output must not count) | L2, P-REC, S1, S3 |
@@ -34,7 +35,7 @@ Fault codes: **crash** (SIGKILL), **restart** (new process/session), **pause** (
 | `test_network_faults.py::test_lost_claim_and_start_replies_are_replayed_from_receipts` | loss of a claim reply and a start reply | S3, C (receipts), L1 |
 | `test_network_faults.py::test_crash_after_success_is_accepted_but_its_reply_is_lost` | loss of report reply + crash (report boundary) | S3, L1 |
 | `test_network_faults.py::test_delayed_and_duplicated_messages_change_nothing` | delay (0–150 ms) on all messages, dup on every start and report | S3, S1, L1 |
-| `test_network_faults.py::test_chaos_campaign_keeps_every_guarantee` | seeded mix: 5% request loss, 5% reply loss, delay, a crash, a pause longer than the lease, a replacement worker | S1, S2, S3, L1, L2 |
+| `test_network_faults.py::test_chaos_campaign_keeps_every_guarantee` | seeded mix: 5% request loss, 5% reply loss, delay, a crash, a pause longer than the lease, a replacement worker; each fault hits a worker holding a task, and every attempt it held must expire | S1, S2, S3, L1, L2 |
 
 Every fault test also runs `check_history` on the full scheduler and worker history, so S1–S3 are checked in each one even where not listed.
 
@@ -76,7 +77,7 @@ Every fault test also runs `check_history` on the full scheduler and worker hist
 |---|---|---|
 | `tests/unit/test_history_checks.py` (16 tests) | Each history invariant is falsified by a one-event mutation of a real saved history, including MS3's "success from an expired attempt" and "expiry of a non-owner". | E (the checker can detect S1–S3 violations) |
 | `tests/unit/test_fault_oracle.py` | The crash oracle's preconditions and polling evidence cannot be satisfied by malformed or stale evidence. | E |
-| `tests/unit/test_hokea_adapter.py`, `test_hokea_packaging.py` | Course-cluster adapter and pinned packaging. | C |
+| `tests/unit/test_hokea_adapter.py`, `test_hokea_packaging.py` | Course-cluster adapter and runner packaging; a runner whose Hokea differs from the public commit is recorded, not rejected; a Hokea missing a call the adapter makes fails before any pod starts (the two tests against a real Hokea skip where it is not installed). | C |
 
 ## JUnit (`mvn -B verify`, also part of `make test`)
 

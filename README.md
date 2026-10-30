@@ -20,7 +20,7 @@ cd distributed-dag-scheduler
 make test
 ```
 
-`make test` builds the harness image, compiles every module, runs the 77 JUnit tests, then runs all pytest suites (unit, integration and fault injection) against real scheduler, artifact-store and worker processes. Expect about 10–15 minutes and a final line like `102 passed`. Zero expected failures are allowed (`MS2_REQUIRE_XFAIL=0`). Per-test evidence is written to `results/latest-tests/<run>/<test>/`.
+`make test` builds the harness image, compiles every module, runs the 77 JUnit tests, then runs all pytest suites (unit, integration and fault injection) against real scheduler, artifact-store and worker processes. Expect about 10–15 minutes and a final line like `105 passed, 2 skipped` (the two skipped tests need a local Hokea install). Zero expected failures are allowed (`MS2_REQUIRE_XFAIL=0`). Per-test evidence is written to `results/latest-tests/<run>/<test>/`.
 
 Windows: run from Git Bash (`sh deploy/harness/run.sh` is the same as `make test`), and set `git config --global core.longpaths true` before cloning, because some committed evidence paths are long.
 
@@ -41,6 +41,22 @@ Run a subset inside the harness container:
 ```bash
 sh deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests && pytest -q tests/faults/test_network_faults.py'
 ```
+
+## Running on the course cluster (Hokea)
+
+The smoke test, the functional workload and both worker-crash tests (crashes are force-deleted pods) also run on the course Hokea cluster, using the public images built from the service code at `6104fa7`, which later revisions do not change. From a Linux or WSL shell with your course kubeconfig and the Hokea CLI from the course lab, using your own team namespace:
+
+```bash
+python3 deploy/hokea/package_runner.py --out /tmp/ms3-runner --source-revision "$(git rev-parse HEAD)" \
+  --scheduler-image ghcr.io/ahmadbitaarr/scheduler@sha256:65b2abd2b78746659366406791c157ae756be06de210102bd31afb08ab43ce59 \
+  --artifact-store-image ghcr.io/ahmadbitaarr/artifact-store@sha256:02c9470377e24dcee6fdaa41b339485b04ffc55e72caee1a4f03b6b7ed01bf27 \
+  --worker-image ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca
+cd /tmp/ms3-runner && hokea test --namespace team-NN -v
+```
+
+Expect `4 passed` in about two minutes; Hokea copies each test's evidence back to `./runs/`. Our runs are in `results/ms3-logs/hokea-cluster/`, and adapter details in [deploy/hokea/README.md](deploy/hokea/README.md).
+
+## Checking saved evidence
 
 Re-check the safety invariants offline on any saved evidence (standard-library Python only):
 
@@ -119,4 +135,4 @@ Every service-backed test exports the scheduler's full event history, worker log
 | `docs/` | Specification, progress reports, API, evidence schema, test matrix, MS2 architecture and roadmap, step handoffs |
 | `results/` | Committed run logs and evidence (`ms3-logs/`, `handoffs/step-XX/`) |
 
-Historical MS2 material (architecture, roadmap, step handoffs, the MS2 report) is kept unchanged under `docs/` for provenance.
+Historical MS2 material (architecture, roadmap, step handoffs, the MS2 report) is kept unchanged under `docs/` for provenance. `docs/handoffs/`, `docs/HANDOFF.md`, `docs/PROGRESS.md` and `docs/OPEN_ISSUES.md` are working instructions and status records written for AI coding agents during development, not reviewed documentation; the documents in the table at the top are the reviewed ones.

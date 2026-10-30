@@ -1,0 +1,27 @@
+{
+  "4d11e02e-cd37-410a-b465-006e0b1b459f": {
+    "schema_version": 1,
+    "job_id": "4d11e02e-cd37-410a-b465-006e0b1b459f",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 12000,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "X",
+        "output_name": "value"
+      }
+    }
+  }
+}

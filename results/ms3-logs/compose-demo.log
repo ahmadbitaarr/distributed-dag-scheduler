@@ -1,0 +1,283 @@
+## make up
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [artifact-store internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.03kB 0.0s done
+#1 DONE 0.0s
+
+#2 [artifact-store internal] load metadata for docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#2 DONE 0.0s
+
+#3 [artifact-store internal] load metadata for docker.io/library/maven:3.9.9-eclipse-temurin-21
+#3 DONE 0.0s
+
+#4 [artifact-store internal] load .dockerignore
+#4 transferring context: 149B done
+#4 DONE 0.0s
+
+#5 [artifact-store build 1/9] FROM docker.io/library/maven:3.9.9-eclipse-temurin-21
+#5 DONE 0.0s
+
+#6 [artifact-store stage-1 1/3] FROM docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#6 DONE 0.0s
+
+#7 [artifact-store internal] load build context
+#7 transferring context: 61.09kB 0.0s done
+#7 DONE 0.0s
+
+#8 [artifact-store build 7/9] COPY worker/pom.xml worker/pom.xml
+#8 CACHED
+
+#9 [artifact-store build 6/9] COPY scheduler/pom.xml scheduler/pom.xml
+#9 CACHED
+
+#10 [artifact-store build 3/9] COPY pom.xml .
+#10 CACHED
+
+#11 [artifact-store build 5/9] COPY artifact-store artifact-store
+#11 CACHED
+
+#12 [artifact-store build 2/9] WORKDIR /src
+#12 CACHED
+
+#13 [artifact-store stage-1 2/3] WORKDIR /app
+#13 CACHED
+
+#14 [artifact-store build 8/9] COPY client/pom.xml client/pom.xml
+#14 CACHED
+
+#15 [artifact-store build 4/9] COPY protocol protocol
+#15 CACHED
+
+#16 [artifact-store build 9/9] RUN mvn -B -q -pl artifact-store -am package -DskipTests
+#16 CACHED
+
+#17 [artifact-store stage-1 3/3] COPY --from=build /src/artifact-store/target/artifact-store-0.2.0.jar app.jar
+#17 CACHED
+
+#18 [artifact-store] exporting to image
+#18 exporting layers done
+#18 writing image sha256:1ffb2aaa7d1a9b8e73a1699efd1cfe7b8752168fcc0e15990fc071936be6cbdc done
+#18 naming to docker.io/dag-ms2/artifact-store:0.2.0
+#18 naming to docker.io/dag-ms2/artifact-store:0.2.0 done
+#18 DONE 0.0s
+
+#19 [artifact-store] resolving provenance for metadata file
+#19 DONE 0.0s
+
+#20 [scheduler internal] load build definition from Dockerfile
+#20 transferring dockerfile: 992B 0.0s done
+#20 DONE 0.0s
+
+#2 [scheduler internal] load metadata for docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#2 DONE 0.0s
+
+#3 [scheduler internal] load metadata for docker.io/library/maven:3.9.9-eclipse-temurin-21
+#3 DONE 0.0s
+
+#21 [scheduler internal] load .dockerignore
+#21 transferring context: 149B done
+#21 DONE 0.0s
+
+#6 [scheduler stage-1 1/4] FROM docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#6 DONE 0.0s
+
+#5 [scheduler build 1/9] FROM docker.io/library/maven:3.9.9-eclipse-temurin-21
+#5 DONE 0.0s
+
+#22 [scheduler internal] load build context
+#22 transferring context: 70.26kB 0.0s done
+#22 DONE 0.0s
+
+#23 [scheduler build 5/9] COPY scheduler scheduler
+#23 CACHED
+
+#24 [scheduler stage-1 2/4] RUN useradd --system --no-create-home dag
+#24 CACHED
+
+#25 [scheduler build 4/9] COPY protocol protocol
+#25 CACHED
+
+#26 [scheduler build 9/9] RUN mvn -B -q -pl scheduler -am package -DskipTests
+#26 CACHED
+
+#27 [scheduler build 3/9] COPY pom.xml .
+#27 CACHED
+
+#28 [scheduler build 8/9] COPY client/pom.xml client/pom.xml
+#28 CACHED
+
+#29 [scheduler stage-1 3/4] WORKDIR /app
+#29 CACHED
+
+#12 [scheduler build 2/9] WORKDIR /src
+#12 CACHED
+
+#30 [scheduler build 6/9] COPY artifact-store/pom.xml artifact-store/pom.xml
+#30 CACHED
+
+#31 [scheduler build 7/9] COPY worker/pom.xml worker/pom.xml
+#31 CACHED
+
+#32 [scheduler stage-1 4/4] COPY --from=build /src/scheduler/target/scheduler-0.2.0.jar app.jar
+#32 CACHED
+
+#33 [scheduler] exporting to image
+#33 exporting layers done
+#33 writing image sha256:31565a68ed94c65f9c80ff8eb4d4468b4679d1808b43271ee60ddc24f721061c done
+#33 naming to docker.io/dag-ms2/scheduler:0.2.0
+#33 naming to docker.io/dag-ms2/scheduler:0.2.0 done
+#33 DONE 0.0s
+
+#34 [scheduler] resolving provenance for metadata file
+#34 DONE 0.0s
+
+#35 [worker internal] load build definition from Dockerfile
+#35 transferring dockerfile: 1.12kB done
+#35 DONE 0.0s
+
+#2 [worker internal] load metadata for docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#2 DONE 0.0s
+
+#3 [worker internal] load metadata for docker.io/library/maven:3.9.9-eclipse-temurin-21
+#3 DONE 0.0s
+
+#36 [worker internal] load .dockerignore
+#36 transferring context: 149B done
+#36 DONE 0.0s
+
+#6 [worker stage-1 1/4] FROM docker.io/library/eclipse-temurin:21.0.5_11-jre-jammy
+#6 DONE 0.0s
+
+#5 [worker build 1/9] FROM docker.io/library/maven:3.9.9-eclipse-temurin-21
+#5 DONE 0.0s
+
+#37 [worker internal] load build context
+#37 transferring context: 18.70kB 0.0s done
+#37 DONE 0.0s
+
+#12 [worker build 2/9] WORKDIR /src
+#12 CACHED
+
+#38 [worker build 5/9] COPY worker worker
+#38 CACHED
+
+#39 [worker build 6/9] COPY scheduler/pom.xml scheduler/pom.xml
+#39 CACHED
+
+#40 [worker build 7/9] COPY artifact-store/pom.xml artifact-store/pom.xml
+#40 CACHED
+
+#41 [worker stage-1 3/4] WORKDIR /app
+#41 CACHED
+
+#42 [worker build 8/9] COPY client/pom.xml client/pom.xml
+#42 CACHED
+
+#43 [worker build 4/9] COPY protocol protocol
+#43 CACHED
+
+#44 [worker stage-1 2/4] RUN apt-get update     && apt-get install -y --no-install-recommends ffmpeg     && rm -rf /var/lib/apt/lists/*     && useradd --system --no-create-home dag
+#44 CACHED
+
+#45 [worker build 9/9] RUN mvn -B -q -pl worker -am package -DskipTests
+#45 CACHED
+
+#46 [worker build 3/9] COPY pom.xml .
+#46 CACHED
+
+#47 [worker stage-1 4/4] COPY --from=build /src/worker/target/worker-0.2.0.jar app.jar
+#47 CACHED
+
+#48 [worker] exporting to image
+#48 exporting layers done
+#48 writing image sha256:ec8e049bd28677d0b4173dfe75985d68ad787315628c59423a71becd9acd0cbd done
+#48 naming to docker.io/dag-ms2/worker:0.2.0 done
+#48 DONE 0.0s
+
+#49 [worker] resolving provenance for metadata file
+#49 DONE 0.0s
+ Network dag-ms2_default  Creating
+ Network dag-ms2_default  Created
+ Container dag-ms2-artifact-store-1  Creating
+ Container dag-ms2-artifact-store-1  Created
+ Container dag-ms2-scheduler-1  Creating
+ Container dag-ms2-scheduler-1  Created
+ Container dag-ms2-worker-3  Creating
+ Container dag-ms2-worker-1  Creating
+ Container dag-ms2-worker-2  Creating
+ Container dag-ms2-worker-3  Created
+ Container dag-ms2-worker-1  Created
+ Container dag-ms2-worker-2  Created
+ Container dag-ms2-artifact-store-1  Starting
+ Container dag-ms2-artifact-store-1  Started
+ Container dag-ms2-artifact-store-1  Waiting
+ Container dag-ms2-artifact-store-1  Healthy
+ Container dag-ms2-scheduler-1  Starting
+ Container dag-ms2-scheduler-1  Started
+ Container dag-ms2-scheduler-1  Waiting
+ Container dag-ms2-scheduler-1  Healthy
+ Container dag-ms2-worker-3  Starting
+ Container dag-ms2-worker-3  Started
+ Container dag-ms2-worker-1  Starting
+ Container dag-ms2-worker-1  Started
+ Container dag-ms2-worker-2  Starting
+ Container dag-ms2-worker-2  Started
+ Container dag-ms2-worker-3  Waiting
+ Container dag-ms2-worker-1  Waiting
+ Container dag-ms2-worker-2  Waiting
+ Container dag-ms2-artifact-store-1  Waiting
+ Container dag-ms2-scheduler-1  Waiting
+ Container dag-ms2-scheduler-1  Healthy
+ Container dag-ms2-worker-3  Healthy
+ Container dag-ms2-worker-1  Healthy
+ Container dag-ms2-worker-2  Healthy
+ Container dag-ms2-artifact-store-1  Healthy
+up exit 0
+## make demo
+scheduler run 0f5cc36c-cc1e-4838-b1aa-48b093316a6f; writing outputs to C:\Users\Hasan\OneDrive\Desktop\Capstone\distributed-dag-scheduler\results\demo\20261030T202951Z
+submitted 88d011ee-fb0e-4aca-a75b-fd1762ba85c7 (5 tasks)
+submitted 58bb6ff2-7ae0-4fe0-a4ed-da609195811d (6 tasks)
+{
+  "scheduler_run_id": "0f5cc36c-cc1e-4838-b1aa-48b093316a6f",
+  "functional": {
+    "job_id": "88d011ee-fb0e-4aca-a75b-fd1762ba85c7",
+    "result": "result=22\n"
+  },
+  "video": {
+    "job_id": "58bb6ff2-7ae0-4fe0-a4ed-da609195811d",
+    "duration_ms": 5286.45135,
+    "outputs": {
+      "video720": "runs/0f5cc36c-cc1e-4838-b1aa-48b093316a6f/jobs/58bb6ff2-7ae0-4fe0-a4ed-da609195811d/tasks/transcode720/attempts/1/video",
+      "video360": "runs/0f5cc36c-cc1e-4838-b1aa-48b093316a6f/jobs/58bb6ff2-7ae0-4fe0-a4ed-da609195811d/tasks/transcode360/attempts/1/video",
+      "image": "runs/0f5cc36c-cc1e-4838-b1aa-48b093316a6f/jobs/58bb6ff2-7ae0-4fe0-a4ed-da609195811d/tasks/thumbnail/attempts/1/image",
+      "subtitles": "runs/0f5cc36c-cc1e-4838-b1aa-48b093316a6f/jobs/58bb6ff2-7ae0-4fe0-a4ed-da609195811d/tasks/subtitles/attempts/1/subtitles"
+    }
+  },
+  "history_checks": "passed"
+}
+demo exit 0
+## make down
+ Container dag-ms2-worker-3  Stopping
+ Container dag-ms2-worker-2  Stopping
+ Container dag-ms2-worker-1  Stopping
+ Container dag-ms2-worker-2  Stopped
+ Container dag-ms2-worker-2  Removing
+ Container dag-ms2-worker-2  Removed
+ Container dag-ms2-worker-3  Stopped
+ Container dag-ms2-worker-3  Removing
+ Container dag-ms2-worker-3  Removed
+ Container dag-ms2-worker-1  Stopped
+ Container dag-ms2-worker-1  Removing
+ Container dag-ms2-worker-1  Removed
+ Container dag-ms2-scheduler-1  Stopping
+ Container dag-ms2-scheduler-1  Stopped
+ Container dag-ms2-scheduler-1  Removing
+ Container dag-ms2-scheduler-1  Removed
+ Container dag-ms2-artifact-store-1  Stopping
+ Container dag-ms2-artifact-store-1  Stopped
+ Container dag-ms2-artifact-store-1  Removing
+ Container dag-ms2-artifact-store-1  Removed
+ Network dag-ms2_default  Removing
+ Network dag-ms2_default  Removed
+down exit 0

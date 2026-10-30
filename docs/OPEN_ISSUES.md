@@ -1,6 +1,6 @@
 # Open issues and retained MS2 limitations
 
-> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. Everything below is the MS2 record, kept for provenance.
+> **MS3 (October 29, 2026):** leases and heartbeats implemented on branch `ms3/leases`; MS2's intentional worker-crash gap (S11-04) is closed and its oracle passes. Current documents: [specification](specification.md), [MS3 progress report](ms3-progress-report.md), [test matrix](test-matrix.md), run logs in `results/ms3-logs/`. On October 30, S11-03 turned out to be our adapter's bug (a byte-for-byte Hokea pin), not the runner's; it is fixed and all four cluster tests pass (`results/ms3-logs/hokea-cluster/`). Everything below is the MS2 record, kept for provenance.
 
 Steps 0–14 are complete and accepted at `f4c5dceef533a98b195d7dfa2e54ec8cac788825`.
 Step 15 is PASS/runtime-content audit complete using the supported-host results

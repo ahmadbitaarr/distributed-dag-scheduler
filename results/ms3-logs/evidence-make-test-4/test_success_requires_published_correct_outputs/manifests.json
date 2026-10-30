@@ -1,0 +1,26 @@
+{
+  "53de602f-282f-44d1-acb8-da433dc55385": {
+    "schema_version": 1,
+    "job_id": "53de602f-282f-44d1-acb8-da433dc55385",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "A",
+        "output_name": "value"
+      }
+    }
+  }
+}

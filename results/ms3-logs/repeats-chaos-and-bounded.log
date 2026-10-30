@@ -1,0 +1,25 @@
+== chaos repeat 1
+.                                                                        [100%]
+1 passed in 21.05s
+== chaos repeat 2
+.                                                                        [100%]
+1 passed in 19.81s
+== chaos repeat 3
+.                                                                        [100%]
+1 passed in 20.93s
+== chaos repeat 4
+.                                                                        [100%]
+1 passed in 19.85s
+== chaos repeat 5
+.                                                                        [100%]
+1 passed in 19.54s
+== bounded re-run repeat 1
+.                                                                        [100%]
+1 passed in 32.30s
+== bounded re-run repeat 2
+.                                                                        [100%]
+1 passed in 32.30s
+== bounded re-run repeat 3
+.                                                                        [100%]
+1 passed in 32.24s
+exit 0

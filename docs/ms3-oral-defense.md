@@ -22,7 +22,7 @@ Format (course guidelines): 25 minutes, chalkboard only. One randomly chosen mem
 
 **6. Performance guarantees (1 min).** We commit to one bound: a crashed worker's task is never declared dead before the 5 s lease, and is reassigned within lease + 2 s when an idle worker is polling. Measured: 5.0–5.1 s. Throughput is a characterization, not a promise: about 4.2 tasks/s per worker on the MS2 host, and it scales with workers until the DAG's own parallelism runs out.
 
-**7. Testing strategy (1 min).** One command, `make test`: 77 JUnit tests (leases tested on a fake clock) and 102 pytest tests against real processes. We inject faults (SIGKILL, SIGSTOP, crash points before start / during / before report, a proxy that drops, delays, duplicates or partitions one worker's link, and a seeded chaos run), and every test runs a checker over the full event history that would flag any S1–S3 violation. The checker is itself tested by injecting violations into a real history.
+**7. Testing strategy (1 min).** One command, `make test`: 77 JUnit tests (leases tested on a fake clock) and 105 pytest tests against real processes. We inject faults (SIGKILL, SIGSTOP, crash points before start / during / before report, a proxy that drops, delays, duplicates or partitions one worker's link, and a seeded chaos run), and every test runs a checker over the full event history that would flag any S1–S3 violation. The checker is itself tested by injecting violations into a real history.
 
 ## Likely questions and short answers
 
@@ -52,4 +52,6 @@ Format (course guidelines): 25 minutes, chalkboard only. One randomly chosen mem
 
 **What can't you handle?** Scheduler crash, artifact-store loss, malicious workers, a link that drops every report but delivers heartbeats (not fair-loss), and a task that always fails (retried forever; no retry limit).
 
-**What changed since MS2?** Leases, heartbeats and expiry; L2 now holds; 13 new fault tests plus 16 lease unit tests; a fault proxy; recovery-time benchmark; sharper claims (S1 "current unexpired holder", S3 recorded vs. physical, fair-loss stated).
+**Does it run on the course cluster?** Yes. The smoke test, the functional workload, the crash oracle and the instructor's bounded re-run test pass on Hokea, with crashes done by force-deleting the pod; recovery there took 5.1–5.6 s. MS2's "version mismatch" was our bug: we required Hokea to match a public commit byte for byte, and the runner's build differs. We now check only for the Hokea calls we make.
+
+**What changed since MS2?** Leases, heartbeats and expiry; L2 now holds; 14 new fault tests (one is the instructor's) plus 16 lease unit tests; a fault proxy; recovery-time benchmark; sharper claims (S1 "current unexpired holder", S3 recorded vs. physical, fair-loss stated).

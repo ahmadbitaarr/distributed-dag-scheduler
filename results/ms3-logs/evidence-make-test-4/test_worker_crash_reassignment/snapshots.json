@@ -1,0 +1,266 @@
+{
+  "abfca3f7-ce69-4bee-8dc3-721f959e3dc9": {
+    "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+    "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+    "state": "SUCCEEDED",
+    "accepted_elapsed_ns": 1913498215,
+    "completed_elapsed_ns": 7618250972,
+    "duration_ns": 5704752757,
+    "tasks": {
+      "X": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 3,
+        "owner": null,
+        "attempt_no": 2,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+              "task_id": "X",
+              "attempt_no": 1,
+              "worker_session_id": "336afeda-b62e-4458-b67f-c583050a8c28"
+            },
+            "state": "EXPIRED",
+            "ready_elapsed_ns": 1916171690,
+            "assigned_elapsed_ns": 2005761066,
+            "started_elapsed_ns": 2194656721,
+            "finished_elapsed_ns": 7211741495,
+            "start_receipt": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": null,
+            "report_ack": null,
+            "last_alive_elapsed_ns": 2194660030,
+            "lease_deadline_elapsed_ns": 7194660030,
+            "lease_renewals": 0
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+              "task_id": "X",
+              "attempt_no": 2,
+              "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 7212081217,
+            "assigned_elapsed_ns": 7212147659,
+            "started_elapsed_ns": 7217283479,
+            "finished_elapsed_ns": 7384609639,
+            "start_receipt": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 18,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+                "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+                "task_id": "X",
+                "attempt_no": 2,
+                "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/abfca3f7-ce69-4bee-8dc3-721f959e3dc9/tasks/X/attempts/2/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 19,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 7217284471,
+            "lease_deadline_elapsed_ns": 12217284471,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/abfca3f7-ce69-4bee-8dc3-721f959e3dc9/tasks/X/attempts/2/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "Y": {
+        "state": "SUCCEEDED",
+        "parents": [
+          "X"
+        ],
+        "satisfied_parents": [
+          "X"
+        ],
+        "ready_seq": 4,
+        "owner": null,
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+              "task_id": "Y",
+              "attempt_no": 1,
+              "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 7384752177,
+            "assigned_elapsed_ns": 7395938058,
+            "started_elapsed_ns": 7445191916,
+            "finished_elapsed_ns": 7618146961,
+            "start_receipt": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 24,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+                "job_id": "abfca3f7-ce69-4bee-8dc3-721f959e3dc9",
+                "task_id": "Y",
+                "attempt_no": 1,
+                "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/abfca3f7-ce69-4bee-8dc3-721f959e3dc9/tasks/Y/attempts/1/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 25,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 7445193921,
+            "lease_deadline_elapsed_ns": 12445193921,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/abfca3f7-ce69-4bee-8dc3-721f959e3dc9/tasks/Y/attempts/1/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    "counts": {
+      "SUCCEEDED": 2
+    },
+    "outputs": {
+      "result": {
+        "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/abfca3f7-ce69-4bee-8dc3-721f959e3dc9/tasks/Y/attempts/1/value",
+        "length": 1,
+        "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "media_type": "application/json"
+      }
+    },
+    "snapshot_event_seq": 26
+  },
+  "99024b2c-4aad-4c58-b241-211376bcfc8a": {
+    "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+    "job_id": "99024b2c-4aad-4c58-b241-211376bcfc8a",
+    "state": "SUCCEEDED",
+    "accepted_elapsed_ns": 3221848510,
+    "completed_elapsed_ns": 3793256874,
+    "duration_ns": 571408364,
+    "tasks": {
+      "probe": {
+        "state": "SUCCEEDED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 2,
+        "owner": null,
+        "attempt_no": 1,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "job_id": "99024b2c-4aad-4c58-b241-211376bcfc8a",
+              "task_id": "probe",
+              "attempt_no": 1,
+              "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+            },
+            "state": "SUCCEEDED",
+            "ready_elapsed_ns": 3221946174,
+            "assigned_elapsed_ns": 3262891466,
+            "started_elapsed_ns": 3380056943,
+            "finished_elapsed_ns": 3792702913,
+            "start_receipt": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 10,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+                "job_id": "99024b2c-4aad-4c58-b241-211376bcfc8a",
+                "task_id": "probe",
+                "attempt_no": 1,
+                "worker_session_id": "424b0cb2-5953-4b3d-aba2-a479de33f796"
+              },
+              "outcome": "SUCCESS",
+              "outputs": {
+                "value": {
+                  "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/99024b2c-4aad-4c58-b241-211376bcfc8a/tasks/probe/attempts/1/value",
+                  "length": 1,
+                  "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+                  "media_type": "application/json"
+                }
+              },
+              "error": null
+            },
+            "report_ack": {
+              "scheduler_run_id": "9db6e94e-2738-47d4-8927-1b73cd768d18",
+              "scheduler_event_seq": 11,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 3380058986,
+            "lease_deadline_elapsed_ns": 8380058986,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": {
+          "value": {
+            "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/99024b2c-4aad-4c58-b241-211376bcfc8a/tasks/probe/attempts/1/value",
+            "length": 1,
+            "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    "counts": {
+      "SUCCEEDED": 1
+    },
+    "outputs": {
+      "result": {
+        "key": "runs/9db6e94e-2738-47d4-8927-1b73cd768d18/jobs/99024b2c-4aad-4c58-b241-211376bcfc8a/tasks/probe/attempts/1/value",
+        "length": 1,
+        "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "media_type": "application/json"
+      }
+    },
+    "snapshot_event_seq": 26
+  }
+}

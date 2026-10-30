@@ -1,5 +1,7 @@
 # User-controlled course rerun — external runner mismatch
 
+> **Superseded in MS3 (October 30, 2026).** The runner was not mis-pinned; our adapter's byte-for-byte pin was the bug, and it is fixed (see [README.md](README.md)). Use "Running on the course cluster" in the top-level README; expect 4 passed and no XFAIL. This file is the MS2 record.
+
 The user attempted course execution during Step 11 in `team-06`, using public
 immutable GHCR images. Hokea launched the runner, transferred the package, started
 pytest and copied evidence out. All three tests errored during fixture setup,
