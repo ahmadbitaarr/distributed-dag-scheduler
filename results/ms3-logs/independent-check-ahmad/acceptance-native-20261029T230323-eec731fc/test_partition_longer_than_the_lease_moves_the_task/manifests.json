@@ -1,0 +1,70 @@
+{
+  "63c4f54c-a52e-45e6-b099-7818136776a7": {
+    "schema_version": 1,
+    "job_id": "63c4f54c-a52e-45e6-b099-7818136776a7",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "delay_ms": 4000,
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "Y",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4
+        },
+        "parents": [
+          "X"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "X",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "Y",
+        "output_name": "value"
+      }
+    }
+  },
+  "0163e2b1-a6ca-47f7-ac82-5173cfe2367b": {
+    "schema_version": 1,
+    "job_id": "0163e2b1-a6ca-47f7-ac82-5173cfe2367b",
+    "tasks": [
+      {
+        "task_id": "probe",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "probe",
+        "output_name": "value"
+      }
+    }
+  }
+}

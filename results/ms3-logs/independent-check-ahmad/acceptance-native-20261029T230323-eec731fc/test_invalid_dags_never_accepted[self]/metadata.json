@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_invalid_dags_never_accepted[self]",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "399b3066-b8a4-42ef-ab46-96d6db4834f0",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407",
+  "run_label": "acceptance-native-20261029T230323-eec731fc",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:06:53.290342+00:00",
+  "finished_utc": "2026-10-29T23:06:59.542375+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

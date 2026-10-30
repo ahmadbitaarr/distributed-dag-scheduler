@@ -1,0 +1,87 @@
+{
+  "clock": "harness time.monotonic_ns relative to test origin; no cross-process subtraction",
+  "budget_ns": 10000000000,
+  "start_elapsed_ns": 6883382328,
+  "start_scheduler_event_seq": 12,
+  "late_threshold_ns": 8000000000,
+  "worker_a_identity": {
+    "scheduler_run_id": "6e40ea8f-55cb-4f32-8a32-b38d92f25d33",
+    "job_id": "04d73aa9-322d-4514-9124-f115dba9039d",
+    "task_id": "X",
+    "attempt_no": 1,
+    "worker_session_id": "ed771bac-e7c7-4d40-806a-444165359c78"
+  },
+  "worker_b_session_id": "47b7f7ab-fd0b-400e-a7af-459b5cc93be9",
+  "samples": [
+    {
+      "started_elapsed_ns": 6883394090,
+      "snapshot_observed_elapsed_ns": 6894429912,
+      "finished_elapsed_ns": 6901768260,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 2,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 7161001396,
+      "snapshot_observed_elapsed_ns": 7166291098,
+      "finished_elapsed_ns": 7172971664,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 4,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 7433532026,
+      "snapshot_observed_elapsed_ns": 7443387644,
+      "finished_elapsed_ns": 7459653709,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 7,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 7718176335,
+      "snapshot_observed_elapsed_ns": 7726111900,
+      "finished_elapsed_ns": 7745666759,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 9,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 8004365983,
+      "snapshot_observed_elapsed_ns": 8009011045,
+      "finished_elapsed_ns": 8012990343,
+      "snapshot_event_seq": 12,
+      "last_scheduler_event_seq": 12,
+      "b_alive": true,
+      "b_empty_claims": 11,
+      "x_state": "RUNNING",
+      "x_attempt_no": 1
+    },
+    {
+      "started_elapsed_ns": 8278509727,
+      "snapshot_observed_elapsed_ns": 8288474867,
+      "finished_elapsed_ns": 8298368604,
+      "snapshot_event_seq": 18,
+      "last_scheduler_event_seq": 18,
+      "b_alive": true,
+      "b_empty_claims": 11,
+      "x_state": "RUNNING",
+      "x_attempt_no": 2
+    }
+  ],
+  "end_elapsed_ns": 8311793707,
+  "actual_duration_ns": 1428411379,
+  "deadline_overrun_ns": 0,
+  "recovered_within_window": true
+}

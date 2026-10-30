@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_functional_multiple_jobs_workers",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "e02ed686-7e3f-42b0-b8ba-68523f70ccb1",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407",
+  "run_label": "acceptance-native-20261029T230323-eec731fc",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:04:51.386889+00:00",
+  "finished_utc": "2026-10-29T23:05:09.886804+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

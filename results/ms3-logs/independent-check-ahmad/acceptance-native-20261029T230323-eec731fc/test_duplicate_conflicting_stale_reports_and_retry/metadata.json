@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_system.py::test_duplicate_conflicting_stale_reports_and_retry",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "3dbfce00-9cba-4f74-90ac-c748dd92b970",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407",
+  "run_label": "acceptance-native-20261029T230323-eec731fc",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:06:09.717762+00:00",
+  "finished_utc": "2026-10-29T23:06:17.420181+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/integration/test_worker_client.py::test_hooks_are_disabled_by_default",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "c7ad1e2c-0ac1-4017-9f78-82b6c5e86981",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407",
+  "run_label": "acceptance-native-20261029T230323-eec731fc",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:08:38.235388+00:00",
+  "finished_utc": "2026-10-29T23:08:49.813088+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

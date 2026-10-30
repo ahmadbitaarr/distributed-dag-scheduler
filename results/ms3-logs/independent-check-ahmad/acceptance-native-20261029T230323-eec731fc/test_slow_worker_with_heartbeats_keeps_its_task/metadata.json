@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_lease_faults.py::test_slow_worker_with_heartbeats_keeps_its_task",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "695318ec-e515-4eed-8e46-147acfcc7852",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407",
+  "run_label": "acceptance-native-20261029T230323-eec731fc",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:11:09.516373+00:00",
+  "finished_utc": "2026-10-29T23:11:32.487740+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

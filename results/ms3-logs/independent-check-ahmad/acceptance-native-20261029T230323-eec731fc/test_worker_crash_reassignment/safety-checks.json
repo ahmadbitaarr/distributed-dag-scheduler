@@ -1,0 +1,14 @@
+{
+  "checked_jobs": [
+    "04d73aa9-322d-4514-9124-f115dba9039d",
+    "2c463768-ca2c-4f87-82cb-940dc749b881"
+  ],
+  "history_check": "PASS",
+  "probe_bytes": "3",
+  "b_session_distinct": true,
+  "a_dead": true,
+  "b_alive": true,
+  "services_healthy": true,
+  "faulted_attempt_unchanged": false,
+  "recovered": true
+}

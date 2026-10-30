@@ -1,0 +1,45 @@
+{
+  "7e997898-62f4-441b-9b69-dc5927cc5c28": {
+    "schema_version": 1,
+    "job_id": "7e997898-62f4-441b-9b69-dc5927cc5c28",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "Y",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 4
+        },
+        "parents": [
+          "X"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "X",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "Y",
+        "output_name": "value"
+      }
+    }
+  }
+}

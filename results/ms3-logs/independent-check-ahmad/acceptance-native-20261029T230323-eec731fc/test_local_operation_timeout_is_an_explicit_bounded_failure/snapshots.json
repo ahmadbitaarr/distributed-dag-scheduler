@@ -1,0 +1,132 @@
+{
+  "79f69da0-a70c-4d80-a399-c65e1039e4da": {
+    "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+    "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+    "state": "RUNNING",
+    "accepted_elapsed_ns": 4714486207,
+    "completed_elapsed_ns": null,
+    "duration_ns": null,
+    "tasks": {
+      "slow": {
+        "state": "ASSIGNED",
+        "parents": [],
+        "satisfied_parents": [],
+        "ready_seq": 3,
+        "owner": "95590e9e-8840-48b3-a07f-422dbb33a5bf",
+        "attempt_no": 3,
+        "attempts": [
+          {
+            "identity": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+              "task_id": "slow",
+              "attempt_no": 1,
+              "worker_session_id": "95590e9e-8840-48b3-a07f-422dbb33a5bf"
+            },
+            "state": "FAILED",
+            "ready_elapsed_ns": 4725121405,
+            "assigned_elapsed_ns": 4792917630,
+            "started_elapsed_ns": 5144426945,
+            "finished_elapsed_ns": 5678536366,
+            "start_receipt": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "scheduler_event_seq": 5,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+                "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+                "task_id": "slow",
+                "attempt_no": 1,
+                "worker_session_id": "95590e9e-8840-48b3-a07f-422dbb33a5bf"
+              },
+              "outcome": "FAILURE",
+              "outputs": {},
+              "error": {
+                "code": "OPERATION_TIMEOUT",
+                "message": "Local operation exceeded its timeout"
+              }
+            },
+            "report_ack": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "scheduler_event_seq": 6,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 5144432120,
+            "lease_deadline_elapsed_ns": 10144432120,
+            "lease_renewals": 0
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+              "task_id": "slow",
+              "attempt_no": 2,
+              "worker_session_id": "95590e9e-8840-48b3-a07f-422dbb33a5bf"
+            },
+            "state": "FAILED",
+            "ready_elapsed_ns": 5678713853,
+            "assigned_elapsed_ns": 5696266293,
+            "started_elapsed_ns": 5759991163,
+            "finished_elapsed_ns": 6142878129,
+            "start_receipt": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "scheduler_event_seq": 11,
+              "disposition": "ACCEPTED"
+            },
+            "report_receipt": {
+              "identity": {
+                "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+                "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+                "task_id": "slow",
+                "attempt_no": 2,
+                "worker_session_id": "95590e9e-8840-48b3-a07f-422dbb33a5bf"
+              },
+              "outcome": "FAILURE",
+              "outputs": {},
+              "error": {
+                "code": "OPERATION_TIMEOUT",
+                "message": "Local operation exceeded its timeout"
+              }
+            },
+            "report_ack": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "scheduler_event_seq": 12,
+              "disposition": "ACCEPTED"
+            },
+            "last_alive_elapsed_ns": 5759994053,
+            "lease_deadline_elapsed_ns": 10759994053,
+            "lease_renewals": 0
+          },
+          {
+            "identity": {
+              "scheduler_run_id": "16ba33ee-b13b-42c2-971f-143d5f5c9c57",
+              "job_id": "79f69da0-a70c-4d80-a399-c65e1039e4da",
+              "task_id": "slow",
+              "attempt_no": 3,
+              "worker_session_id": "95590e9e-8840-48b3-a07f-422dbb33a5bf"
+            },
+            "state": "ASSIGNED",
+            "ready_elapsed_ns": 6148101876,
+            "assigned_elapsed_ns": 6178069809,
+            "started_elapsed_ns": null,
+            "finished_elapsed_ns": null,
+            "start_receipt": null,
+            "report_receipt": null,
+            "report_ack": null,
+            "last_alive_elapsed_ns": 6178069809,
+            "lease_deadline_elapsed_ns": 11178069809,
+            "lease_renewals": 0
+          }
+        ],
+        "outputs": null
+      }
+    },
+    "counts": {
+      "ASSIGNED": 1
+    },
+    "outputs": {},
+    "snapshot_event_seq": 16
+  }
+}

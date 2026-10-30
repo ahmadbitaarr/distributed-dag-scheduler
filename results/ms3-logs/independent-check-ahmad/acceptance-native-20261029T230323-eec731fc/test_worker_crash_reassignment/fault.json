@@ -1,0 +1,20 @@
+{
+  "worker": "worker-1",
+  "pid": 6190,
+  "signal": "SIGKILL",
+  "exit_code": -9,
+  "schema_version": 1,
+  "event_type": "fault_injected",
+  "producer": "harness",
+  "producer_seq": 1,
+  "utc_timestamp": "2026-10-29T23:13:47.766583+00:00",
+  "elapsed_ns": 3219745731,
+  "request_id": "kill-worker-A",
+  "scheduler_run_id": "6e40ea8f-55cb-4f32-8a32-b38d92f25d33",
+  "job_id": "04d73aa9-322d-4514-9124-f115dba9039d",
+  "task_id": "X",
+  "attempt_no": 1,
+  "worker_session_id": "ed771bac-e7c7-4d40-806a-444165359c78",
+  "kill_confirmed_elapsed_ns": 3252571923,
+  "gate_operation_timeout_ms": 120000
+}

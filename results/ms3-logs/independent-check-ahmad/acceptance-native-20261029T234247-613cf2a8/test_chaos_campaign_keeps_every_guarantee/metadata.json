@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "tests/faults/test_network_faults.py::test_chaos_campaign_keeps_every_guarantee",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "native",
+  "scheduler_run_id": "0365afd1-9e11-4372-a772-c8e2ebd1fe38",
+  "source_revision": "6104fa786ae8e49efdc9585adda81c1c61b45407+uncommitted",
+  "run_label": "acceptance-native-20261029T234247-613cf2a8",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-29T23:42:47.972898+00:00",
+  "finished_utc": "2026-10-29T23:43:14.291604+00:00",
+  "python": "3.12.3",
+  "java": "openjdk version \"21.0.7\" 2025-04-15 LTS",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+}

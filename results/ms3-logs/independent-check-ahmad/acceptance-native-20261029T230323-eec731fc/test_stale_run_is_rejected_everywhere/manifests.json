@@ -1,0 +1,26 @@
+{
+  "aa7dfcd9-ed89-41bb-807a-1962f9b93975": {
+    "schema_version": 1,
+    "job_id": "aa7dfcd9-ed89-41bb-807a-1962f9b93975",
+    "tasks": [
+      {
+        "task_id": "A",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 3
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "A",
+        "output_name": "value"
+      }
+    }
+  }
+}
