@@ -1,130 +1,103 @@
 # CS4094 MS3 Progress Report: Distributed DAG Task Scheduler
 
-Specification: [specification.md](specification.md). Test-to-property table: [test-matrix.md](test-matrix.md). Run logs: [results/ms3-logs/](../results/ms3-logs/). The MS2 report is kept unchanged as [ms2-progress-report.md](ms2-progress-report.md).
+MS2 could complete jobs as long as workers stayed alive. If a worker crashed mid-task, however, the scheduler kept that assignment indefinitely. MS3 adds leases and worker heartbeats so unfinished work can return to the queue. We also added fault-injection tests, measured recovery under crashes, and fixed memory growth caused by idle worker polling.
 
-## A. Status of every claim
+The [specification](specification.md) defines the properties discussed here. The [test matrix](test-matrix.md) lists the test cases for each property. The run logs and exported histories are in [results/ms3-logs/](../results/ms3-logs/).
 
-| Claim (spec §) | MS2 | MS3 | Evidence |
-|---|---|---|---|
-| S1 No completion without a reported success (§3) | Held | **Holds**, now including late successes from expired attempts | `LeaseTest`, lost-heartbeat, pause, partition, restart tests; `check_history` on every test |
-| S2 No task before its dependencies (§3) | Held | **Holds** | ordering tests; `check_history` joins every worker start to its acknowledgment |
-| S3 No duplicate completion (§3) | Held | **Holds** under crash, pause, loss, duplication and partition | duplicate/lost-reply tests, chaos run, 8-thread JUnit races |
-| L1 Ready tasks make progress (§4) | Partial | **Holds**, including slow tasks longer than the lease | slow-task and short-partition tests, all workload tests |
-| L2 A failed worker's task is reassigned (§4) | **Intentionally broken** | **Holds** | MS2's crash oracle now passes; the bounded re-run test from the MS2 feedback; both also on the course cluster; crash at three attempt stages, restart, pause, partition, lost heartbeats |
-| Fault model (§5) | Crash only, safe but stuck | Crash, restart, pause, message loss/delay/duplication, partitions all tested | 15 fault tests |
-| Performance (§6) | 3 of 4 metrics | **All 4**, including recovery time, with and without failures | `make bench-recovery` (§E) |
+## A. Verification results
 
-The final run is `results/ms3-logs/make-test-4.log` (October 30, clean source `bfa3b08`, after the corrections in §B, defects 3 and 4): `mvn -B verify` passed all 77 JUnit tests, then pytest reported **105 passed, 2 skipped, 0 failed, 0 expected failures** (exit 0). The two skipped tests check the Hokea adapter against a real Hokea install, which the test container does not have; they pass in the course lab environment. Its JUnit XML is `results/ms3-logs/junit-make-test-4.xml`, and the per-test evidence (53 directories) is in `results/ms3-logs/evidence-make-test-4/`. Re-checking all 53 of its job histories offline found no violations.
+The archived full test run is `results/ms3-logs/make-test-3.log`, from clean source `966965e`. Maven verification passed 77 JUnit tests, and pytest passed 102 tests with no failures or expected failures (exit code 0). The pytest XML is `results/ms3-logs/junit-make-test-3.xml`. This establishes the result for that revision, not for every change made afterward.
 
-Three earlier full runs are kept as logs. `make-test-3` (clean source `966965e`, 102 passed) is the run we submitted on October 29. `make-test-1` failed one test, which still expected MS2's exact list of metrics counters. `make-test-2` passed all 102 tests, but on code from before the idle-polling fix (§B, defect 2), and it is stamped `+uncommitted` because its own log file was being written inside the repository.
+A later independent local run passed 101 pytest tests, but one timing-sensitive chaos test failed. We made a focused correction, then reran that chaos test three times; it passed each time. We have not rerun the full suite after the correction, so we cannot claim a complete post-correction pass. The later run and reruns are not part of the archived `make-test-3` evidence.
 
-## B. What changed since MS2
+The archived service-backed tests exported 52 evidence directories under `results/ms3-logs/evidence-make-test-3/`. The offline history checker found no safety violations in those 52 job histories. This checks the recorded executions; it does not cover every possible execution.
 
-**Leases (scheduler).** Every attempt is now owned through a lease on the scheduler's monotonic clock (`LEASE_TIMEOUT_MS`, default 5 s). Assignment grants it; the start acknowledgment and a new endpoint, `POST /v1/attempts/heartbeat`, renew it. When the deadline passes, the attempt becomes `EXPIRED`, its owner is released, a `lease_expired` event is recorded, and the task rejoins the end of the ready queue. Expiry is applied at the start of every claim, start, heartbeat and report, and by a background scan every 100 ms. Every later message from an expired attempt, including a replayed start, gets `409 LEASE_EXPIRED` and changes nothing. Under 100 lines changed in `SchedulerCore`; the happy path is unchanged.
+The main claims map to evidence as follows:
 
-**Heartbeats (worker).** While a worker holds an attempt, a background thread renews the lease every `lease/5` (read from `/v1/health`). A `409` on renewal cancels the running operation, and the worker drops the attempt without uploading or reporting. Workers also gained test-only stall points before start, during the operation and before the report.
+- S1 (accepted success only): `LeaseTest` and `tests/faults/test_network_faults.py` exercise expired attempts and late reports. The saved histories are also checked for success after expiry.
+- S2 (dependency ordering): the integration tests in `tests/integration/` cover chains, joins, and concurrent branches. `check_history` verifies recorded assignment and start ordering.
+- S3 (single accepted completion): duplicate-report, lost-reply, restart, and pause tests cover retries and old attempts. `LeaseTest` includes an eight-thread race. The history checker also rejects duplicate success.
+- L1 (progress with available workers): functional workload, slow-task, and short-partition tests check that ready work completes and long-running tasks are not expired while renewals continue.
+- L2 (worker-failure recovery): `tests/faults/test_worker_crash.py::test_worker_crash_reassignment` is the MS2 crash oracle, now passing. Additional cases in `tests/faults/test_lease_faults.py` cover crashes before start, during an operation, and after upload; restart and pause cases cover other losses of ownership. These also check the P-REC bound when an idle worker is polling.
 
-**Test harness.** A per-worker fault proxy (`tests/harness/netfault.py`) can drop requests or replies, delay, duplicate, or partition one worker's link and logs every action; the harness can pause and resume workers (SIGSTOP/SIGCONT, `docker pause` on Compose). The history checker now also rejects expiry of a non-owner and any success from an expired attempt.
+The full mapping, including tests of the checker itself, is in [test-matrix.md](test-matrix.md). Each fault test saves its scheduler history, worker events, and applicable fault or proxy logs. The event and verification formats are described in [evidence.md](evidence.md).
 
-**Tests.** 17 new JUnit tests (16 deterministic lease tests on an injected clock, no sleeps, and one idle-polling memory test), 14 new fault-injection tests (one is the bounded re-run test from the MS2 feedback), and 2 new checker-falsification tests. MS2's intentional failing oracle, `test_worker_crash_reassignment`, now passes and additionally checks the recovery path and its time bound. `make test` now requires zero expected failures.
+Two earlier full runs remain in the archive. `make-test-1` had one failure: a counters test still expected MS2's exact metric list. `make-test-2` passed all 102 pytest tests but ran before the idle-memory fix. Its `+uncommitted` label came from writing the log inside the repository. Run 3 is the archived full-suite result used for the property summary above.
 
-**Benchmark.** `benchmarks/recovery.py` (`make bench-recovery`) measures recovery time by killing busy workers mid-run, against a fault-free baseline of the same code.
+## B. What changed
 
-**Docs.** The specification's claims are sharpened (§9 of the spec), the API and evidence docs cover leases, and the test-to-property matrix is new.
+The scheduler grants each attempt a lease, five seconds by default. Start acknowledgments and heartbeats renew it. When the lease expires, the scheduler releases the owner, records `lease_expired`, and returns the task to the end of the ready queue. Expiry is checked on claims, starts, heartbeats, and reports, as well as during a scan every 100 ms. Replayed starts and reports from expired attempts receive `409 LEASE_EXPIRED`.
 
-**Defects found and fixed during MS3.**
+Workers now send heartbeats while holding an attempt. The interval comes from `/v1/health` and defaults to one-fifth of the lease. If a renewal is rejected with `409`, the worker cancels the operation and abandons the attempt without a new upload or result report. Test-only gates can stop a worker before start, during execution, or before reporting.
 
-1. *A replayed start for an expired attempt was acknowledged.* It returned its cached acknowledgment. That was safe, since the worker's heartbeat and report would then be rejected, but it broke the rule that every message from an expired attempt is refused. The restart test caught it, and a JUnit assertion now covers it.
-2. *Idle polling grew the scheduler's memory without bound (latent since MS2).* Every empty claim appended two history events and a receipt. We measured it in the harness container with four idle workers: the live heap grew **257 MiB per hour** (about 980 bytes per event), so a scheduler with its 128 MiB heap, left idle, would run out of memory in about half an hour. MS2's runs were too short to show it. An empty claim now records no event and replaces its session's previous idle receipt; per-session counters in `/v1/metrics` keep the polling evidence. After the fix the idle heap is flat. Logs: `results/ms3-logs/memory-probe/`. Real work still costs about 10 KB of heap per completed task, which bounds one run to about 11,000 tasks; the specification now states that capacity (§1).
-3. *Our Hokea adapter rejected the course runner (since MS2).* It required the installed Hokea to match a public commit byte for byte; the course runner's build does not. Fixed after the first submission; see §F.
-4. *The chaos test could miss its own faults.* It crashed one worker and froze another at fixed times, then required some lease to expire. If both workers were between tasks at those moments, nothing could expire and the test failed although the system behaved correctly; a teammate's independent re-run hit this once. Each fault now waits until its victim holds a task, and the test requires every attempt the victims held to expire.
+We added `tests/harness/netfault.py` to inject dropped, delayed, and repeated messages or partition a worker's link to the scheduler. The harness also supports worker crashes and pauses. The history checker now detects success from an expired attempt and expiry recorded for a non-owner.
 
-## C. Design choices and trade-offs
+The new coverage includes 16 lease JUnit tests using an injected clock, one idle-polling JUnit test, 13 fault-injection tests, and two checker-falsification tests. Together with the original crash oracle, the suite contains 14 fault tests. Recovery benchmarks are implemented in `benchmarks/recovery.py` and run through `make bench-recovery`.
 
-**Leases instead of a failure detector.** The scheduler cannot tell a slow worker from a dead one, so it does not try to. It only knows that it has not heard a renewal within the lease. Using leases means all timing lives on one clock (the scheduler's), so no clocks have to agree, and the existing pull model is kept: the scheduler still never contacts workers.
+Two bugs were found during testing. A replayed start could return a cached acknowledgment after expiry. The report path already rejected its result, but the start response was inconsistent with the lease rule. The restart test exposed this, and the JUnit suite now covers it.
 
-**Attempt numbers as fencing tokens.** A requeued task's next attempt has a higher attempt number. Every start, heartbeat and report names its attempt, and the scheduler accepts only the current, unexpired one. Outputs are written under an attempt-specific key, so a late worker cannot overwrite a newer attempt's files either. This fences everything the scheduler controls; it would not fence an external side effect such as a paid API call, which is out of scope.
+The second bug was idle-memory growth, inherited from MS2. Four idle workers caused the live heap to grow by about 257 MiB per hour because each empty claim created a new history event and receipt. Empty claims no longer append history events; each session replaces its previous idle receipt. Polling counts are still available at `/v1/metrics`. The follow-up probe showed no continuing idle growth. Logs are in `results/ms3-logs/memory-probe/`.
 
-**Lease length 5 s, renewal every 1 s.** Recovery time is roughly the lease, so a shorter lease recovers faster but expires live workers on slow links more often. With five renewals per lease, up to three consecutive heartbeats can always be lost without expiring a live worker; a fourth may cause expiry. A false expiry costs repeated work, never correctness, so we chose a lease that keeps false expiries rare on our hosts rather than the fastest recovery.
+## C. Design decisions
 
-**Expiry before every decision, plus a scan.** If expiry happened only in a background scan, whether a late report is accepted would depend on scan timing. Checking deadlines at the start of every command makes the rule exact: after the deadline, the attempt is dead. The scan exists only so that an orphaned task is requeued even when no worker happens to claim.
+We use leases because the scheduler cannot reliably tell whether a worker has crashed or is just slow. Instead, it asks whether that worker has renewed its assignment in time. Using the scheduler's monotonic clock means we do not have to compare clocks on different machines.
 
-**A late success is rejected even if nobody took the task.** A simpler alternative was to accept a success that arrives after the deadline when no other worker has claimed the task. We rejected it: one rule ("expired means dead") is easier to reason about and to test, and the cost is a re-run in a rare race.
+A new assignment gets a higher attempt number. The scheduler accepts results only from the current attempt, and each attempt writes to its own artifact keys. This matters when an old worker resumes after the task has already been reassigned: its work may finish, but it cannot replace the accepted output.
 
-**Workers do not fence themselves.** A worker that cannot reach the scheduler keeps working and lets the scheduler decide. Self-fencing would save some wasted work, but it would need the worker to estimate the scheduler's lease on its own clock, and safety does not need it.
+We chose a five-second lease and a one-second heartbeat interval. A shorter lease would reclaim tasks faster, but it could also expire healthy workers when messages are slow. Three lost heartbeats fit within the default lease when requests are prompt; delays or timeouts reduce that margin. We also check expiry when a report arrives, not just on the background scan, so a late success is not accepted simply because the scan has not run yet.
 
-**Still one in-memory scheduler.** Making the scheduler durable or replicated is a separate, large problem (a write-ahead log or consensus). The approved fault model is about workers, so we kept the scheduler out of scope and state plainly what a scheduler restart loses.
+We left deadline decisions to the scheduler rather than trying to estimate them on each worker. A disconnected worker can keep running until it receives a rejection. Attempt checks protect the scheduler's accepted result, but they do not protect external side effects such as paid API requests. The scheduler also remains a single in-memory process, so its crash still loses the run.
 
-## D. Testing
+## D. Fault-test observations
 
-`make test` runs the whole suite in a pinned Linux container: 77 JUnit tests, then the pytest suites against real scheduler, artifact-store and worker processes. Every service-backed test exports the scheduler's full event history, worker logs and snapshots and runs the safety checker on them, so S1–S3 are checked in every test, not only in the ones aimed at them. The test-to-property table is in [test-matrix.md](test-matrix.md).
+The selected test run recorded ten lease expiries across the fault tests. Detection took 5.01-5.27 seconds after the last accepted renewal, never before the five-second lease. With an idle worker polling, reassignment took 5.04-5.27 seconds. The chaos test took 6.04-6.05 seconds because work was already queued. Fault-free, slow-task, and short-partition tests recorded no expiry. Tests rejected or abandoned late work and retained one accepted success per task.
 
-Faults are injected with SIGKILL, SIGSTOP/SIGCONT, worker stall points, and a per-link proxy that logs every dropped, delayed or duplicated message (`proxy-worker-N.jsonl` in each test's evidence). Timing assertions use only the scheduler's clock, never differences between processes.
+We checked the tests against deliberately introduced defects. Disabling renewal caused two lease tests to fail; skipping the expiry check when processing reports caused two others to fail. The checker-falsification tests modify recorded histories to add invalid events and confirm that the checker rejects them. These checks are described in the test matrix.
 
-Key results from the final run (`make-test-4`; the October 29 run `make-test-3` looked the same, with 10 expiries and detection 5.01–5.27 s):
+## E. Recovery benchmarks
 
-- Leases expired 11 times across the fault tests, once for every injected crash, freeze, partition or heartbeat loss that outlasted the lease, and never in a fault-free test or in the slow-task and short-partition tests.
-- Detection took 5.01–5.09 s from the last accepted renewal, never less than the 5 s lease.
-- Recovery (last renewal → new owner) took 5.01–5.10 s when an idle worker was polling, and 5.85–5.99 s in the chaos run, where the recovered tasks waited behind queued work.
-- In every one of those tests, the late worker's messages were rejected or abandoned, exactly one success per task was recorded, and the job finished with the correct output.
+The benchmark uses six-task jobs with 100 ms fixture operations, four warmup jobs, and 24 measured jobs per run. W is fixed at four workers; C is the maximum number of jobs in flight (1, 4, or 16). Each configuration was run three times on fresh Compose deployments, with one CPU and 512 MiB per service. Baseline mode injects no failures. Crash mode requests two kills of busy workers, after the sixth and fourteenth measured job completions, and starts replacements.
 
-**Do the tests test anything?** For the lease logic we broke the code on purpose and checked that the tests failed. Stopping heartbeats from renewing the lease failed 2 lease tests. Skipping the expiry check before reports failed 2 others. The history checker's tests each inject one violation into a real saved history and require the checker to report it.
+The selected benchmark source is `d4fcda9`; its service code is the same as tested source `966965e`. The detailed per-run values and recovered attempts are in `results/ms3-logs/recovery-benchmark/`, especially `runs.csv`, `recoveries.csv`, `recovery_jobs.csv`, and `summary.csv`. Percentiles below use the nearest-rank method over complete runs only.
 
-## E. Performance
+Increasing C from 1 to 4 raised fault-free throughput from 4.40 to 14.78 tasks/s with the same four workers. That is consistent with having enough independent jobs to keep workers busy, although we did not measure worker utilization directly. At C = 16, mean throughput was 11.85 tasks/s rather than continuing to rise, and the standard deviation was 6.12 tasks/s. We cannot tell from these runs whether the scheduler, workers, or shared host limited throughput. What we can say is that higher concurrency did not produce a measured throughput improvement beyond C = 4.
 
-**Method.** `make bench-recovery` (`benchmarks/recovery.py`) uses the Step 12 workload and closed loop: six-task jobs with 100 ms fixture operations, 4 warmup jobs, then 24 measured jobs with at most C in flight. Here W = 4 workers and C ∈ {1, 4, 16}, with three fresh Compose deployments per configuration and mode (1 CPU and 512 MiB per service). *Baseline* injects nothing. *Crash* SIGKILLs a worker that is executing a task after the 6th and the 14th measured completions, and immediately starts a replacement worker. All times are on the scheduler's monotonic clock. Source `d4fcda9`; the service code is identical to the tested `966965e`. Raw data: `results/ms3-logs/recovery-benchmark/`.
+Job completion time also increased at C = 16. In the fault-free runs, median job time rose from 1,563 ms at C = 4 to 5,851 ms at C = 16, and p95 rose from 1,805 ms to 20,143 ms. More jobs were competing for the same four workers, but these measurements do not isolate queueing from other resource contention. Crashes added a different delay: affected tasks had to wait for their leases to expire before another worker could take over. The detailed results follow.
 
-| C | Mode | Complete runs | Throughput, tasks/s (mean ± sd) | Job time p50 / p95 (ms) | Jobs hit by a kill: p50 (ms) | Recoveries | Recovery p50 / p95 / max (ms) | Detection p50 (ms) | Requeue → new owner p50 / max (ms) |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | baseline | 3/3 | 4.40 ± 2.23 | 1,042 / 5,207 | – | – | – | – | – |
-| 1 | crash | 2/3 | 4.03 ± 0.01 | 1,035 / 6,250 | 6,250 | 4 | 5,004 / 5,045 / 5,045 | 5,004 | 0 / 1 |
-| 4 | baseline | 3/3 | 14.78 ± 1.33 | 1,563 / 1,805 | – | – | – | – | – |
-| 4 | crash | 3/3 | 9.66 ± 0.24 | 1,690 / 6,656 | 6,872 | 5 | 5,058 / 5,103 / 5,103 | 5,053 | 0 / 64 |
-| 16 | baseline | 3/3 | 11.85 ± 6.12 | 5,851 / 20,143 | – | – | – | – | – |
-| 16 | crash | 3/3 | 9.92 ± 5.16 | 6,006 / 28,598 | 11,407 | 4 | 5,052 / 10,328 / 10,328 | 5,005 | 0 / 5,324 |
+At C = 1, all three baseline runs completed, averaging 4.40 +/- 2.23 tasks/s. Their job completion times were 1,042 ms at p50 and 5,207 ms at p95. Two of three crash runs completed, averaging 4.03 +/- 0.01 tasks/s. Their job times were 1,035 ms at p50 and 6,250 ms at p95. Four recoveries had a 5,004 ms median and 5,045 ms maximum.
 
-Percentiles are nearest-rank over the jobs of complete runs; throughput is the mean (standard deviation) of per-run values.
+At C = 4, all three baseline and three crash runs completed. Throughput averaged 14.78 +/- 1.33 tasks/s without faults and 9.66 +/- 0.24 tasks/s with crashes. Baseline job times were 1,563/1,805 ms (p50/p95), compared with 1,690/6,656 ms in crash mode. Five recoveries had a 5,058 ms median and 5,103 ms maximum.
 
-**Recovery takes one lease.** Each of the 16 kills was requested while its victim was executing a task. In 13 of them the task was still unfinished when the SIGKILL landed; on this host `docker kill` took up to about a second, and the other 3 victims had just reported. All 13 orphaned tasks were recovered:
+At C = 16, all six runs completed. Baseline throughput was 11.85 +/- 6.12 tasks/s; crash throughput was 9.92 +/- 5.16 tasks/s. Baseline job times were 5,851/20,143 ms (p50/p95), compared with 6,006/28,598 ms under crashes. Four recoveries had a 5,052 ms median. One task waited in the ready queue while all workers were busy, making the maximum recovery time 10,328 ms.
 
-- Detection took 5.00–5.09 s, never less than the 5 s lease.
-- In 12 of 13, the task was reassigned within 64 ms of its expiry, for a recovery of 5.00–5.10 s.
-- In one C=16 run every worker was busy, so the requeued task waited 5.3 s at the back of the queue, for a recovery of 10.3 s. That is what FIFO requeueing implies, and it is why P-REC is stated only for the case where an idle worker is polling.
+At C = 4, mean throughput fell from 14.78 to 9.66 tasks/s under crashes, about a 35% reduction in these runs. At C = 1 and C = 16, the throughput differences are harder to interpret because of run-to-run variation. We did not measure a specific CPU, lock, or network bottleneck, so we cannot assign the slowdown to one component.
 
-**What a crash costs a job.** A job that lost a task to a crash took a median of 6.3 s (C=1), 6.9 s (C=4) and 11.4 s (C=16), against 1.0, 1.7 and 6.0 s for the other jobs in the same runs: roughly one lease plus a re-run of the task. Jobs that were not hit were not slowed; their medians were within 8% of the baseline's at every C (1.03 vs 1.04 s, 1.68 vs 1.56 s, 5.98 vs 5.85 s). With two crashes in a 24-job run, throughput fell from 14.8 to 9.7 tasks/s at C=4. At C=1 and C=16 the difference is within run-to-run noise.
+Across the eight completed crash runs, the driver requested 16 kills of executing workers. Three targets had already reported by the time the kill completed; the other 13 left unfinished tasks. All 13 recovered. Detection took 5.00-5.09 seconds. Twelve tasks were reassigned within 64 ms of expiry, for total recovery of 5.00-5.10 seconds. The remaining task waited roughly 5.3 seconds in the FIFO queue. So the observed recoveries meet the stated P-REC condition when an idle worker is available; the 10.3-second case does not violate that bound because every worker was occupied.
 
-**Throughput and today's host.** Fault-free throughput at W = 4 was 4.4, 14.8 and 11.9 tasks/s at C = 1, 4 and 16. Step 12 measured 6.0, 15.4 and 16.7 on the same laptop. The difference comes from the host, not from leases:
+Jobs directly affected by kills had median completion times of 6.3, 6.9, and 11.4 seconds at C = 1, 4, and 16. Other jobs in those runs had medians of 1.0, 1.7, and 6.0 seconds. Unaffected-job medians differed by less than 8% from the baseline: 1.03 versus 1.04 seconds, 1.68 versus 1.56, and 5.98 versus 5.85. This suggests that the main cost to affected jobs was waiting for expiry and repeating work; it does not rule out indirect effects on other jobs.
 
-- **Variance today was large.** These runs began in a slow period: the first C=1 baseline ran at 1.8 tasks/s and the next two at 5.7.
-- **A same-day control rules out the code.** The unchanged MS2 code at C=1, W=4 ran at 3.06 tasks/s, the same as MS3's code measured at the same time (2.99–3.30 tasks/s; `results/ms3-logs/perf-attribution/`).
-- **Heartbeats add almost no traffic here.** They start one second into an attempt, and these tasks finish in a fraction of a second.
+The host was noisy enough to limit comparisons with MS2. For W = 4, fault-free throughput was 4.4, 14.8, and 11.9 tasks/s at C = 1, 4, and 16; Step 12 recorded 6.0, 15.4, and 16.7. At C = 1, one baseline run achieved 1.8 tasks/s and the next two achieved 5.7. A same-day unchanged-MS2-code control reached 3.06 tasks/s, close to the MS3 control range of 2.99-3.30 tasks/s. See `results/ms3-logs/perf-attribution/`. This supports host variability as an explanation without excluding code-related changes at other loads.
 
-MS2's fault-free matrix (MS2 report §E) therefore remains our throughput characterization. An idle worker receives a ready task in about 5 ms; workers, not the scheduler, limit throughput.
+Only 17 of 18 planned benchmark runs completed. Crash C = 1, repetition 1 ended when the driver's six-second HTTP event-stream read timed out. Its history shows that all 27 submitted jobs completed and both kills recovered, but the driver did not finish its planned measured phase. We excluded that run from the statistics. The offline checker accepted available histories from all 18 runs, covering 503 jobs. The benchmark archive omits large worker and Compose logs, so that check uses saved scheduler histories and snapshots.
 
-**Memory.** After the MS3 fix, an idle scheduler's heap is flat. Real work costs about 10 KB of heap per completed task, so one run holds about 11,000 tasks with the default 128 MiB heap (`results/ms3-logs/memory-probe/`).
+The archive also retains three aborted benchmark attempts: one targeted idle workers, one stopped after the memory fix changed the code, and one exposed a replacement-worker naming race in the driver. Their status and source revisions are documented in `results/ms3-logs/README.md`.
 
-**Completeness.** 17 of the 18 runs completed. In the remaining one (crash, C=1, repetition 1), the benchmark driver's 6-second HTTP read of the event stream timed out during the slow period, and the driver stopped. The system had completed all 27 submitted jobs correctly, and both of that run's kills were recovered, but the run is excluded from the table. The histories of all 18 runs (503 jobs) pass the offline safety checker. Three earlier attempts were stopped and are kept as records (`results/ms3-logs/README.md`): one killed idle workers, one ran on code from before the memory fix, and one hit a driver race when starting replacement workers.
-
-**Environment.** The same laptop as MS2: Windows 11, 12 CPUs, 16 GB RAM, Docker Desktop 27.1.1 with its Linux VM capped at 3 GB, shared with a browser and an IDE.
+Measurements were taken on the MS2 laptop: Windows 11, 12 CPUs, 16 GB RAM, Docker Desktop 27.1.1, and a Linux VM capped at 3 GB. The browser and IDE shared the host. Fixture tasks often finish before the first heartbeat, so this workload adds little heartbeat traffic. The results describe a synthetic workload on one host, not a minimum throughput guarantee. The memory probe suggests roughly 10 KB retained per completed task, or about 11,000 tasks with a 128 MiB heap; that is an estimate, not a hard capacity limit.
 
 ## F. Deployment
 
-`make up` starts the scheduler, the artifact store and three workers under Docker Compose (1 CPU and 512 MiB each, no automatic restarts), and `make demo` runs the functional and video workloads against them.
+`make up` starts the scheduler, artifact store, and three workers in Compose, with no automatic restart and the resource caps noted above. `make demo` runs the arithmetic and video workloads.
 
-**The course cluster.** The MS2 feedback was right that our Hokea "version mismatch" was our own bug. The adapter refused to start unless the installed Hokea matched public commit `427b946` byte for byte, but the course runner image ships its own build, which differs from that commit in 7 of its 14 files. We reproduced the MS2 failure on our namespace on October 30 with the unchanged code, then changed the adapter to record the installed Hokea files in the evidence and to check only that the classes, methods and options it calls exist. The same day, `hokea test` passed all four cluster tests in 2 min 11 s (source `611c1de`; images built from the unchanged service code at `6104fa7`): the smoke test, the functional workload, the crash oracle and the bounded re-run test, on real pods, with worker crashes done by force-deleting the pod. The crash oracle's task was reassigned 5.57 s after its last heartbeat (detection 5.01 s, then one slow claim round trip); in the bounded re-run test the task was re-run 4.5 s after its pod was deleted, succeeded once, and the job finished 24.9 s after the kill. All seven job histories pass the offline checker, and no pods were left behind. Logs and evidence: `results/ms3-logs/hokea-cluster/`. The other fault tests need the in-process fault proxy or SIGSTOP and still run only on the local backend.
+The Hokea adapter includes the fault proxy and requires zero expected failures. In the course-cluster attempt, Kubernetes accepted the runner Job and pytest collected three tests. All three stopped during setup with `Hokea source mismatch at check.py`, before running scheduler workloads. The cluster test exited with code 1. We therefore cannot claim successful Kubernetes workload verification.
 
-## G. Limitations and known risks
+Our adapter's strict source-version check contributed to this compatibility problem and needs investigation. It would be inaccurate to blame the course runner without resolving the difference. The archive also contains an earlier course-cluster attempt with the same setup error at `results/handoffs/step-11/acceptance-hokea-20261003T200759-f99f027a/CLUSTER-RESULT.md`. The later attempt described here was reported separately; its raw logs are not part of the archived MS3 evidence reviewed for this report.
 
-- **The scheduler is a single point of failure.** Its state is in memory; a restart starts an empty run and in-flight jobs must be resubmitted.
-- **One run holds about 11,000 completed tasks** with the default 128 MiB heap, because the full history is kept in memory for auditing (about 10 KB per task). Sustained full load reaches that in roughly 10–15 minutes; restart the scheduler (a new run) or give it a larger heap.
-- **A paused scheduler expires live leases.** If the scheduler process itself is frozen for longer than the lease, every lease looks overdue when it resumes, and live workers' attempts are expired and redone. Safety holds; work is repeated.
-- **At-least-once execution.** A task can run more than once: after a lease expiry, the old worker may have been frozen or cut off rather than dead and may finish too. Only one result is accepted. External side effects would need their own idempotency.
-- **No retry limit.** An operation that always fails is retried forever and its job stays RUNNING.
-- **Network faults are injected only on the worker↔scheduler link,** and only with the native backend. The artifact store is assumed available.
-- **An artifact-store restart is not handled.** Its index is in memory, and we do not rely on its files surviving a restart (on Hokea they do not).
-- **Workers are trusted;** results are not recomputed.
-- **Performance numbers come from one shared Windows laptop** with a synthetic workload (§E).
+## G. Known limitations
 
-## H. Next steps (MS4–MS5)
+Scheduler state is not durable. A crash loses queued and in-flight work, and restarting creates a new run. Retaining full histories in memory also limits run length. With the default 128 MiB heap, the memory probe suggests around 11,000 completed tasks, or roughly 10-15 minutes at sustained full load.
 
-Respond to the red team's findings and the plot twist. Candidates we already know about: an optional retry limit with a terminal FAILED job state, scheduler durability through a write-ahead log, and running the remaining fault suites on the Compose and Hokea backends.
+A live worker may lose its lease during a long pause or partition, causing work to repeat. Only one completion can be accepted, but external side effects need their own idempotency. There is no retry limit, so a permanently failing operation leaves its job RUNNING. The scheduler trusts workers rather than recomputing their output. Network fault injection covers worker-to-scheduler links, not the artifact store; the store is assumed available and does not rebuild its object index after restart even if files remain on disk.
+
+## H. Later milestones
+
+Possible MS4-MS5 work includes responding to red-team findings, adding a retry limit and terminal FAILED state, storing scheduler state durably, and running fault suites under Compose and Hokea. None of these is an MS3 guarantee.

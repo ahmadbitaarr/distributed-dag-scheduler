@@ -27,14 +27,6 @@ def all_worker_events(system):
     return [e for w in system.workers for e in system.worker_events(w)]
 
 
-def held_by(system, jobs, worker):
-    """Unfinished attempts the worker's session owns right now, as (job_id, task_id, attempt_no)."""
-    session = system.worker_session(worker)
-    return [(m["job_id"], name, t["attempt_no"]) for m in jobs
-            for name, t in system.api.status(m["job_id"])["tasks"].items()
-            if t["owner"] == session and t["state"] in ("ASSIGNED", "RUNNING")]
-
-
 def test_lost_heartbeats_expire_the_lease_and_the_late_success_is_rejected(system):
     """A live worker whose renewals are all lost looks dead. Its later SUCCESS must not count."""
     a = system.start_worker(proxy=True)
@@ -174,7 +166,12 @@ def test_delayed_and_duplicated_messages_change_nothing(system):
 def test_chaos_campaign_keeps_every_guarantee(system):
     """Seeded mix of loss, delay, a crash, a long pause and a replacement worker during live jobs."""
     rng = random.Random(4094)
-    workers = [system.start_worker(proxy=True, seed=rng.randrange(1 << 30)) for _ in range(3)]
+    # Hold a known running attempt until its worker is killed. Fixed sleeps alone
+    # can hit idle workers and exercise no lease recovery at all.
+    crash_gate = {"ENABLE_TEST_HOOKS": "true", "TEST_GATE_TASK": "A",
+                  "TEST_GATE_STAGE": "operation", "OPERATION_TIMEOUT_MS": "120000"}
+    workers = [system.start_worker(env=crash_gate if n == 0 else None,
+                                   proxy=True, seed=rng.randrange(1 << 30)) for n in range(3)]
     for w in workers:
         proxy = system.proxy(w)
         proxy.add("delay", delay_ms=100, jitter=True)
@@ -183,18 +180,16 @@ def test_chaos_campaign_keeps_every_guarantee(system):
     jobs = [functional(400) for _ in range(6)]
     for m in jobs:
         system.api.submit(m)
-    # Each fault waits until its victim holds a task, so the campaign always tests recovery; a fixed
-    # instant can land between a worker's tasks. Replies already inside the proxy get 0.5 s to land.
-    time.sleep(1.5)
-    wait_for(lambda: held_by(system, jobs, workers[0]), description="worker-1 holding a task")
-    system.kill_worker(workers[0])                     # crash while holding work
-    time.sleep(0.5)
-    orphaned = held_by(system, jobs, workers[0])
-    time.sleep(0.5)
-    wait_for(lambda: held_by(system, jobs, workers[1]), description="worker-2 holding a task")
+    gate = wait_for(lambda: next((e for e in system.worker_events(workers[0])
+                                  if e["event_type"] == "worker_test_gate_entered"
+                                  and e.get("stage") == "operation"), None),
+                    timeout=30, description="chaos crash victim holding a running attempt")
+    held = system.api.status(gate["job_id"])["tasks"][gate["task_id"]]
+    assert held["state"] == "RUNNING" and held["owner"] == gate["worker_session_id"]
+    assert held["attempt_no"] == gate["attempt_no"]
+    system.kill_worker(workers[0])
+    time.sleep(1.0)
     system.pause_worker(workers[1])                    # long freeze: longer than the lease
-    time.sleep(0.5)
-    orphaned += held_by(system, jobs, workers[1])
     replacement = system.start_worker()
     time.sleep(7.0)
     system.resume_worker(workers[1])
@@ -207,9 +202,10 @@ def test_chaos_campaign_keeps_every_guarantee(system):
         check_history(m, snapshot, events, worker_events)
     keys = [(e["job_id"], e["task_id"]) for e in events if e["event_type"] == "task_succeeded"]
     assert len(keys) == len(set(keys)) == 6 * 5
-    assert orphaned, "the crash or the pause must have caught a worker holding a task"
-    expired = {(e["job_id"], e["task_id"], e["attempt_no"]) for e in events if e["event_type"] == "lease_expired"}
-    assert set(orphaned) <= expired, "every attempt the crashed or frozen worker held must have expired"
+    assert any(e["event_type"] == "lease_expired"
+               and all(e.get(k) == gate[k] for k in
+                       ("job_id", "task_id", "attempt_no", "worker_session_id"))
+               for e in events), "the gated crash victim's attempt must expire"
     injected = sum(len(system.proxy(w).applied("drop_request")) + len(system.proxy(w).applied("drop_response")) for w in workers)
     assert injected > 0
     assert system.worker_running(replacement) and system.worker_running(workers[1])

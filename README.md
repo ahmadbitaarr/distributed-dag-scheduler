@@ -1,6 +1,6 @@
 # Distributed DAG Task Scheduler (CS4094, MS3)
 
-A fault-tolerant task scheduler for a video-processing workload. A client submits a job as a DAG of tasks; one scheduler hands ready tasks to polling workers under **leases**; workers exchange files through an immutable artifact store. If a worker crashes, freezes or is cut off, its lease expires and the task is given to another worker, and nothing the old worker sends afterwards can count.
+We built this scheduler to run DAGs of video-processing tasks. One scheduler tracks dependencies and assigns ready work to workers that poll it. Workers exchange inputs and outputs through an immutable artifact store. MS3 adds leases: if a worker crashes or stops renewing, its unfinished task returns to the queue and another worker can take it. The scheduler rejects the expired attempt's later messages.
 
 | Read this | For |
 |---|---|
@@ -12,7 +12,7 @@ A fault-tolerant task scheduler for a video-processing workload. A client submit
 
 ## Quick start: run the whole test suite with one command
 
-Requirements: **Docker** (with the Compose plugin), `make` and a POSIX shell. Nothing else is needed on the host; the suite runs in a pinned Linux container.
+You need Docker with the Compose plugin, `make` and a POSIX shell. The pinned Linux harness container supplies the language tools, so you do not need Java or Python installed on the host for `make test`.
 
 ```bash
 git clone https://github.com/ahmadbitaarr/distributed-dag-scheduler.git
@@ -20,9 +20,9 @@ cd distributed-dag-scheduler
 make test
 ```
 
-`make test` builds the harness image, compiles every module, runs the 77 JUnit tests, then runs all pytest suites (unit, integration and fault injection) against real scheduler, artifact-store and worker processes. Expect about 10–15 minutes and a final line like `105 passed, 2 skipped` (the two skipped tests need a local Hokea install). Zero expected failures are allowed (`MS2_REQUIRE_XFAIL=0`). Per-test evidence is written to `results/latest-tests/<run>/<test>/`.
+Start with `make test`. It builds the harness, compiles the modules, runs 77 JUnit tests, then runs the pytest unit, integration and fault suites. Service-backed tests use real scheduler, artifact-store and worker processes. The submitted run finished with `102 passed`. Allow about 10–15 minutes after image setup; timing depends on the host. The suite permits no expected failures (`MS2_REQUIRE_XFAIL=0`) and writes per-test evidence to `results/latest-tests/<run>/<test>/`.
 
-Windows: run from Git Bash (`sh deploy/harness/run.sh` is the same as `make test`), and set `git config --global core.longpaths true` before cloning, because some committed evidence paths are long.
+On Windows, use Git Bash (`sh deploy/harness/run.sh` is the same as `make test`), and set `git config --global core.longpaths true` before cloning, because some committed evidence paths are long.
 
 ## Commands
 
@@ -36,35 +36,19 @@ Windows: run from Git Bash (`sh deploy/harness/run.sh` is the same as `make test
 | `make bench` | Fault-free benchmark matrix: C ∈ {1,4,16} concurrent jobs × W ∈ {1,2,4} workers × 5 runs. |
 | `make bench-recovery` | Recovery experiment: W = 4, C ∈ {1,4,16}, baseline vs. two worker kills per run, 3 runs each. |
 
-Run a subset inside the harness container:
+For a smaller check, run a subset inside the same harness container:
 
 ```bash
 sh deploy/harness/run.sh sh -c 'mvn -B -q package -DskipTests && pytest -q tests/faults/test_network_faults.py'
 ```
 
-## Running on the course cluster (Hokea)
-
-The smoke test, the functional workload and both worker-crash tests (crashes are force-deleted pods) also run on the course Hokea cluster, using the public images built from the service code at `6104fa7`, which later revisions do not change. From a Linux or WSL shell with your course kubeconfig and the Hokea CLI from the course lab, using your own team namespace:
-
-```bash
-python3 deploy/hokea/package_runner.py --out /tmp/ms3-runner --source-revision "$(git rev-parse HEAD)" \
-  --scheduler-image ghcr.io/ahmadbitaarr/scheduler@sha256:65b2abd2b78746659366406791c157ae756be06de210102bd31afb08ab43ce59 \
-  --artifact-store-image ghcr.io/ahmadbitaarr/artifact-store@sha256:02c9470377e24dcee6fdaa41b339485b04ffc55e72caee1a4f03b6b7ed01bf27 \
-  --worker-image ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca
-cd /tmp/ms3-runner && hokea test --namespace team-NN -v
-```
-
-Expect `4 passed` in about two minutes; Hokea copies each test's evidence back to `./runs/`. Our runs are in `results/ms3-logs/hokea-cluster/`, and adapter details in [deploy/hokea/README.md](deploy/hokea/README.md).
-
-## Checking saved evidence
-
-Re-check the safety invariants offline on any saved evidence (standard-library Python only):
+You can also check saved evidence without starting services. This needs only standard-library Python:
 
 ```bash
 python3 -m tests.harness.check_evidence results/latest-tests/<run>/*/
 ```
 
-## Architecture in one picture
+## How the components work together
 
 ```
  client ──submit/status──▶  SCHEDULER (one process, one mutex, in-memory state, leases)
@@ -116,7 +100,7 @@ Example job: `java -jar client/target/client-0.2.0.jar submit workloads/function
 | Integration | `tests/integration/` | API, worker lifecycle, Java client, retries, replays, the functional and video workloads. |
 | Faults | `tests/faults/` | Crashes at every attempt stage, restart, pause, slow tasks, lost/delayed/duplicated messages, partitions, a seeded chaos run, and the crash-reassignment oracle. |
 
-Every service-backed test exports the scheduler's full event history, worker logs, snapshots, metrics and (for network faults) the proxy's log of every dropped, delayed or duplicated message, and checks the safety invariants on that history. The native harness uses POSIX process control, so run pytest on Linux/macOS/WSL or through `make test`. `MS2_BACKEND=compose` drives real containers from host Python for the tests that do not need the in-process fault proxy.
+We save the scheduler history, worker logs, snapshots and metrics for each service-backed test. Network tests also save the proxy's fault log. The checker looks for safety violations in those records. The native harness needs POSIX process control, so use Linux/macOS/WSL for direct pytest runs or use `make test`. For tests without the in-process fault proxy, `MS2_BACKEND=compose` runs real containers from host Python.
 
 ## Workloads
 
@@ -135,4 +119,4 @@ Every service-backed test exports the scheduler's full event history, worker log
 | `docs/` | Specification, progress reports, API, evidence schema, test matrix, MS2 architecture and roadmap, step handoffs |
 | `results/` | Committed run logs and evidence (`ms3-logs/`, `handoffs/step-XX/`) |
 
-Historical MS2 material (architecture, roadmap, step handoffs, the MS2 report) is kept unchanged under `docs/` for provenance. `docs/handoffs/`, `docs/HANDOFF.md`, `docs/PROGRESS.md` and `docs/OPEN_ISSUES.md` are working instructions and status records written for AI coding agents during development, not reviewed documentation; the documents in the table at the top are the reviewed ones.
+We kept the MS2 architecture, roadmap, handoffs and report unchanged under `docs/` so reviewers can see how the project developed. The current test results and benchmark limitations are in the MS3 report; course-cluster execution remains unverified.

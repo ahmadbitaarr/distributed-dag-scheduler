@@ -1,57 +1,103 @@
 # MS3 oral defense: preparation sheet
 
-Format (course guidelines): 25 minutes, chalkboard only. One randomly chosen member gives a 10-minute overview of items 1–7 below; then 15 minutes of pointed questions to individual members. Everyone should be able to give the overview.
+Use this to practise explaining the system, then answer in your own words. Our recorded course format is 25 minutes, chalkboard only: a randomly chosen member gives a 10-minute overview, followed by 15 minutes of questions to individuals. Both of us need to understand the whole design.
 
-## The 10-minute overview (one board, left to right)
+## The 10-minute overview
 
-**1. Design and architecture (2 min).** Draw: client → scheduler ← workers (arrows *into* the scheduler: workers pull) and workers ↔ artifact store. One scheduler process, one mutex, in-memory state. Workers have no inbound port; the scheduler never calls them. Files move only through the immutable artifact store, under per-attempt keys.
+### 1. Design and architecture (2 min)
 
-**2. Vocabulary (1 min).** Job = DAG of tasks. Attempt = one try of a task, numbered 1, 2, 3… Ownership tuple = (run, job, task, attempt, worker session). Lease = time-limited ownership of an attempt, on the scheduler's clock. Heartbeat = a renewal of the lease. Fencing token = the attempt number: a message carrying an old one is refused.
+Draw the client, scheduler, workers and artifact store. Show claim, start, heartbeat and report arrows going into the scheduler because workers pull. We chose one scheduler, one mutex and in-memory state. Workers have no inbound task-control port. Inputs and outputs go through the immutable artifact store, under separate keys for each attempt.
 
-**3. Functionality (1 min).** Submit a manifest (validated: no cycles, allowlisted operations, size limits) → roots go READY → workers claim (FIFO) → start ack → run → upload outputs → report → children whose parents all succeeded go READY → job done when every task is. Video job: inspect → 720p, 360p, thumbnail, subtitles in parallel → publish.
+### 2. Vocabulary (1 min)
 
-**4. Safety and liveness (3 min).** Write S1, S2, S3 and L1, L2 on the board.
-- S1: only the current, unexpired lease holder's SUCCESS report, with verified outputs, completes a task.
-- S2: assigned only after all parents succeeded; executed only after the start ack.
-- S3: at most one accepted success per task; one owner at a time.
-- L1: with a live worker, every ready task is assigned and eventually succeeds or is retried.
-- L2: a crashed, frozen or cut-off worker's task is requeued once its lease expires (5 s) and reassigned.
-- Key sentence: *safety never depends on timing; timing only affects how fast we make progress.*
+A job is a DAG of tasks. An attempt is one execution assignment, numbered 1, 2, 3… The ownership tuple is (run, job, task, attempt, worker session). A lease gives the attempt time-limited ownership on the scheduler's clock; a heartbeat renews it. The attempt number is our fencing token, so an expired attempt cannot later decide the task's result.
 
-**5. How we think about performance (1 min).** Four metrics, all on the scheduler's clock: job completion time, throughput, scheduling latency (ready → assigned), recovery time (last heartbeat → new owner). Closed-loop load: C concurrent jobs, W workers, 1 CPU / 512 MiB per service.
+### 3. Functionality (1 min)
 
-**6. Performance guarantees (1 min).** We commit to one bound: a crashed worker's task is never declared dead before the 5 s lease, and is reassigned within lease + 2 s when an idle worker is polling. Measured: 5.0–5.1 s. Throughput is a characterization, not a promise: about 4.2 tasks/s per worker on the MS2 host, and it scales with workers until the DAG's own parallelism runs out.
+The client submits a manifest. We reject cycles, unsupported operations and oversized inputs. Roots become READY. Workers claim from the FIFO, wait for a start acknowledgment, execute, upload outputs and report. A successful report can release children; the job finishes only after every task succeeds. Our video DAG is inspect → 720p, 360p, thumbnail and fixture subtitles in parallel → publish.
 
-**7. Testing strategy (1 min).** One command, `make test`: 77 JUnit tests (leases tested on a fake clock) and 105 pytest tests against real processes. We inject faults (SIGKILL, SIGSTOP, crash points before start / during / before report, a proxy that drops, delays, duplicates or partitions one worker's link, and a seeded chaos run), and every test runs a checker over the full event history that would flag any S1–S3 violation. The checker is itself tested by injecting violations into a real history.
+### 4. Safety and liveness (3 min)
 
-## Likely questions and short answers
+Write S1, S2, S3, L1 and L2 on the board and explain the distinction.
 
-**Why not just reassign after a timeout?** Because a slow worker would then finish too, and two results would compete. Timeouts are fine *if* the old attempt is fenced: its attempt number is now stale, so its report, heartbeat and start are refused, and its files sit under its own attempt prefix where nothing reads them.
+- S1: only a valid SUCCESS from the current, unexpired lease holder, with verified outputs, completes a task.
+- S2: assignment waits for all parent successes; execution waits for the start acknowledgment.
+- S3: one accepted success per logical task and one active owner, even if execution repeats.
+- L1: with available services, eventual communication and adequate execution intervals, ready work is assigned and succeeds or is retried.
+- L2: a crashed, frozen or disconnected worker's unfinished task returns to the queue after its lease expires (default 5 s).
 
-**How do you tell a slow worker from a dead one?** We don't, and can't, in an asynchronous network. We only decide "not renewed within 5 s". A slow but live worker keeps renewing (heartbeats run on their own thread), so it keeps its task; the slow-task test runs a task for 2.4 leases without losing it.
+Safety comes from atomic ownership and state checks. Timing affects progress and how often work is repeated. We do not need synchronized clocks.
 
-**What if a worker's lease expires while it is still working (a false suspicion)?** It may finish and report; the report gets `409 LEASE_EXPIRED` and changes nothing. Cost: repeated work. Tests: lost heartbeats, pause, partition.
+### 5. How we measure performance (1 min)
 
-**What if the report arrives a millisecond after the deadline, before anyone else took the task?** Rejected anyway. We chose one rule, "expired means dead", over accepting it, because it is simpler to reason about and test. Cost: a re-run in a rare race.
+Explain the four scheduler-clock metrics: job completion time, throughput, scheduling latency (ready → assigned), and recovery (last accepted renewal → new owner). Recovery does not start at the external kill command. The load driver keeps C jobs in flight on W workers, with 1 CPU and 512 MiB per service.
 
-**Is this exactly-once?** Exactly-once *recording* of completion, yes. Execution is at-least-once: an expired attempt can still run. That is fine here because outputs are immutable and per-attempt; it would not be fine for an external side effect like a paid API, which we do not claim.
+### 6. Performance guarantees (1 min)
 
-**Why 5 s / 1 s?** Recovery ≈ lease, so shorter is faster but expires live workers on slow links more often. Five renewals per lease means up to three consecutive lost heartbeats are always tolerated. A false expiry costs work, never correctness, so we leaned toward fewer false expiries.
+P-REC says we do not detect expiry before the 5 s lease, and require reassignment within lease + 2 s when an idle worker is polling under the stated conditions. The completed benchmark measured 5.0–5.1 s with a free worker. One queued task took 10.3 s with all workers busy. The benchmark completed 17 of 18 runs; explain the driver's timeout rather than calling all 18 complete. Throughput is a characterization: about 4.2 tasks/s per worker in the MS2 measurements, with limits from the workload and host.
 
-**Whose clock?** Only the scheduler's monotonic clock decides expiry. Workers never compare clocks with the scheduler; we never subtract timestamps across machines.
+### 7. Testing strategy (1 min)
 
-**What if the scheduler crashes?** Out of scope by our fault model: a restart is a new, empty run, old messages get `409 STALE_RUN`, and jobs must be resubmitted. Making it durable needs a write-ahead log; replicating it needs consensus.
+`make test` runs 77 JUnit tests and 102 pytest tests. The submitted log records no failures or expected failures. Lease unit tests use an injected clock. Service-backed tests use real processes and inject SIGKILL, SIGSTOP, stage-specific stalls, message loss, delay, duplication and partitions, plus a seeded chaos run. We check the exported histories for S1–S3. Checker tests deliberately corrupt a saved history and require rejection.
 
-**What if the scheduler pauses (GC, VM freeze) for longer than the lease?** On resume, every lease looks overdue and live workers' attempts are expired and redone. Safety holds; work is repeated. We list this as a known risk.
+## Questions to practise
 
-**Why a single mutex? Isn't that a bottleneck?** Every decision (claim, success + releasing children, expiry + requeue) is atomic, which is what makes S2 and S3 easy to argue. The benchmark shows an idle worker gets a task in about 5 ms; workers, not the scheduler, limit throughput at our scale.
+**Why not just reassign after a timeout?**
 
-**What if a message is duplicated or a reply is lost?** Every request carries a stable ID; retries return the stored receipt (`completion_duplicate`), never a second effect. Tested by dropping claim, start and report replies and duplicating every start and report.
+We do reassign after timeout, but also fence the old attempt. A slow worker may still finish. Its attempt number is no longer current, so its start, heartbeat and report are refused. Its output prefix is separate and does not overwrite the accepted files.
 
-**How do you know your tests can fail?** For leases we broke the code on purpose (no renewal; no expiry check before reports) and the tests failed. The history checker is tested by injecting each kind of violation into a real saved history. MS2's crash test failed for real before leases existed.
+**How do you tell a slow worker from a dead one?**
 
-**What can't you handle?** Scheduler crash, artifact-store loss, malicious workers, a link that drops every report but delivers heartbeats (not fair-loss), and a task that always fails (retried forever; no retry limit).
+We cannot know from silence alone. We know only that no renewal arrived within 5 s. A slow worker can keep its attempt through its heartbeat thread. The slow-task test runs for 2.4 leases without expiry.
 
-**Does it run on the course cluster?** Yes. The smoke test, the functional workload, the crash oracle and the instructor's bounded re-run test pass on Hokea, with crashes done by force-deleting the pod; recovery there took 5.1–5.6 s. MS2's "version mismatch" was our bug: we required Hokea to match a public commit byte for byte, and the runner's build differs. We now check only for the Hokea calls we make.
+**What happens on false suspicion?**
 
-**What changed since MS2?** Leases, heartbeats and expiry; L2 now holds; 14 new fault tests (one is the instructor's) plus 16 lease unit tests; a fault proxy; recovery-time benchmark; sharper claims (S1 "current unexpired holder", S3 recorded vs. physical, fair-loss stated).
+The old worker may finish, but its report receives `409 LEASE_EXPIRED`. We repeat work rather than accepting two results. Lost-heartbeat, pause and partition tests exercise this.
+
+**What if success arrives a millisecond late and nobody else has claimed?**
+
+We still reject it. A single expiry rule is easier to explain and test than a special case for tasks not yet reassigned. The cost is an occasional re-run.
+
+**Is this exactly-once?**
+
+We guarantee at most one recorded success for a logical task. With the liveness assumptions and an operation that can succeed, the job eventually gets its result. Physical execution is at-least-once: an expired attempt may continue running. Immutable per-attempt files make that acceptable here. We do not promise exactly-once paid API calls or other external effects.
+
+**Why a 5 s lease and 1 s heartbeat?**
+
+A shorter lease recovers sooner but is less tolerant of delay. With prompt heartbeat requests, three consecutive lost renewals fit inside the default lease. This is not an unconditional guarantee: the worker waits after each request finishes, so a long request or timeout can consume the margin. False expiry costs work, not a second accepted completion.
+
+**Whose clock decides?**
+
+The scheduler's monotonic clock. Workers do not compare their clocks to it, and measurements never subtract timestamps from separate machines.
+
+**What if the scheduler crashes?**
+
+Scheduler recovery is outside our fault model. A restart creates a new, empty run; old messages receive `409 STALE_RUN`, and jobs need resubmission. Durable state and replicated failover would require separate design work, such as a write-ahead log or consensus.
+
+**What if the scheduler pauses longer than the lease?**
+
+When it resumes, leases look overdue and live attempts may be expired and repeated. Ownership checks still protect safety. We list this risk in the report.
+
+**Does the single mutex limit performance?**
+
+It makes assignment, completion with dependency release, and expiry with requeue atomic. The earlier benchmark measured about 5 ms ready-to-assigned latency with an idle worker, suggesting workers were the main limit at that scale. We have not proved the scheduler can handle arbitrary load.
+
+**What if a message or reply is lost or duplicated?**
+
+Retries retain their job, claim or attempt identity. The scheduler uses receipts so a replay does not repeat its state change (`completion_duplicate`). We test lost claim, start and report replies and duplicated starts and reports. Empty-claim receipts are bounded per session after the memory fix; they are not an unlimited archive of idle polls.
+
+**How do you know the tests detect defects?**
+
+Deliberately disabling renewal and removing report-time expiry checks made lease tests fail. Checker tests inject specific violations into a real history. The original crash test also failed in MS2 before recovery existed.
+
+**What do the benchmark's interrupted runs mean?**
+
+The selected experiment completed 17 of 18 runs. One event-stream read timed out in the driver; its 27 submitted jobs finished, but it did not complete the planned benchmark phase and is excluded from the summary. Earlier attempts are kept and labeled separately. The retained scheduler histories of all 18 selected runs pass the offline checker, covering 503 jobs. That does not turn an incomplete benchmark into a complete one.
+
+**What cannot the system handle?**
+
+Scheduler crash recovery, artifact-store loss and malicious workers are out of scope. A link dropping every report while delivering heartbeats violates fair-loss assumptions and can stall completion. A task that always fails retries forever. Histories grow with real work; the memory probe suggests about 11,000 tasks per run with the 128 MiB heap. Hokea course-cluster execution is still unverified.
+
+**What changed since MS2?**
+
+Leases, heartbeats and expiry fixed the stuck-task case. We added 16 lease unit tests, an idle-polling test, 13 fault tests, 2 checker tests, the fault proxy and recovery benchmark. We also fixed replayed-start handling after expiry and the idle-polling memory leak. The specification now separates recorded completion from physical execution and states the fault assumptions more precisely.
