@@ -1,0 +1,31 @@
+hokea: shipping 4 file(s) and starting the runner Job hokea-test-20261030-160410-d92f in team-06-clients (servers will run in team-06)
+hokea: runner pod is being created...
+hokea: streaming pytest output from pod hokea-test-20261030-160410-d92f-zmr7h (Ctrl-C detaches; the Job keeps running)
+hokea runner: running: pytest -v -rA
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /project
+configfile: pytest.ini
+testpaths: test_entry.py
+plugins: hokea-0.1.0
+collecting ... collected 4 items
+
+test_entry.py::test_service_exchange PASSED                              [ 25%]
+test_entry.py::test_committed_functional_workload PASSED                 [ 50%]
+hokea: still waiting for pytest to finish (pod phase Running)
+test_entry.py::test_worker_crash_reassignment PASSED                     [ 75%]
+hokea: still waiting for pytest to finish (pod phase Running)
+test_entry.py::test_dead_worker_task_rerun_within_budget PASSED          [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED test_entry.py::test_service_exchange
+PASSED test_entry.py::test_committed_functional_workload
+PASSED test_entry.py::test_worker_crash_reassignment
+PASSED test_entry.py::test_dead_worker_task_rerun_within_budget
+======================== 4 passed in 130.62s (0:02:10) =========================
+hokea runner: pytest exited 0; artifacts ready — holding up to 600s for the launcher to copy runs/ out
+hokea: copied 1 run(s) into ./runs/: acceptance-hokea-20261030T200412-a59531c8
+hokea runner: copy-out confirmed; exiting
+hokea: tests passed

@@ -1,0 +1,1 @@
+hokea test --namespace team-06 -v -rA

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "test": "test_entry.py::test_committed_functional_workload",
+  "outcome": "passed",
+  "xfail": false,
+  "backend": "hokea",
+  "scheduler_run_id": "27642fd2-8e0e-4fd1-8e74-4d7d4b619411",
+  "source_revision": "611c1de07d8f3e85bdf1f379cc46b8f55f147466",
+  "run_label": "acceptance-hokea-20261030T200412-a59531c8",
+  "cleanup_succeeded": true,
+  "started_utc": "2026-10-30T20:04:34.911799+00:00",
+  "finished_utc": "2026-10-30T20:05:10.053177+00:00",
+  "python": "3.12.13",
+  "java": null,
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.41"
+}

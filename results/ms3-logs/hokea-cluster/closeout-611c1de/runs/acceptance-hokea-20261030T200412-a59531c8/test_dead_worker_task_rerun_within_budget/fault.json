@@ -1,0 +1,29 @@
+{
+  "worker": "worker-1",
+  "hokea_reference_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "runtime": "kubernetes",
+  "node": "hokea-ms2-1024f0dcad-worker-1-node1",
+  "node_index": 1,
+  "old_instance_id": "9e29a643-bc63-4a0e-8070-6bce2a4ee9a5",
+  "worker_session_id": "5db238ea-7011-438c-b9bb-d71a5c14d3d4",
+  "hard_kill_requested": true,
+  "kill_completed": true,
+  "old_instance_running": false,
+  "automatic_restart_observed": false,
+  "mechanism": "force_pod_deletion",
+  "death_observation": {
+    "instance_id": null,
+    "running": false,
+    "gone": true
+  },
+  "victim": "worker-1",
+  "survivor": "worker-2",
+  "x_identity": {
+    "scheduler_run_id": "83a61d65-79c1-4ed9-b2f1-ace9728bd3ee",
+    "job_id": "f6bb1d92-eeaf-44bc-b299-9b9af9b2f9de",
+    "task_id": "X",
+    "attempt_no": 1,
+    "worker_session_id": "5db238ea-7011-438c-b9bb-d71a5c14d3d4"
+  },
+  "kill_confirmed_elapsed_ns": 8753439200
+}

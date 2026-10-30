@@ -1,0 +1,32 @@
+{
+  "worker": "worker-1",
+  "hokea_reference_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "runtime": "kubernetes",
+  "node": "hokea-ms2-6f7895cb30-worker-1-node1",
+  "node_index": 1,
+  "old_instance_id": "264bf33b-08ec-4ae6-9788-dce22dccad77",
+  "worker_session_id": "0ed2dc7e-7572-4d56-88c7-1092e77b6ca8",
+  "hard_kill_requested": true,
+  "kill_completed": true,
+  "old_instance_running": false,
+  "automatic_restart_observed": false,
+  "mechanism": "force_pod_deletion",
+  "death_observation": {
+    "instance_id": null,
+    "running": false,
+    "gone": true
+  },
+  "schema_version": 1,
+  "event_type": "fault_injected",
+  "producer": "harness",
+  "producer_seq": 1,
+  "utc_timestamp": "2026-10-30T20:05:20.398917+00:00",
+  "elapsed_ns": 4032372578,
+  "request_id": "kill-worker-A",
+  "scheduler_run_id": "2977e6a8-5a88-4e82-8342-ca574c740031",
+  "job_id": "aca66657-97c0-4224-8675-93987678e3c3",
+  "task_id": "X",
+  "attempt_no": 1,
+  "kill_confirmed_elapsed_ns": 4891227627,
+  "gate_operation_timeout_ms": 120000
+}

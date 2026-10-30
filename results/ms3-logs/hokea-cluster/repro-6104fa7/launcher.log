@@ -1,0 +1,56 @@
+hokea: shipping 6 file(s) and starting the runner Job hokea-test-20261030-160009-1065 in team-06-clients (servers will run in team-06)
+hokea: runner pod is being created...
+hokea: streaming pytest output from pod hokea-test-20261030-160009-1065-dlrz9 (Ctrl-C detaches; the Job keeps running)
+hokea runner: running: pytest -q -k test_service_exchange
+E                                                                        [100%]
+==================================== ERRORS ====================================
+___________________ ERROR at setup of test_service_exchange ____________________
+
+request = <SubRequest 'system' for <Function test_service_exchange>>
+
+    @pytest.fixture
+    def system(request):
+        root = Path(os.environ.get("MS2_EVIDENCE_DIR", "results/latest-tests"))
+        directory = root / request.config._ms2_run_label / request.node.name
+        # Refuse to mix or replace evidence from a previous execution.
+        directory.mkdir(parents=True, exist_ok=False)
+        started = datetime.now(timezone.utc).isoformat()
+        instance = None
+        cleanup_succeeded = False
+        try:
+>           with harness(directory) as instance:
+                 ^^^^^^^^^^^^^^^^^^
+
+_project/tests/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_project/tests/harness/runtime.py:231: in harness
+    return HokeaHarness(evidence)
+           ^^^^^^^^^^^^^^^^^^^^^^
+_project/tests/harness/hokea_adapter.py:140: in __init__
+    self.factory = factory or Factory(self.mode, self.namespace)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_project/tests/harness/hokea_adapter.py:56: in __init__
+    verify_package(Path(module.__file__).parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+package = PosixPath('/usr/local/lib/python3.12/site-packages/hokea')
+
+    def verify_package(package):
+        pin = json.loads(PIN.read_text())
+        if pin["revision"] != HOKEA_SHA:
+            raise RuntimeError("Hokea pin document disagrees with adapter revision")
+        directory = Path(package)
+        for name, expected in pin["package_files"].items():
+            path = directory / name
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+>               raise RuntimeError(f"Hokea source mismatch at {name}; require {HOKEA_SHA}")
+E               RuntimeError: Hokea source mismatch at check.py; require 427b94634b1736ba8e59d4977836162aa58bd2cb
+
+_project/tests/harness/hokea_adapter.py:27: RuntimeError
+=========================== short test summary info ============================
+ERROR test_entry.py::test_service_exchange - RuntimeError: Hokea source misma...
+2 deselected, 1 error in 0.10s
+hokea runner: pytest exited 1; artifacts ready — holding up to 600s for the launcher to copy runs/ out
+hokea: copied 1 run(s) into ./runs/: acceptance-hokea-20261030T200011-6bea445f
+hokea runner: copy-out confirmed; exiting
+hokea: pytest exited 1 — the output above is pytest's own

@@ -1,0 +1,46 @@
+{
+  "f6bb1d92-eeaf-44bc-b299-9b9af9b2f9de": {
+    "schema_version": 1,
+    "job_id": "f6bb1d92-eeaf-44bc-b299-9b9af9b2f9de",
+    "tasks": [
+      {
+        "task_id": "X",
+        "operation": "fixture_write",
+        "parameters": {
+          "value": 7,
+          "delay_ms": 20000
+        },
+        "parents": [],
+        "inputs": {},
+        "outputs": [
+          "value"
+        ]
+      },
+      {
+        "task_id": "Y",
+        "operation": "fixture_add",
+        "parameters": {
+          "amount": 1
+        },
+        "parents": [
+          "X"
+        ],
+        "inputs": {
+          "value": {
+            "task_id": "X",
+            "output_name": "value"
+          }
+        },
+        "outputs": [
+          "value"
+        ]
+      }
+    ],
+    "final_outputs": {
+      "result": {
+        "task_id": "Y",
+        "output_name": "value"
+      }
+    }
+  }
+}

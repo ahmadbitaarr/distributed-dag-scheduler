@@ -1,0 +1,408 @@
+{
+  "hokea_reference_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+  "hokea_package": {
+    "path": "/usr/local/lib/python3.12/site-packages/hokea",
+    "reference_revision": "427b94634b1736ba8e59d4977836162aa58bd2cb",
+    "matches_reference": false,
+    "differing_files": [
+      "check.py",
+      "cluster.py",
+      "kube.py",
+      "net.py",
+      "runner.py",
+      "runs.py",
+      "workload.py"
+    ],
+    "sha256": {
+      "__init__.py": "10b5a7778dd6fe9be5080fc8457aeb8518b4f7ce205b567f949a4512ae80e458",
+      "check.py": "6326f26d45fea3d1b07b23e789fc95cdd2cac952df92df8f562187de6d7f2c23",
+      "cli.py": "cefc678b1257ea9d3823ab077ac34ccc3d0ede5022ab85c732d1cab815e5fbf9",
+      "cluster.py": "7d66c4ce462be3fd9361efd04fea41facd141f7ea718fbcc74255373301b15e6",
+      "events.py": "29075ad1976467cb9ab1685f29a86864158a6d62721fe89ac010af660305604a",
+      "export.py": "c872df7bff5e6e109a53d676610b90b662c8fe479647d95dc37a2b1b3a39d13d",
+      "kube.py": "fece3601eb493eae982cc56b81c9e55a9a65b0eae4bd6c109977db93d2670eb4",
+      "net.py": "71271d86f46927a86b843bba99e657269c539c2eb5cccc2f244c2862fa59e206",
+      "proc.py": "70b5ee1f815ac7800d36ab3ad2fe181b5ccf330a2b7911d77c3d052b1cfc4882",
+      "pytest_plugin.py": "a8e02b5e4ce25e4905cb813c3452bd1f48ee7e7e2543336e0890953bdb45f144",
+      "runner.py": "fcaecb9327c1b6bba3e2c545d8f123722f68da298ea9f276be593a92302d2228",
+      "runner_entry.py": "211c7117a0297bc1046dc1c3a7045c4ab05e30fb6947b83f913beff00b162953",
+      "runs.py": "d23fc19f9a960c98a3c4ece445da986522aae9256647d8fcc576d906b912e938",
+      "workload.py": "60d82960ec08dbb7cf14e220775a56579473d1bf716ae227aaf04815fd9ca7ea"
+    }
+  },
+  "runtime": "kubernetes",
+  "namespace": "team-06",
+  "source_revision": "611c1de07d8f3e85bdf1f379cc46b8f55f147466",
+  "images": {
+    "scheduler": "ghcr.io/ahmadbitaarr/scheduler@sha256:65b2abd2b78746659366406791c157ae756be06de210102bd31afb08ab43ce59",
+    "artifact-store": "ghcr.io/ahmadbitaarr/artifact-store@sha256:02c9470377e24dcee6fdaa41b339485b04ffc55e72caee1a4f03b6b7ed01bf27",
+    "worker": "ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca"
+  },
+  "records": [
+    {
+      "role": "artifact-store",
+      "name": "artifact-store",
+      "node": "hokea-ms2-a9784b5c2f-artifact-store-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8081",
+        "DATA_DIR": "/data"
+      },
+      "observed": {
+        "instance_id": "2edf6b81-d94f-4439-97fe-0aa050c3f42e",
+        "running": true,
+        "gone": false,
+        "restart_policy": "Never",
+        "container_statuses": [
+          {
+            "allocatedResources": {
+              "cpu": "1",
+              "ephemeral-storage": "256Mi",
+              "memory": "512Mi"
+            },
+            "containerID": "containerd://826e56285f83b65f0b3a5ce37c2d75e262721f9172b11a8816b62ef896950f22",
+            "image": "sha256:8535b70632eca032409a95fad9c7346beaae1df5bdd0b0878136c359df45f1b3",
+            "imageID": "ghcr.io/ahmadbitaarr/artifact-store@sha256:02c9470377e24dcee6fdaa41b339485b04ffc55e72caee1a4f03b6b7ed01bf27",
+            "lastState": {},
+            "name": "main",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "ephemeral-storage": "512Mi",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "ephemeral-storage": "256Mi",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-10-30T20:04:36Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 0,
+                "supplementalGroups": [
+                  0
+                ],
+                "uid": 0
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "name": "kube-api-access-6gsl8",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "scheduler",
+      "name": "scheduler",
+      "node": "hokea-ms2-a9784b5c2f-scheduler-node1",
+      "node_index": 1,
+      "env": {
+        "PORT": "8080",
+        "ARTIFACT_BASE_URL": "http://node-1.hokea-ms2-a9784b5c2f-artifact-store-peers.team-06.svc.cluster.local:8081"
+      },
+      "observed": {
+        "instance_id": "d20053db-afce-428a-b9cf-d507ef5f6c0f",
+        "running": true,
+        "gone": false,
+        "restart_policy": "Never",
+        "container_statuses": [
+          {
+            "allocatedResources": {
+              "cpu": "1",
+              "ephemeral-storage": "256Mi",
+              "memory": "512Mi"
+            },
+            "containerID": "containerd://f9ec2a08bd7f53e70d8680e19113c265153ff0fdc1cf718024b0f07722cff307",
+            "image": "sha256:cd286075891bf147ece83ff33a808a0b18a6c3fe00a8f795440525cbfed584a4",
+            "imageID": "ghcr.io/ahmadbitaarr/scheduler@sha256:65b2abd2b78746659366406791c157ae756be06de210102bd31afb08ab43ce59",
+            "lastState": {},
+            "name": "main",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "ephemeral-storage": "512Mi",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "ephemeral-storage": "256Mi",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-10-30T20:04:39Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 999,
+                "supplementalGroups": [
+                  999
+                ],
+                "uid": 999
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "name": "kube-api-access-8g8sv",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-1",
+      "node": "hokea-ms2-a9784b5c2f-worker-1-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://node-1.hokea-ms2-a9784b5c2f-scheduler-peers.team-06.svc.cluster.local:8080",
+        "ARTIFACT_BASE_URL": "http://node-1.hokea-ms2-a9784b5c2f-artifact-store-peers.team-06.svc.cluster.local:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "dd65754c-14a3-4265-bbb5-d9d435e91a51",
+        "running": true,
+        "gone": false,
+        "restart_policy": "Never",
+        "container_statuses": [
+          {
+            "allocatedResources": {
+              "cpu": "1",
+              "ephemeral-storage": "256Mi",
+              "memory": "512Mi"
+            },
+            "containerID": "containerd://cb774f42f4b3de931ca4abe180fc40b934d7b499bead9ef8f331c3578fec88e5",
+            "image": "sha256:9cb38f983e13d7be24d54f25caf17d42d6a3d16d6fbc036b74d053d947a393a6",
+            "imageID": "ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca",
+            "lastState": {},
+            "name": "main",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "ephemeral-storage": "512Mi",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "ephemeral-storage": "256Mi",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-10-30T20:04:43Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 999,
+                "supplementalGroups": [
+                  999
+                ],
+                "uid": 999
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "name": "kube-api-access-xf555",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-2",
+      "node": "hokea-ms2-a9784b5c2f-worker-2-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://node-1.hokea-ms2-a9784b5c2f-scheduler-peers.team-06.svc.cluster.local:8080",
+        "ARTIFACT_BASE_URL": "http://node-1.hokea-ms2-a9784b5c2f-artifact-store-peers.team-06.svc.cluster.local:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "5a3610d4-b443-4bf6-a618-da5c155a2bd9",
+        "running": true,
+        "gone": false,
+        "restart_policy": "Never",
+        "container_statuses": [
+          {
+            "allocatedResources": {
+              "cpu": "1",
+              "ephemeral-storage": "256Mi",
+              "memory": "512Mi"
+            },
+            "containerID": "containerd://24b1718bc6819480c45236b32c45e6291be8ee179c0e2f2208cf8de18b6b7b87",
+            "image": "sha256:9cb38f983e13d7be24d54f25caf17d42d6a3d16d6fbc036b74d053d947a393a6",
+            "imageID": "ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca",
+            "lastState": {},
+            "name": "main",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "ephemeral-storage": "512Mi",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "ephemeral-storage": "256Mi",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-10-30T20:04:47Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 999,
+                "supplementalGroups": [
+                  999
+                ],
+                "uid": 999
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "name": "kube-api-access-xqx74",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "role": "worker",
+      "name": "worker-3",
+      "node": "hokea-ms2-a9784b5c2f-worker-3-node1",
+      "node_index": 1,
+      "env": {
+        "SCHEDULER_URL": "http://node-1.hokea-ms2-a9784b5c2f-scheduler-peers.team-06.svc.cluster.local:8080",
+        "ARTIFACT_BASE_URL": "http://node-1.hokea-ms2-a9784b5c2f-artifact-store-peers.team-06.svc.cluster.local:8081",
+        "POLL_INTERVAL_MS": "100",
+        "OPERATION_TIMEOUT_MS": "30000",
+        "ENABLE_TEST_HOOKS": "false"
+      },
+      "observed": {
+        "instance_id": "6d5b26cf-d51f-4463-bd20-bc06b735cfe2",
+        "running": true,
+        "gone": false,
+        "restart_policy": "Never",
+        "container_statuses": [
+          {
+            "allocatedResources": {
+              "cpu": "1",
+              "ephemeral-storage": "256Mi",
+              "memory": "512Mi"
+            },
+            "containerID": "containerd://852fdc3d193c4bba161de42c71d9d2896a3fc4155465d5100b556aafe95896a7",
+            "image": "sha256:9cb38f983e13d7be24d54f25caf17d42d6a3d16d6fbc036b74d053d947a393a6",
+            "imageID": "ghcr.io/ahmadbitaarr/worker@sha256:159416cdf9d8310544702787d46744a6e9b26eb5e7535ac4a1a1ecbad23fb6ca",
+            "lastState": {},
+            "name": "main",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "ephemeral-storage": "512Mi",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "1",
+                "ephemeral-storage": "256Mi",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-10-30T20:04:52Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 999,
+                "supplementalGroups": [
+                  999
+                ],
+                "uid": 999
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data"
+              },
+              {
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "name": "kube-api-access-zwv2w",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup_succeeded": true
+}

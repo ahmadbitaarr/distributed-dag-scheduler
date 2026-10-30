@@ -1,0 +1,32 @@
+{
+  "clock": "harness time.monotonic_ns relative to test origin; no cross-process subtraction",
+  "budget_ns": 10000000000,
+  "start_elapsed_ns": 9793209690,
+  "start_scheduler_event_seq": 26,
+  "late_threshold_ns": 8000000000,
+  "worker_a_identity": {
+    "scheduler_run_id": "2977e6a8-5a88-4e82-8342-ca574c740031",
+    "job_id": "aca66657-97c0-4224-8675-93987678e3c3",
+    "task_id": "X",
+    "attempt_no": 1,
+    "worker_session_id": "0ed2dc7e-7572-4d56-88c7-1092e77b6ca8"
+  },
+  "worker_b_session_id": "d097b850-c744-4d54-8882-8d76213a3710",
+  "samples": [
+    {
+      "started_elapsed_ns": 9793251810,
+      "snapshot_observed_elapsed_ns": 9798653131,
+      "finished_elapsed_ns": 9882567974,
+      "snapshot_event_seq": 26,
+      "last_scheduler_event_seq": 26,
+      "b_alive": true,
+      "b_empty_claims": 4,
+      "x_state": "SUCCEEDED",
+      "x_attempt_no": 2
+    }
+  ],
+  "end_elapsed_ns": 9887326241,
+  "actual_duration_ns": 94116551,
+  "deadline_overrun_ns": 0,
+  "recovered_within_window": true
+}
