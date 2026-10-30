@@ -27,6 +27,14 @@ def all_worker_events(system):
     return [e for w in system.workers for e in system.worker_events(w)]
 
 
+def held_by(system, jobs, worker):
+    """Unfinished attempts the worker's session owns right now, as (job_id, task_id, attempt_no)."""
+    session = system.worker_session(worker)
+    return [(m["job_id"], name, t["attempt_no"]) for m in jobs
+            for name, t in system.api.status(m["job_id"])["tasks"].items()
+            if t["owner"] == session and t["state"] in ("ASSIGNED", "RUNNING")]
+
+
 def test_lost_heartbeats_expire_the_lease_and_the_late_success_is_rejected(system):
     """A live worker whose renewals are all lost looks dead. Its later SUCCESS must not count."""
     a = system.start_worker(proxy=True)
@@ -175,10 +183,18 @@ def test_chaos_campaign_keeps_every_guarantee(system):
     jobs = [functional(400) for _ in range(6)]
     for m in jobs:
         system.api.submit(m)
+    # Each fault waits until its victim holds a task, so the campaign always tests recovery; a fixed
+    # instant can land between a worker's tasks. Replies already inside the proxy get 0.5 s to land.
     time.sleep(1.5)
-    system.kill_worker(workers[0])                     # crash, holding work or not
-    time.sleep(1.0)
+    wait_for(lambda: held_by(system, jobs, workers[0]), description="worker-1 holding a task")
+    system.kill_worker(workers[0])                     # crash while holding work
+    time.sleep(0.5)
+    orphaned = held_by(system, jobs, workers[0])
+    time.sleep(0.5)
+    wait_for(lambda: held_by(system, jobs, workers[1]), description="worker-2 holding a task")
     system.pause_worker(workers[1])                    # long freeze: longer than the lease
+    time.sleep(0.5)
+    orphaned += held_by(system, jobs, workers[1])
     replacement = system.start_worker()
     time.sleep(7.0)
     system.resume_worker(workers[1])
@@ -191,7 +207,9 @@ def test_chaos_campaign_keeps_every_guarantee(system):
         check_history(m, snapshot, events, worker_events)
     keys = [(e["job_id"], e["task_id"]) for e in events if e["event_type"] == "task_succeeded"]
     assert len(keys) == len(set(keys)) == 6 * 5
-    assert any(e["event_type"] == "lease_expired" for e in events), "the crash or the pause must have cost a lease"
+    assert orphaned, "the crash or the pause must have caught a worker holding a task"
+    expired = {(e["job_id"], e["task_id"], e["attempt_no"]) for e in events if e["event_type"] == "lease_expired"}
+    assert set(orphaned) <= expired, "every attempt the crashed or frozen worker held must have expired"
     injected = sum(len(system.proxy(w).applied("drop_request")) + len(system.proxy(w).applied("drop_response")) for w in workers)
     assert injected > 0
     assert system.worker_running(replacement) and system.worker_running(workers[1])
